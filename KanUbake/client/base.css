@@ -1,0 +1,202 @@
+@font-face {
+    font-family: "Delius Swash Caps";
+    src: url("./DeliusSwashCaps-Regular.ttf");
+    /* free font provided by fontsquirrel.com 
+    https://www.fontsquirrel.com/license/delius-swash-caps
+    accessed: 2026-05-03, 22:02 */
+}
+
+body {
+    font-family: "Delius Swash Caps", Arial, Verdana, Geneva, sans-serif;
+    letter-spacing: 0.5px;
+    margin: 0;
+    font-size: medium;
+
+    /*
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    grid-template-areas:
+        "h"
+        "n"
+        "m"
+        "f";
+        */
+}
+
+/*
+@media (min-width: 700px) {
+    body {
+        width: 100%;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "h h"
+            "n n"
+            "m m"
+            "f f";
+    }
+}
+    */
+
+h2,
+h3,
+h4,
+p {
+    color: #5f3526;
+    text-align: center;
+    margin: 0 20% 0 20%;
+    line-height: 1.5;
+}
+
+h1 {
+    color: #ffffff;
+    text-align: center;
+    letter-spacing: 3px;
+    font-size: 220%;
+}
+
+h2 {
+    background-color: #fff4e6;
+    border-radius: 30px;
+    padding: 10px 30px 10px 30px;
+    font-size: 150%;
+    margin: 40px 0 20px 0;
+}
+
+p {
+    background: #fff;
+    padding: 15px;
+    border-radius: 18px;
+    font-family: Arial, Verdana, Geneva, sans-serif;
+    margin: 20px 20% 20px 20%;
+}
+
+/* for accessibility; maybe not on EVERYTHING ... 
+p:hover {
+    font-size: 20px;
+}
+*/
+
+a {
+    color: #e07a5f;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.login {
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 10%;
+}
+
+.login a {
+    background-color: #fff0f0;
+    padding: 8px 16px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #5f3526;
+    font-weight: bolder;
+    border: solid 1.5px;
+}
+
+.login a:hover {
+    background: #f3e1fa;
+}
+
+
+
+nav ul {
+    list-style-type: none;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 0;
+}
+
+li {
+    background-color: #fde5e5;
+    border-radius: 18px;
+    padding: 20px;
+}
+
+article {
+    background-color: #ecb5b5;
+    border-radius: 18px;
+    border: #e07a5f solid;
+    padding: 24px;
+    margin: 20px 20% 20px 20%;
+}
+
+article:hover {
+    box-shadow: 0 12px 50px rgba(82, 14, 14, 0.12);
+    background: #eeaa99;
+}
+
+.imglogo {
+    margin-left: 10%;
+}
+
+header {
+    padding: 30px;
+    background: linear-gradient(45deg, #e07a5f, #e99494);
+    grid-area: h;
+}
+
+nav {
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    grid-area: n;
+    padding: 20px;
+}
+
+main {
+    background: linear-gradient(180deg, rgb(227, 205, 235) 0%, #cd9fe0 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    grid-area: m;
+}
+
+footer {
+    background: linear-gradient(45deg, #e07a5f, #e99494);
+    grid-area: f;
+    padding: 10px;
+}
+
+p.footerbox {
+    background-color: #fde5e5;
+    margin: 30px 10% 30px 10%;
+}
+
+.nav-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.nav-buttons a {
+    background-color: #fde5e5;
+    padding: 10px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #5f3526;
+    font-weight: bold;
+    border: #5f3526 solid 1.5px;
+}
+
+.nav-buttons a:hover {
+    background: #fabeaf;
+}
+
+/* 
+inspo: 
+
+border-bottom: 1px solid #5c3a2e;
+
+*/

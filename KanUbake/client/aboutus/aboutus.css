@@ -1,0 +1,5 @@
+@import url(../base.css);
+
+main {
+    background: linear-gradient(180deg, rgb(197, 224, 165) 0%, #a2dac4 100%);
+}
