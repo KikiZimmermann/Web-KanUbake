@@ -1,0 +1,16 @@
+@import url(../base.css);
+
+main {
+    background: linear-gradient(180deg, rgb(248, 215, 166) 0%, #f1ba6c 100%);
+}
+
+div.introduction {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+p.websitelink {
+    width: 90%;
+    font-weight: normal;
+}
