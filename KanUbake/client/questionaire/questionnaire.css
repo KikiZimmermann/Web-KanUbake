@@ -1,0 +1,38 @@
+@import url(../base.css);
+
+
+
+main {
+  
+  background: linear-gradient(180deg, rgb(241, 167, 177) 0%, #f3c1d4 100%);
+}
+
+form {
+  width: 1000px;
+}
+
+
+form div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+
+
+label {
+  width: 180px;
+  font-weight: bold;
+  padding-top: 6px;
+}
+
+input,
+select,
+textarea {
+  flex: 1;
+  min-width: 300px; /* optional, damit sie nicht zu klein werden */
+}
+
+
+
