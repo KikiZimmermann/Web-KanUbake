@@ -24,11 +24,11 @@
 
 /* ── Tokens ──────────────────────────────────────────── */
 :root {
-  --dark-brown:   #492a1e;
-  --light-pink:   #f6e0e0;
-  --warm-white:   #fff4e6;
-  --shadow-warm:  0 4px 24px rgba(122, 59, 30, 0.12),
-                  0 1px 4px  rgba(122, 59, 30, 0.08);
+  --dark-brown: #492a1e;
+  --light-pink: #f6e0e0;
+  --warm-white: #fff4e6;
+  --shadow-warm: 0 4px 24px rgba(122, 59, 30, 0.12),
+    0 1px 4px rgba(122, 59, 30, 0.08);
 }
 
 /* ── Links ───────────────────────────────────────────── */
@@ -64,8 +64,14 @@ input:focus {
 }
 
 @keyframes warmPulse {
-  0%   { box-shadow: 0 0 0 0px  rgba(122, 59, 30, 0.4); border-color: #7a3b1e; }
-  100% { box-shadow: 0 0 0 8px  rgba(122, 59, 30, 0);   border-color: #7a3b1e; }
+  0% {
+    box-shadow: 0 0 0 0px rgba(122, 59, 30, 0.4);
+    border-color: #7a3b1e;
+  }
+  100% {
+    box-shadow: 0 0 0 8px rgba(122, 59, 30, 0);
+    border-color: #7a3b1e;
+  }
 }
 
 /* ── Buttons ─────────────────────────────────────────── */
