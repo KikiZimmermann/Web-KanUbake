@@ -4,6 +4,6 @@ document.querySelectorAll('a').forEach(a => {
     e.preventDefault();
     const href = a.href;
     document.body.style.opacity = '0';
-    setTimeout(() => location.href = href, 200);
+    setTimeout(() => location.href = href, 150);
   });
 });
