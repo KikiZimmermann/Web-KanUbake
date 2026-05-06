@@ -1,0 +1,96 @@
+/* ── Tablet & up ─────────────────────────────────────── */
+@media (min-width: 764px) {
+  html {
+    font-size: 10px;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #cd9fe0;
+  }
+
+  .card {
+    width: 30vw;
+    margin: 1rem;
+  }
+
+  /* Home icon */
+  .hompage-btn {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 4rem;
+    height: 4rem;
+    padding: 0.5rem;
+    border-radius: 0 0 1rem;
+    background-color: #b992c9;
+  }
+
+  /* Form card */
+  .form_basic {
+    /* margin: 3rem 0; */
+    border-radius: 1rem;
+    align-items: center;
+    padding: 1rem;
+    box-shadow: var(--shadow-warm);
+  }
+
+  /* Nav toggle pill */
+  .nav-btn {
+    flex-direction: row;
+    width: 100%;
+    border-radius: 10rem;
+    justify-content: space-evenly;
+    align-items: center;
+    height: auto;
+    padding: 0.5rem;
+  }
+
+  .nav-btn .btn {
+    width: 100%;
+    border-radius: 10rem;
+  }
+
+  .lbl {
+    width: 80%;
+  }
+
+  #log_in {
+    width: 40%;
+  }
+
+  /* ── Sign-up page overrides ────────────────────────── */
+  body.page-signup {
+    justify-content: flex-start;
+    padding: 2rem;
+    height: auto;
+  }
+
+  body.page-signup header{
+    margin: 3rem 0;
+  }
+
+  body.page-signup .card {
+    width: 30vw;
+  }
+
+  body.page-signup .form_basic {
+    gap: 2rem;
+  }
+
+  #sign_up{
+    width: 40%;
+  }
+}
+
+/* ── Desktop ─────────────────────────────────────────── */
+@media (min-width: 1080px) {
+  html {
+    font-size: 15px;
+  }
+}

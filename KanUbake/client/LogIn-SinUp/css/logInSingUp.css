@@ -1,0 +1,61 @@
+@import url(./base.css);
+
+/* ── Page shell ──────────────────────────────────────── */
+body {
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+html {
+  font-size: 25px;
+}
+
+/* ── Form layout ─────────────────────────────────────── */
+.form_basic {
+  background-color: var(--warm-white);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+  padding-bottom: 0.3rem;
+}
+
+/* ── Labels ──────────────────────────────────────────── */
+.lbl {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  color: var(--dark-brown);
+  margin: 0 1rem;
+}
+
+/* ── Nav toggle ──────────────────────────────────────── */
+.nav-btn {
+  width: 100%;
+  background-color: var(--dark-brown);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.2rem;
+  height: 6rem;
+}
+
+/* ── Submit button ───────────────────────────────────── */
+.form_basic > .btn:last-child {
+  font-weight: bold;
+  padding: 1.8rem;
+  margin: 0 0.5rem 0.2rem;
+  background-color: #ebd3d3;
+  border: 0.05rem solid var(--dark-brown);
+}
+
+/* ── Home icon (mobile: hidden) ──────────────────────── */
+.hompage-btn {
+  display: none;
+}
+
+/* ── Header ──────────────────────────────────────────── */
+header {
+  text-align: center;
+  color: var(--dark-brown);
+}

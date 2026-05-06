@@ -1,0 +1,93 @@
+@font-face {
+  font-family: "Delius Swash Caps";
+  src: url("../../DeliusSwashCaps-Regular.ttf");
+  /* free font provided by fontsquirrel.com
+     https://www.fontsquirrel.com/license/delius-swash-caps
+     accessed: 2026-05-03 */
+}
+
+/* ── Reset ───────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Delius Swash Caps";
+  font-size: 1.25rem;
+}
+
+*::selection {
+  background: rgba(122, 59, 30, 0.25);
+  color: #3d1f10;
+}
+
+/* ── Tokens ──────────────────────────────────────────── */
+:root {
+  --dark-brown:   #492a1e;
+  --light-pink:   #f6e0e0;
+  --warm-white:   #fff4e6;
+  --shadow-warm:  0 4px 24px rgba(122, 59, 30, 0.12),
+                  0 1px 4px  rgba(122, 59, 30, 0.08);
+}
+
+/* ── Links ───────────────────────────────────────────── */
+a:link,
+a:visited {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ── Typography ──────────────────────────────────────── */
+h1 {
+  font-weight: bold;
+  font-size: 2rem;
+}
+
+/* ── Inputs ──────────────────────────────────────────── */
+input {
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+  padding: 1.5rem;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  box-shadow: var(--shadow-warm);
+  transition: all 0.2s;
+}
+
+input:focus {
+  outline: none;
+  background-color: var(--light-pink);
+  font-weight: bold;
+  animation: warmPulse 1.5s infinite;
+}
+
+@keyframes warmPulse {
+  0%   { box-shadow: 0 0 0 0px  rgba(122, 59, 30, 0.4); border-color: #7a3b1e; }
+  100% { box-shadow: 0 0 0 8px  rgba(122, 59, 30, 0);   border-color: #7a3b1e; }
+}
+
+/* ── Buttons ─────────────────────────────────────────── */
+.btn {
+  border: none;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--light-pink);
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  font-weight: bold;
+  filter: brightness(0.92);
+}
+
+.btn-disabled {
+  background-color: var(--dark-brown);
+  color: var(--light-pink);
+}
