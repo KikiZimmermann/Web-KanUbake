@@ -1,9 +1,10 @@
 window.addEventListener('load', () => document.body.style.opacity = '1');
 document.querySelectorAll('a').forEach(a => {
   a.addEventListener('click', e => {
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('#')) return; // ← skip same-page anchors
     e.preventDefault();
-    const href = a.href;
     document.body.style.opacity = '0';
-    setTimeout(() => location.href = href, 150);
+    setTimeout(() => location.href = a.href, 150);
   });
 });

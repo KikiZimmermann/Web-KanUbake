@@ -20,8 +20,8 @@
     <section class="card">
       <form autocomplete="off" action="" class="form_basic">
         <nav class="nav-btn">
-          <a class="btn btn-disabled" href="./LogIn.html">Log In</a>
-          <a class="btn" href="#sign_up">Sign Up</a>
+          <a title="go to log in form" class="btn btn-disabled" href="./LogIn.html">Log In</a>
+          <a title="go to sign up button" class="btn" href="#sign_up">Sign Up</a>
         </nav>
 
         <header>
@@ -31,17 +31,28 @@
 
         <label for="first_name" class="lbl">
           First Name
-          <input placeholder="KanU" id="first_name" type="text" />
+          <input
+            title="Please enter your first name"
+            placeholder="KanU"
+            id="first_name"
+            type="text"
+          />
         </label>
 
         <label for="last_name" class="lbl">
           Last Name
-          <input placeholder="Bake" id="last_name" type="text" />
+          <input
+            title="Please enter your last name"
+            placeholder="Bake"
+            id="last_name"
+            type="text"
+          />
         </label>
 
         <label for="login_email" class="lbl">
           Email
           <input
+            title="Please enter your email address"
             placeholder="KanUbake@gmail.com"
             id="login_email"
             type="email"
@@ -51,19 +62,23 @@
 
         <label for="date_of_birth" class="lbl">
           Date of Birth
-          <input id="date_of_birth" type="date" />
+          <input
+            title="Please pick your date of brith"
+            id="date_of_birth"
+            type="date"
+          />
           <p></p>
         </label>
 
         <label for="login_pass" class="lbl">
           Password
-          <input placeholder="••••••••" id="login_pass" type="password" />
+          <input title="Please enter your password" placeholder="••••••••" id="login_pass" type="password" />
           <p></p>
         </label>
 
         <label for="login_pass_confirm" class="lbl">
           Confirm Password
-          <input
+          <input title="Please confirm your password"
             placeholder="••••••••"
             id="login_pass_confirm"
             type="password"
@@ -71,7 +86,7 @@
           <p></p>
         </label>
 
-        <button type="button" id="sign_up" class="btn">Sign Up</button>
+        <button title="press button to sign up" type="button" id="sign_up" class="btn">Sign Up</button>
       </form>
     </section>
     <script src="../js/transition-between-pages.js"></script>
