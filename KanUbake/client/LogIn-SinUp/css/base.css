@@ -94,6 +94,6 @@ input:focus {
 }
 
 .btn-disabled {
-  background-color: var(--dark-brown);
-  color: var(--light-pink);
+  background-color: gray;
+  color: var(--light-pink) !important;
 }

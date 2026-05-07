@@ -32,7 +32,7 @@ html {
 /* ── Nav toggle ──────────────────────────────────────── */
 .nav-btn {
   width: 100%;
-  background-color: var(--dark-brown);
+  background-color: gray;
   display: flex;
   flex-direction: column;
   gap: 0.4rem;

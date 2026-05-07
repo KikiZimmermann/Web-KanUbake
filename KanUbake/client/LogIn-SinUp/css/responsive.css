@@ -14,7 +14,7 @@
   }
 
   .card {
-    width: 30vw;
+    width: 30rem;
     margin: 1rem;
   }
 
@@ -76,7 +76,7 @@
   }
 
   body.page-signup .card {
-    width: 30vw;
+    width: 30rem;
   }
 
   body.page-signup .form_basic {
