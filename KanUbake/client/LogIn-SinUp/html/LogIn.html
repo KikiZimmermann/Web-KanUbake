@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../css/logInSingUp.css" />
     <link rel="stylesheet" href="../css/responsive.css" />
     <link rel="stylesheet" href="../css/transition-between-pages.css">
+    <link rel="stylesheet" href="../css/validation.css">
   </head>
   <body>
     <a href="../../index/index.html" title="Go to Home Page">
@@ -31,14 +32,18 @@
 
         <label for="login_email" class="lbl">
           Email
-          <input title="Please enter your email address" placeholder="KanUbake@gmail.com" id="login_email" type="email" />
-          <p></p>
+          <input maxlength="50" title="Please enter your email address" placeholder="KanUbake@gmail.com" id="login_email" type="email" />
+          <p>
+            
+          </p>
         </label>
 
         <label title="Please enter your password" for="login_pass" class="lbl">
           Password
-          <input placeholder="••••••••" id="login_pass" type="password" />
-          <p></p>
+          <input maxlength="50" placeholder="••••••••" id="login_pass" type="password" />
+          <p>
+            
+          </p>
         </label>
 
         <button title="press button to log in" type="button" id="log_in" class="btn">Log In</button>
@@ -47,5 +52,6 @@
     <script src="../js/transition-between-pages.js"></script>
 
     <script src="../js/show-hide-pass.js"></script>
+    <script src="../js/validation.js"></script>
   </body>
 </html>
