@@ -6,11 +6,15 @@
     <title>Sign Up</title>
     <link rel="stylesheet" href="../css/logInSingUp.css" />
     <link rel="stylesheet" href="../css/responsive.css" />
-    <link rel="stylesheet" href="../css/transition-between-pages.css">
+    <link rel="stylesheet" href="../css/transition-between-pages.css" />
   </head>
   <body class="page-signup">
     <a href="../../index/index.html" title="Go to Home Page">
-      <img class="hompage-btn btn" src="../../img/logos/home-icon-silhouette-svgrepo-com.svg" alt="Back To Homepage" />
+      <img
+        class="hompage-btn btn"
+        src="../../img/logos/home-icon-silhouette-svgrepo-com.svg"
+        alt="Back To Homepage"
+      />
     </a>
 
     <section class="card">
@@ -27,17 +31,21 @@
 
         <label for="first_name" class="lbl">
           First Name
-          <input id="first_name" type="text" />
+          <input placeholder="KanU" id="first_name" type="text" />
         </label>
 
         <label for="last_name" class="lbl">
           Last Name
-          <input id="last_name" type="text" />
+          <input placeholder="Bake" id="last_name" type="text" />
         </label>
 
         <label for="login_email" class="lbl">
           Email
-          <input id="login_email" type="email" />
+          <input
+            placeholder="KanUbake@gmail.com"
+            id="login_email"
+            type="email"
+          />
           <p></p>
         </label>
 
@@ -49,13 +57,17 @@
 
         <label for="login_pass" class="lbl">
           Password
-          <input id="login_pass" type="password" />
+          <input placeholder="••••••••" id="login_pass" type="password" />
           <p></p>
         </label>
 
         <label for="login_pass_confirm" class="lbl">
           Confirm Password
-          <input id="login_pass_confirm" type="password" />
+          <input
+            placeholder="••••••••"
+            id="login_pass_confirm"
+            type="password"
+          />
           <p></p>
         </label>
 
@@ -63,5 +75,7 @@
       </form>
     </section>
     <script src="../js/transition-between-pages.js"></script>
+
+    <script src="../js/show-hide-pass.js"></script>
   </body>
 </html>
