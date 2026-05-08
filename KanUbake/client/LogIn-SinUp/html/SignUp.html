@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="../css/logInSingUp.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
+    <link rel="stylesheet" href="../css/transition-between-pages.css" />
+    <link rel="stylesheet" href="../css/validation.css" />
+  </head>
+  <body class="page-signup">
+    <a href="../../index/index.html" title="Go to Home Page">
+      <img
+        class="hompage-btn btn"
+        src="../../img/logos/home-icon-silhouette-svgrepo-com.svg"
+        alt="Back To Homepage"
+      />
+    </a>
+
+    <section class="card">
+      <form autocomplete="off" action="" class="form_basic">
+        <nav class="nav-btn">
+          <a
+            title="go to log in form"
+            class="btn btn-disabled"
+            href="./LogIn.html"
+            >Log In</a
+          >
+          <a title="go to sign up button" class="btn" href="#sign_up"
+            >Sign Up</a
+          >
+        </nav>
+
+        <header>
+          <h1>Get Started Now</h1>
+          <p>Create an account to explore our app</p>
+        </header>
+
+        <label for="first_name" class="lbl">
+          First Name
+          <input
+            maxlength="50"
+            title="Please enter your first name"
+            placeholder="KanU"
+            id="first_name"
+            type="text"
+          />
+          <p></p>
+        </label>
+
+        <label maxlength="50" for="last_name" class="lbl">
+          Last Name
+          <input
+            title="Please enter your last name"
+            placeholder="Bake"
+            id="last_name"
+            type="text"
+          />
+          <p></p>
+        </label>
+
+        <label maxlength="50" for="login_email" class="lbl">
+          Email
+          <input
+            title="Please enter your email address"
+            placeholder="KanUbake@gmail.com"
+            id="login_email"
+            type="email"
+          />
+          <p></p>
+        </label>
+
+        <label for="date_of_birth" class="lbl">
+          Date of Birth
+          <input
+            title="Please pick your date of brith"
+            id="date_of_birth"
+            type="date"
+          />
+          <p></p>
+        </label>
+
+        <label maxlength="50" for="login_pass" class="lbl">
+          Password
+          <input
+            title="Please enter your password"
+            placeholder="••••••••"
+            id="login_pass"
+            type="password"
+          />
+          <p></p>
+        </label>
+
+        <label maxlength="50" for="login_pass_confirm" class="lbl">
+          Confirm Password
+          <input
+            title="Please confirm your password"
+            placeholder="••••••••"
+            id="login_pass_confirm"
+            type="password"
+          />
+          <p></p>
+        </label>
+
+        <button
+          title="press button to sign up"
+          type="button"
+          id="sign_up"
+          class="btn"
+        >
+          Sign Up
+        </button>
+      </form>
+    </section>
+    <script src="../js/transition-between-pages.js"></script>
+
+    <script src="../js/show-hide-pass.js"></script>
+    <script src="../js/validation.js"></script>
+  </body>
+</html>
