@@ -1,0 +1,37 @@
+[
+  {
+    "firstName": "ali",
+    "lastName": "kia",
+    "email": "kia@gamil.com",
+    "dateOfBirth": "1999-12-09",
+    "password": "$2b$10$Cxi8la6j9dfSmUhs2XlmneLCTAN2CJ.8PNXogW0sPR9Le5sT4iKiu"
+  },
+  {
+    "firstName": "",
+    "lastName": "",
+    "email": "",
+    "dateOfBirth": "",
+    "password": "$2b$10$aaYFhFG41K1an2Xhn0f.uuBfh/f8E/UXpHg0zn510IWLR4E3xUoI6"
+  },
+  {
+    "firstName": "ali",
+    "lastName": "fee",
+    "email": "ali@gamil.com",
+    "dateOfBirth": "0010-12-08",
+    "password": "$2b$10$5U5Lti0/3Q4CjDkMuXooNOz1UjNQ031l/11yPs5UtW2h689BLma7i"
+  },
+  {
+    "firstName": "ali",
+    "lastName": "kia",
+    "email": "test@gamil.com",
+    "dateOfBirth": "2001-12-09",
+    "password": "$2b$10$0/ivYqAniToXfzy389kfg.DfjmPOElFPHWf70//4FRiZ69Z85sZL."
+  },
+  {
+    "firstName": "ali",
+    "lastName": "kia",
+    "email": "ali@gmail.com",
+    "dateOfBirth": "2001-12-09",
+    "password": "$2b$10$n7IjkKhcPkRyg1jOf.fMKeycEdBDGBnPXx99HX784lybpo/B/D3ku"
+  }
+]

@@ -6,10 +6,18 @@
     <title>Log In</title>
     <link rel="stylesheet" href="../css/logInSingUp.css" />
     <link rel="stylesheet" href="../css/responsive.css" />
-    <link rel="stylesheet" href="../css/transition-between-pages.css">
-    <link rel="stylesheet" href="../css/validation.css">
+    <link rel="stylesheet" href="../css/transition-between-pages.css" />
+    <link rel="stylesheet" href="../css/validation.css" />
+    <link rel="stylesheet" href="../css/popup.css">
   </head>
   <body>
+    <div id="popup" class="popup">
+      <img
+        src="../../img/logos/fail-svgrepo-com.svg"
+        alt="log in failed"
+      />
+      <p id="popupMessage">Login failed</p>
+    </div>
     <a href="../../index/index.html" title="Go to Home Page">
       <img
         class="hompage-btn btn"
@@ -22,7 +30,12 @@
       <form autocomplete="off" action="" class="form_basic">
         <nav class="nav-btn">
           <a title="go to log in button" class="btn" href="#log_in">Log In</a>
-          <a title="go to sign up form " class="btn btn-disabled" href="./SignUp.html">Sign Up</a>
+          <a
+            title="go to sign up form "
+            class="btn btn-disabled"
+            href="./SignUp.html"
+            >Sign Up</a
+          >
         </nav>
 
         <header>
@@ -32,26 +45,42 @@
 
         <label for="login_email" class="lbl">
           Email
-          <input maxlength="50" title="Please enter your email address" placeholder="KanUbake@gmail.com" id="login_email" type="email" />
-          <p>
-            
-          </p>
+          <input
+            maxlength="50"
+            title="Please enter your email address"
+            placeholder="KanUbake@gmail.com"
+            id="login_email"
+            type="email"
+          />
+          <p></p>
         </label>
 
         <label title="Please enter your password" for="login_pass" class="lbl">
           Password
-          <input maxlength="50" placeholder="••••••••" id="login_pass" type="password" />
-          <p>
-            
-          </p>
+          <input
+            maxlength="50"
+            placeholder="••••••••"
+            id="login_pass"
+            type="password"
+          />
+          <p></p>
         </label>
 
-        <button title="press button to log in" type="button" id="log_in" class="btn">Log In</button>
+        <button
+          title="press button to log in"
+          type="button"
+          id="log_in"
+          class="btn"
+        >
+          Log In
+        </button>
       </form>
     </section>
     <script src="../js/transition-between-pages.js"></script>
 
     <script src="../js/show-hide-pass.js"></script>
     <script src="../js/validation.js"></script>
+    <script src="../js/popup.js"></script>
+    <script src="../js/login.js"></script>
   </body>
 </html>

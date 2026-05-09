@@ -8,8 +8,14 @@
     <link rel="stylesheet" href="../css/responsive.css" />
     <link rel="stylesheet" href="../css/transition-between-pages.css" />
     <link rel="stylesheet" href="../css/validation.css" />
+    <link rel="stylesheet" href="../css/popup.css">
   </head>
   <body class="page-signup">
+    <div id="popup" class="popup">
+      <img src="../../img/logos/fail-svgrepo-com.svg" alt="failed" />
+      <p id="popupMessage">Signup failed</p>
+    </div>
+
     <a href="../../index/index.html" title="Go to Home Page">
       <img
         class="hompage-btn btn"
@@ -114,8 +120,9 @@
       </form>
     </section>
     <script src="../js/transition-between-pages.js"></script>
-
     <script src="../js/show-hide-pass.js"></script>
     <script src="../js/validation.js"></script>
+    <script src="../js/popup.js"></script>   
+    <script src="../js/signup.js"></script>
   </body>
 </html>
