@@ -44,7 +44,7 @@ app.post("/token", function (req, res) {
     if (err) return res.sendStatus(403);
 
     // create a new short-lived access token and send it back
-    const accessToken = generateAccessToken({ name: user.name });
+    const accessToken = generateAccessToken({ email: user.email });
     res.json({ accessToken: accessToken });
   });
 });
@@ -84,9 +84,9 @@ app.post("/login", async function (req, res) {
   }
 
   // credentials are correct! create the user object to put in the token
-  const user = { name: email };
+  const user = { email: email };
 
-  // create a short-lived access token (expires in 20 seconds)
+  // create a short-lived access token (expires in 1000 seconds)
   const accessToken = generateAccessToken(user);
 
   // create a long-lived refresh token (never expires unless logged out)
@@ -102,7 +102,7 @@ app.post("/login", async function (req, res) {
 // helper function — creates a signed access token that expires in 20 seconds
 // jwt.sign puts the user data inside the token and locks it with the secret key
 function generateAccessToken(user) {
-  return jwt.sign(user, process.env.ACCESS_TOKEN, { expiresIn: "20s" });
+  return jwt.sign(user, process.env.ACCESS_TOKEN, { expiresIn: "1000s" });
 }
 
 // endpoint to sign up — creates a new user account
@@ -137,8 +137,8 @@ app.post("/signup", async function (req, res) {
   };
 
   // add to the list and save back to file
-  users.push(newUser);
-  fs.writeFileSync(__dirname + "/users.json", JSON.stringify(users, null, 2));
+  users.push(newUser); //Json
+  fs.writeFileSync(__dirname + "/users.json", JSON.stringify(users, null, 2)); //Datenbank
 
   // 201 = Created — account was successfully created
   res.sendStatus(201);
