@@ -33,5 +33,33 @@
     "email": "ali@gmail.com",
     "dateOfBirth": "2001-12-09",
     "password": "$2b$10$n7IjkKhcPkRyg1jOf.fMKeycEdBDGBnPXx99HX784lybpo/B/D3ku"
+  },
+  {
+    "firstName": "a",
+    "lastName": "k",
+    "email": "test@gmail.com",
+    "dateOfBirth": "2000-01-01",
+    "password": "$2b$10$E9Y49fDPYMQonDvwDi24bOqftEvfDuL44wbweh1jkI1cKFWmRtDwu"
+  },
+  {
+    "firstName": "max",
+    "lastName": "musterman",
+    "email": "max@gmail.com",
+    "dateOfBirth": "1999-12-01",
+    "password": "$2b$10$rXIuiBS74PjJoqqEQGyMuucWgPx/lZhdmc97acMaOxuVn4ttkNaIC"
+  },
+  {
+    "firstName": "ali",
+    "lastName": "kia",
+    "email": "a@gmail.com",
+    "dateOfBirth": "1999-02-02",
+    "password": "$2b$10$72ouiIpzaqenWuVSYFUvL.XCD2XNXHS8qPTVHByvIS.PsW7bIjlX6"
+  },
+  {
+    "firstName": "al",
+    "lastName": "ki",
+    "email": "ki@gmail.com",
+    "dateOfBirth": "1999-01-02",
+    "password": "$2b$10$Lhsun/TUzSOCf0lVGta.b.cdo3ai9qN.7kYJxM./5zzwepX95H0dO"
   }
 ]
