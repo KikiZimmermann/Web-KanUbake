@@ -3,7 +3,7 @@
 
 
 main {
-  
+
   background: linear-gradient(180deg, rgb(241, 167, 177) 0%, #f3c1d4 100%);
 }
 
@@ -31,8 +31,6 @@ input,
 select,
 textarea {
   flex: 1;
-  min-width: 300px; /* optional, damit sie nicht zu klein werden */
+  min-width: 300px;
+  /* optional, damit sie nicht zu klein werden */
 }
-
-
-
