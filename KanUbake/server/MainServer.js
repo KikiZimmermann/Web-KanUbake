@@ -11,7 +11,7 @@ app.use(express.json())
 //Eine Funktion zum testen
 app.get('/test', authenticateToken, function (req, res) {
     const users = JSON.parse(fs.readFileSync(__dirname + "/users.json"));
-    const existingUser = users.find((user) => user.email === "testtest@gmail.com");
+    const existingUser = users.find((user) => user.email === req.user.email);
     res.json(existingUser);
 })
 
