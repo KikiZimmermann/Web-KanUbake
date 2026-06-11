@@ -2,4 +2,6 @@
 
 main {
     background: linear-gradient(180deg, rgb(167, 168, 241) 0%, #c1e3f3 100%);
+    border-left: rgb(143, 144, 216) solid;
+    border-right: rgb(143, 144, 216) solid;
 }
