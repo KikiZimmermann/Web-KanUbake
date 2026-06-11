@@ -25,7 +25,18 @@ window.onload = function () {
   }
 
   // when user confirms logout
-  document.getElementById("confirmLogout").addEventListener("click", () => {
+  document.getElementById("confirmLogout").addEventListener("click", async () => {
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    // tell the server to invalidate the refresh token
+    if (refreshToken) {
+      await fetch("http://localhost:4010/logout", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: refreshToken }),
+      }).catch(() => {}); // ignore network errors — still log out locally
+    }
+
     // remove both tokens from localStorage — user is now logged out
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
