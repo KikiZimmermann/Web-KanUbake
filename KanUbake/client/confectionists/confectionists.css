@@ -22,8 +22,6 @@
     padding-bottom: 5%;
 }
 
-
-
 main {
     background: linear-gradient(180deg, rgb(248, 215, 166) 0%, #f1ba6c 100%);
     border-left: rgb(245, 196, 123) solid;
@@ -40,10 +38,13 @@ div.introduction {
 article.showcase {
     padding: 20px;
     margin: 0;
-
 }
 
 p.websitelink {
     width: 90%;
     margin: auto 0 0 0;
+}
+
+.core {
+    margin-bottom: 10px;
 }

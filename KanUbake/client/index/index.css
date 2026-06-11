@@ -14,4 +14,9 @@ main {
     article {
         width: 90%;
     }
+
+    h3 {
+        margin: 20px 5%;
+    }
+
 }
