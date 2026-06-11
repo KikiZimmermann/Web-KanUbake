@@ -54,5 +54,5 @@ async function fetchWithAuth(url, options = {}) {
 }
 
 function redirectToLogin() {
-  window.location.href = "/client/LogIn-SinUp/html/LogIn.html";
+  window.location.href = "/KanUbake/client/LogIn-SinUp/html/LogIn.html";
 }
