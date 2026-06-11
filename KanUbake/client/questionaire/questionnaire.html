@@ -1,11 +1,15 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html>
+<html lang="en">
 
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Questionnaire</title>
-  <link rel="stylesheet" href="questionnaire.css">
+  <link rel="stylesheet" href="questionnaire.css" />
+  <link rel="stylesheet" href="../authBtn.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../authBtn.js"></script>
+  <script type="module" src="questionnaire.js" defer></script>
 </head>
 
 <body>
@@ -19,111 +23,59 @@
   <nav id="nav"></nav>
   <script src="../fixedLayout/nav.js"></script>
 
-  <main>
-    <!doctype html>
+  <main class="questionnaire-page">
+    <section id="startScreen" class="intro-card">
+      <h2>Welcome to the Cake Designer</h2>
+      <p>
+        This form helps you describe your cake idea step by step. You do not
+        need to know every detail. If you are unsure, you can choose “I’m not
+        sure yet – please advise”.
+      </p>
 
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Edit movie</title>
-      <link rel="icon"
-        href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✏️</text></svg>'>
-      <link rel="stylesheet" href="edit.css" />
-      <script src="edit.js" defer></script>
-    </head>
-    <article>
-      <form>
-        <input type="hidden" id="imdbID" />
+      <button id="startQuestionnaireButton" type="button">
+        Start questionnaire
+      </button>
+    </section>
 
-        <div>
-          <label for="Title">Title</label>
-          <input type="text" id="Title" required />
-        </div>
+    <section id="wizardScreen" class="questionnaire-card hidden">
+      <div class="progress-container" aria-label="Questionnaire progress">
+        <button class="progress-step active" type="button" data-chapter="0">
+          1. Basic
+        </button>
+        <button class="progress-step" type="button" data-chapter="1">
+          2. Flavor
+        </button>
+        <button class="progress-step" type="button" data-chapter="2">
+          3. Design
+        </button>
+        <button class="progress-step" type="button" data-chapter="3">
+          4. References
+        </button>
+        <button class="progress-step" type="button" data-chapter="4">
+          5. Summary
+        </button>
+      </div>
 
-        <div>
-          <label for="Released">Released</label>
-          <input type="date" id="Released" required />
-        </div>
+      <section id="chapterIntro" class="chapter-intro">
+        <!-- JavaScript will render the chapter-specific intro here -->
+      </section>
 
-        <div>
-          <label for="Runtime">Runtime</label>
-          <input type="number" id="Runtime" required />
-        </div>
+      <form id="questionnaireForm">
+        <section id="chapterContainer" class="chapter-container">
+          <!-- JavaScript will render the current chapter here -->
+        </section>
 
-        <div>
-          <label for="Genres">Genres</label>
-          <select id="Genres" multiple required>
-            <option value="Action">Action</option>
-            <option value="Adventure">Adventure</option>
-            <option value="Animation">Animation</option>
-            <option value="Biography">Biography</option>
-            <option value="Comedy">Comedy</option>
-            <option value="Crime">Crime</option>
-            <option value="Documentary">Documentary</option>
-            <option value="Drama">Drama</option>
-            <option value="Family">Family</option>
-            <option value="Fantasy">Fantasy</option>
-            <option value="Film Noir">Film Noir</option>
-            <option value="History">History</option>
-            <option value="Horror">Horror</option>
-            <option value="Music">Music</option>
-            <option value="Musical">Musical</option>
-            <option value="Mystery">Mystery</option>
-            <option value="Romance">Romance</option>
-            <option value="Sci-Fi">Sci-Fi</option>
-            <option value="Short Film">Short Film</option>
-            <option value="Sport">Sport</option>
-            <option value="Superhero">Superhero</option>
-            <option value="Thriller">Thriller</option>
-            <option value="War">War</option>
-            <option value="Western">Western</option>
-          </select>
-        </div>
+        <div class="form-navigation">
+          <button id="cancelButton" type="button">Cancel</button>
 
-        <div>
-          <label for="Directors">Directors</label>
-          <input type="text" id="Directors" required />
-        </div>
-
-        <div>
-          <label for="Writers">Writers</label>
-          <input type="text" id="Writers" required />
-        </div>
-
-        <div>
-          <label for="Actors">Actors</label>
-          <input type="text" id="Actors" required />
-        </div>
-
-        <div>
-          <label for="Plot">Plot</label>
-          <textarea id="Plot" rows="5" required></textarea>
-        </div>
-
-        <div>
-          <label for="Poster">Poster</label>
-          <input type="url" id="Poster" required />
-        </div>
-
-        <div>
-          <label for="Metascore">Metascore</label>
-          <input type="number" id="Metascore" required />
-        </div>
-
-        <div>
-          <label for="imdbRating">IMDb Rating</label>
-          <input type="number" id="imdbRating" step="0.1" required />
-        </div>
-
-        <div>
-          <button type="button" onclick="putMovie()">Save</button>
-          <button type="button" onclick="location.href = 'index.html'">
-            Cancel
-          </button>
-          <button type="button" onclick="email()">EMail</button>
+          <div class="form-navigation-right">
+            <button id="backButton" type="button">Back</button>
+            <button id="saveButton" type="button">Save draft</button>
+            <button id="nextButton" type="button">Next</button>
+          </div>
         </div>
       </form>
-    </article>
+    </section>
   </main>
 
 
@@ -133,6 +85,11 @@
   <div id="footer"></div>
   <script src="../fixedLayout/footer.js"></script>
 
+  <dialog id="logoutDialog">
+    <p>Are you sure you want to log out?</p>
+    <button id="confirmLogout">Yes, Log Out</button>
+    <button id="cancelLogout">Cancel</button>
+  </dialog>
 </body>
 
 </html>

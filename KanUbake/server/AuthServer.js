@@ -89,8 +89,8 @@ app.post("/login", async function (req, res) {
   // create a short-lived access token (expires in 1000 seconds)
   const accessToken = generateAccessToken(user);
 
-  // create a long-lived refresh token (never expires unless logged out)
-  const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN);
+  // create a long-lived refresh token (expires after 7 days or by logging out)
+  const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN, { expiresIn: "7d" });
 
   // save the refresh token in our list so we can validate it later
   refreshTokens.push(refreshToken);

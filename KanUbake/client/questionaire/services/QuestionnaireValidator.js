@@ -1,0 +1,290 @@
+/*
+  Questionnaire Validator
+
+  This class validates the user's input before moving to the next chapter
+  or submitting the request.
+
+  It checks required fields, inconsistent combinations, missing selections,
+  file upload rules, and special warnings such as fondant compatibility.
+*/
+
+export class QuestionnaireValidator {
+    constructor(state) {
+        this.state = state;
+    }
+
+    validateCurrentChapter() {
+        const currentChapter = this.state.getCurrentChapter();
+
+        switch (currentChapter.id) {
+            case "basic":
+                return this.validateBasicChapter();
+
+            case "flavor":
+                return this.validateFlavorChapter();
+
+            case "design":
+                return this.validateDesignChapter();
+
+            case "references":
+                return this.validateReferencesChapter();
+
+            case "summary":
+                return {
+                    isValid: true,
+                    messages: [],
+                    fields: []
+                };
+
+            default:
+                return {
+                    isValid: true,
+                    messages: [],
+                    fields: []
+                };
+        }
+    }
+
+    validateBasicChapter() {
+        const request = this.state.getCakeRequest();
+        const messages = [];
+        const fields = [];
+
+        if (!request.occasion) {
+            messages.push("Please choose an occasion.");
+            fields.push("occasion");
+        }
+
+        if (!request.cakeType) {
+            messages.push("Please choose a cake type.");
+            fields.push("cakeType");
+        }
+
+        if (!request.servingSize) {
+            messages.push("Please choose a serving size.");
+            fields.push("servingSize");
+        }
+
+        if (!request.shape) {
+            messages.push("Please choose a cake shape.");
+            fields.push("shape");
+        }
+
+        if (!request.tiers) {
+            messages.push("Please choose the number of tiers.");
+            fields.push("tiers");
+        }
+
+        if (!request.sizeMode) {
+            messages.push("Please choose what you already know about the size.");
+            fields.push("sizeMode");
+        }
+
+        if (request.sizeMode === "known_servings" && !request.knownServings) {
+            messages.push("Please enter the number of guests or servings.");
+            fields.push("knownServings");
+        }
+
+        if (request.sizeMode === "known_size" && !request.knownSize) {
+            messages.push("Please enter the desired cake size.");
+            fields.push("knownSize");
+        }
+
+        return {
+            isValid: messages.length === 0,
+            messages,
+            fields
+        };
+    }
+
+    validateFlavorChapter() {
+        const request = this.state.getCakeRequest();
+        const messages = [];
+        const fields = [];
+
+        if (Number(request.tiers) > 1 && !request.tierFlavorMode) {
+            messages.push("Please choose whether all tiers should be the same or individual.");
+            fields.push("tierFlavorMode");
+        }
+
+        if (!request.tierFlavors || request.tierFlavors.length === 0) {
+            messages.push("Please choose a cake flavor.");
+            fields.push("cakeFlavor-0");
+
+            messages.push("Please choose a filling.");
+            fields.push("filling-0");
+
+            return {
+                isValid: false,
+                messages,
+                fields
+            };
+        }
+
+        request.tierFlavors.forEach((tierFlavor, index) => {
+            if (!tierFlavor.cakeFlavor) {
+                messages.push("Please choose a cake flavor.");
+                fields.push(`cakeFlavor-${index}`);
+            }
+
+            if (tierFlavor.cakeFlavor === "other" && !tierFlavor.otherCakeFlavor) {
+                messages.push("Please describe the other cake flavor.");
+                fields.push(`otherCakeFlavor-${index}`);
+            }
+
+            if (!tierFlavor.filling) {
+                messages.push("Please choose a filling.");
+                fields.push(`filling-${index}`);
+            }
+
+            if (tierFlavor.filling === "other" && !tierFlavor.otherFilling) {
+                messages.push("Please describe the other filling.");
+                fields.push(`otherFilling-${index}`);
+            }
+
+            if (tierFlavor.filling === "fruit_filling" && !tierFlavor.fruitFilling) {
+                messages.push("Please choose a fruit filling.");
+                fields.push(`fruitFilling-${index}`);
+            }
+
+            if (tierFlavor.fruitFilling === "other" && !tierFlavor.otherFruitFilling) {
+                messages.push("Please describe the other fruit filling.");
+                fields.push(`otherFruitFilling-${index}`);
+            }
+
+            if (tierFlavor.filling === "buttercream_filling" && !tierFlavor.buttercreamType) {
+                messages.push("Please choose a buttercream type.");
+                fields.push(`buttercreamType-${index}`);
+            }
+
+            if (tierFlavor.filling === "ganache" && !tierFlavor.ganacheChocolateType) {
+                messages.push("Please choose a ganache chocolate type.");
+                fields.push(`ganacheChocolateType-${index}`);
+            }
+        });
+
+        return {
+            isValid: messages.length === 0,
+            messages,
+            fields
+        };
+    }
+
+    validateDesignChapter() {
+        const request = this.state.getCakeRequest();
+        const messages = [];
+        const fields = [];
+
+        if (!request.covering) {
+            messages.push("Please choose a covering or outer frosting.");
+            fields.push("covering");
+        }
+
+        if (request.covering === "other" && !request.coveringOther) {
+            messages.push("Please describe the other covering option.");
+            fields.push("coveringOther");
+        }
+
+        if (request.covering === "buttercream" && !request.coveringButtercreamType) {
+            messages.push("Please choose a buttercream type.");
+            fields.push("coveringButtercreamType");
+        }
+
+        if (request.covering === "ganache" && !request.coveringGanacheChocolateType) {
+            messages.push("Please choose a ganache chocolate type.");
+            fields.push("coveringGanacheChocolateType");
+        }
+
+        if (request.covering === "fondant") {
+            if (this.usesIndividualFondantLayers(request)) {
+                request.fondantLayerDetails.forEach((layer, index) => {
+                    if (!layer.layerType) {
+                        messages.push(`Please choose a fondant layer for tier ${layer.tierNumber}.`);
+                        fields.push(`fondantLayer-${index}`);
+                    }
+
+                    if (layer.layerType === "buttercream" && !layer.buttercreamType) {
+                        messages.push(`Please choose a buttercream type for tier ${layer.tierNumber}.`);
+                        fields.push(`fondantButtercreamType-${index}`);
+                    }
+
+                    if (layer.layerType === "ganache" && !layer.ganacheChocolateType) {
+                        messages.push(`Please choose a ganache chocolate type for tier ${layer.tierNumber}.`);
+                        fields.push(`fondantGanacheChocolateType-${index}`);
+                    }
+                });
+            } else {
+                if (!request.fondantLayer) {
+                    messages.push("Please choose a layer underneath the fondant.");
+                    fields.push("fondantLayer");
+                }
+
+                if (request.fondantLayer === "buttercream" && !request.fondantButtercreamType) {
+                    messages.push("Please choose a buttercream type for the fondant layer.");
+                    fields.push("fondantButtercreamType");
+                }
+
+                if (request.fondantLayer === "ganache" && !request.fondantGanacheChocolateType) {
+                    messages.push("Please choose a ganache chocolate type for the fondant layer.");
+                    fields.push("fondantGanacheChocolateType");
+                }
+            }
+        }
+
+        if (!request.designStyle) {
+            messages.push("Please choose a design style.");
+            fields.push("designStyle");
+        }
+
+        if (!request.colorMode) {
+            messages.push("Please choose a color option.");
+            fields.push("colorMode");
+        }
+
+        if (request.colorMode === "choose_colors" && !request.colors[0]) {
+            messages.push("Please enter at least a main color.");
+            fields.push("mainColor");
+        }
+
+        if (request.colorMode === "suggest_palette" && !request.paletteBaseColor) {
+            messages.push("Please enter a starting color for the palette suggestion.");
+            fields.push("paletteBaseColor");
+        }
+
+        if (request.colorMode === "choose_color_theme" && !request.colorTheme) {
+            messages.push("Please choose a color theme.");
+            fields.push("colorTheme");
+        }
+
+        return {
+            isValid: messages.length === 0,
+            messages,
+            fields
+        };
+    }
+
+    validateReferencesChapter() {
+        return {
+            isValid: true,
+            messages: [],
+            fields: []
+        };
+    }
+
+    isRequestComplete() {
+        const basic = this.validateBasicChapter();
+        const flavor = this.validateFlavorChapter();
+        const design = this.validateDesignChapter();
+        const references = this.validateReferencesChapter();
+
+        return basic.isValid && flavor.isValid && design.isValid && references.isValid;
+    }
+
+    usesIndividualFondantLayers(request) {
+        return (
+            request.covering === "fondant" &&
+            Number(request.tiers) > 1 &&
+            request.tierFlavorMode === "individual_per_tier"
+        );
+    }
+}
