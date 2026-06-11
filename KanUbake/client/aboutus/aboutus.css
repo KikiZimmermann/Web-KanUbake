@@ -2,6 +2,8 @@
 
 main {
     background: linear-gradient(180deg, rgb(197, 224, 165) 0%, #a2dac4 100%);
+    border-left: rgb(182, 205, 153) solid;
+    border-right: rgb(182, 205, 153) solid;
 }
 
 #teamphoto {
@@ -9,4 +11,5 @@ main {
     border-width: 3px;
     border-color: white;
     height: 400px;
+    margin-bottom: 30px;
 }
