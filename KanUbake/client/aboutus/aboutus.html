@@ -13,22 +13,11 @@
 
 <body>
 
-    <header>
-
-        <div class="login">
-            <button id="authBtn">Log In</button>
-        </div>
-
-        <div class="logo-container">
-            <a href="../index/index.html">
-                <img src="../img/logos/imglogo.png" class="imglogo" id="imglogo" height="100px"
-                    alt="Image logo of a cake with text reading KanUbake" />
-            </a>
-        </div>
-
-        <h1>Meet the gang!</h1>
-
-    </header>
+    <div id="header"></div>
+    <script src="../fixedLayout/header.js"></script>
+    <script>
+        window.pageTitle = "Meet the gang!";
+    </script>
 
     <nav>
         <div class="nav-buttons">
@@ -84,16 +73,9 @@
 
     </main>
 
-    <footer>
-        <p class="footerbox">Brought to you by KanUbake, a brand of KanUproject, 2026
-            <br>
-            <br>
-            <a href="https://jigsaw.w3.org/css-validator/check/referer">
-                <img style="border:0;width:88px;height:31px" src="https://jigsaw.w3.org/css-validator/images/vcss"
-                    alt="CSS ist valide!" />
-            </a>
-        </p>
-    </footer>
+    <div id="footer"></div>
+    <script src="../fixedLayout/footer.js"></script>
+
     <dialog id="logoutDialog">
         <p>Are you sure you want to log out?</p>
         <button id="confirmLogout">Yes, Log Out</button>

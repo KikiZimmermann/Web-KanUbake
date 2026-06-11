@@ -1,46 +1,27 @@
 <!doctype html>
 
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Questionnaire</title>
-    <link rel="stylesheet" href="questionnaire.css" />
-    <link rel="stylesheet" href="../authBtn.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="../authBtn.js"></script>
-    <script type="module" src="questionnaire.js" defer></script>
-  </head>
 
-  <body>
-    <header>
-      <div class="login">
-        <button id="authBtn">Log In</button>
-      </div>
+<head>
+  <meta charset="UTF-8" />
+  <title>Questionnaire</title>
+  <link rel="stylesheet" href="questionnaire.css" />
+  <link rel="stylesheet" href="../authBtn.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../authBtn.js"></script>
+  <script type="module" src="questionnaire.js" defer></script>
+</head>
 
-      <div class="logo-container">
-        <a href="../index/index.html">
-          <img
-            src="../img/logos/imglogo.png"
-            class="imglogo"
-            id="imglogo"
-            height="100px"
-            alt="Image logo of a cake with text reading KanUbake"
-          />
-        </a>
-      </div>
+<body>
 
-      <h1>Questionnaire</h1>
-    </header>
+  <div id="header"></div>
+  <script src="../fixedLayout/header.js"></script>
+  <script>
+    window.pageTitle = "Questionaire";
+  </script>
 
-    <nav>
-      <div class="nav-buttons">
-        <a href="../index/index.html">Home</a>
-        <a href="../questionaire/questionnaire.html">Questionnaire</a>
-        <a href="../mission/mission.html">Our Mission</a>
-        <a href="../aboutus/aboutus.html">About Us</a>
-        <a href="../confectionists/confectionists.html">Confectionists</a>
-      </div>
-    </nav>
+  <nav id="nav"></nav>
+  <script src="../fixedLayout/nav.js"></script>
 
     <main class="questionnaire-page">
       <section id="startScreen" class="intro-card">
@@ -60,71 +41,64 @@
           configurable pricing rules.
         </p>
 
-        <button id="startQuestionnaireButton" type="button">
-          Start questionnaire
+      <button id="startQuestionnaireButton" type="button">
+        Start questionnaire
+      </button>
+    </section>
+
+    <section id="wizardScreen" class="questionnaire-card hidden">
+      <div class="progress-container" aria-label="Questionnaire progress">
+        <button class="progress-step active" type="button" data-chapter="0">
+          1. Basic
         </button>
+        <button class="progress-step" type="button" data-chapter="1">
+          2. Flavor
+        </button>
+        <button class="progress-step" type="button" data-chapter="2">
+          3. Design
+        </button>
+        <button class="progress-step" type="button" data-chapter="3">
+          4. References
+        </button>
+        <button class="progress-step" type="button" data-chapter="4">
+          5. Summary
+        </button>
+      </div>
+
+      <section id="chapterIntro" class="chapter-intro">
+        <!-- JavaScript will render the chapter-specific intro here -->
       </section>
 
-      <section id="wizardScreen" class="questionnaire-card hidden">
-        <div class="progress-container" aria-label="Questionnaire progress">
-          <button class="progress-step active" type="button" data-chapter="0">
-            1. Basic
-          </button>
-          <button class="progress-step" type="button" data-chapter="1">
-            2. Flavor
-          </button>
-          <button class="progress-step" type="button" data-chapter="2">
-            3. Design
-          </button>
-          <button class="progress-step" type="button" data-chapter="3">
-            4. References
-          </button>
-          <button class="progress-step" type="button" data-chapter="4">
-            5. Summary
-          </button>
-        </div>
-
-        <section id="chapterIntro" class="chapter-intro">
-          <!-- JavaScript will render the chapter-specific intro here -->
+      <form id="questionnaireForm">
+        <section id="chapterContainer" class="chapter-container">
+          <!-- JavaScript will render the current chapter here -->
         </section>
 
-        <form id="questionnaireForm">
-          <section id="chapterContainer" class="chapter-container">
-            <!-- JavaScript will render the current chapter here -->
-          </section>
+        <div class="form-navigation">
+          <button id="cancelButton" type="button">Cancel</button>
 
-          <div class="form-navigation">
-            <button id="cancelButton" type="button">Cancel</button>
-
-            <div class="form-navigation-right">
-              <button id="backButton" type="button">Back</button>
-              <button id="saveButton" type="button">Save draft</button>
-              <button id="nextButton" type="button">Next</button>
-            </div>
+          <div class="form-navigation-right">
+            <button id="backButton" type="button">Back</button>
+            <button id="saveButton" type="button">Save draft</button>
+            <button id="nextButton" type="button">Next</button>
           </div>
-        </form>
-      </section>
-    </main>
+        </div>
+      </form>
+    </section>
+  </main>
 
-    <footer>
-      <p class="footerbox">
-        Brought to you by KanUbake, a brand of KanUproject, 2026
-        <br />
-        <br />
-        <a href="https://jigsaw.w3.org/css-validator/check/referer">
-          <img
-            style="border: 0; width: 88px; height: 31px"
-            src="https://jigsaw.w3.org/css-validator/images/vcss"
-            alt="Valid CSS!"
-          />
-        </a>
-      </p>
-    </footer>
 
-    <dialog id="logoutDialog">
-      <p>Are you sure you want to log out?</p>
-      <button id="confirmLogout">Yes, Log Out</button>
-      <button id="cancelLogout">Cancel</button>
-    </dialog>
-  </body>
+
+  </main>
+
+  <div id="footer"></div>
+  <script src="../fixedLayout/footer.js"></script>
+
+  <dialog id="logoutDialog">
+    <p>Are you sure you want to log out?</p>
+    <button id="confirmLogout">Yes, Log Out</button>
+    <button id="cancelLogout">Cancel</button>
+  </dialog>
+</body>
+
 </html>
