@@ -12,30 +12,15 @@
 </head>
 
 <body>
-  <header>
-    <div class="login">
-      <button id="authBtn">Log In</button>
-    </div>
 
-    <div class="logo-container">
-      <a href="../index/index.html">
-        <img src="../img/logos/imglogo.png" class="imglogo" id="imglogo" height="100px"
-          alt="Image logo of a cake with text reading KanUbake" />
-      </a>
-    </div>
+  <div id="header"></div>
+  <script src="../fixedLayout/header.js"></script>
+  <script>
+    window.pageTitle = "Welcome to KanUbake";
+  </script>
 
-    <h1>Welcome to KanUbake</h1>
-  </header>
-
-  <nav>
-    <div class="nav-buttons">
-      <a href="../index/index.html">Home</a>
-      <a href="../questionaire/questionnaire.html">Questionnaire</a>
-      <a href="../mission/mission.html">Our Mission</a>
-      <a href="../aboutus/aboutus.html">About Us</a>
-      <a href="../confectionists/confectionists.html">Confectionists</a>
-    </div>
-  </nav>
+  <nav id="nav"></nav>
+  <script src="../fixedLayout/nav.js"></script>
 
   <main>
 
@@ -111,17 +96,8 @@
 
   </main>
 
-  <footer>
-    <div class="footerbox">
-      2026 KanUbake,
-      a brand of KanUproject<br><br>
-
-      <a href="https://jigsaw.w3.org/css-validator/check/referer" title="A checker for semantically correct CSS">
-        <img style="border:0; width:88px; height:31px" src="https://jigsaw.w3.org/css-validator/images/vcss"
-          alt="CSS ist valid!" />
-      </a>
-    </div>
-  </footer>
+  <div id="footer"></div>
+  <script src="../fixedLayout/footer.js"></script>
 
   <dialog id="logoutDialog">
     <p>Are you sure you want to log out?</p>
