@@ -6,6 +6,12 @@
     accessed: 2026-05-03, 22:02 */
 }
 
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     font-family: "Delius Swash Caps", Arial, Verdana, Geneva, sans-serif;
     letter-spacing: 0.5px;
@@ -49,7 +55,7 @@ h2 {
     border-radius: 30px;
     padding: 10px 30px 10px 30px;
     font-size: 150%;
-    margin: 40px 15px 20px 15px;
+    margin: 40px 15px 18px 15px;
 }
 
 p {
@@ -116,7 +122,7 @@ article {
     background-color: #eeafaf;
     border-radius: 18px;
     padding: 5px;
-    margin: 20px 20% 20px 20%;
+    margin: 5px 20% 20px 20%;
     border-right: rgb(203, 152, 152) 5px solid;
     border-bottom: rgb(203, 152, 152) 5px solid;
 }
@@ -169,24 +175,28 @@ main {
     max-width: 900px;
     border-top-right-radius: 40px;
     border-bottom-left-radius: 40px;
-    margin: 10px 10% 30px 10%;
+    margin: 10px auto 30px auto;
     text-align: left;
-
 }
 
 footer {
     background: linear-gradient(45deg, #e07a5f, #e99494);
     grid-area: f;
-    padding: 10px;
+    padding: 20px 10px;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    border-top: #c26464 solid;
+    border-top: #c26464 solid 2px;
 }
 
-p.footerbox {
-    background-color: #ffdcdc;
-    margin: 30px 10% 30px 10%;
+.footerbox {
+    background-color: transparent;
+    color: white;
+    font-size: 90%;
+    text-align: center;
+    line-height: 1.4;
+    padding: 10px;
+    margin: 0;
 }
 
 .leftbound {
@@ -211,7 +221,25 @@ p.footerbox {
 }
 
 .nav-buttons a:hover {
-    background: #fabeaf;
+    background: #f27f72;
+    color: white;
+    border: none;
+}
+
+#authBtn {
+    background-color: #f77575;
+    padding: 30px;
+    border-radius: 10px;
+    color: #5f3526;
+    border: #5f3526 solid 1.5px;
+    font-family: inherit;
+    font-size: medium;
+}
+
+
+#authBtn:hover {
+    background: #e55b67;
+    color: white;
 }
 
 @media (max-width: 600px) {

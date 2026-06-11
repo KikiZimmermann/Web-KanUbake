@@ -13,3 +13,15 @@ main {
     height: 400px;
     margin-bottom: 30px;
 }
+
+.core p {
+    text-align: left;
+}
+
+@media (max-width: 600px) {
+    #teamphoto {
+        width: 90%;
+        height: 100%;
+        margin-bottom: 20px;
+    }
+}
