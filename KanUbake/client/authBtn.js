@@ -1,3 +1,29 @@
+function showGoodbyePopup() {
+  // create popup element if it doesn't exist yet
+  let popup = document.getElementById("authPopup");
+  if (!popup) {
+    popup = document.createElement("div");
+    popup.id = "authPopup";
+    popup.style.cssText = `
+      position: fixed; top: 20px; right: 20px;
+      background: #f0f8f0; border-left: 4px solid #4caf50;
+      border-radius: 10px; padding: 14px 22px;
+      box-shadow: 0 4px 20px rgba(76,175,80,0.2);
+      transform: translateX(200%); transition: transform 0.35s ease;
+      z-index: 9999; min-width: 260px;
+      font-size: 14px; color: #2e7d32; font-weight: 600;
+    `;
+    document.body.appendChild(popup);
+  }
+
+  popup.textContent = "Goodbye! See you next time 👋";
+  popup.style.transform = "translateX(0)";
+
+  setTimeout(() => {
+    popup.style.transform = "translateX(200%)";
+  }, 2500);
+}
+
 // runs when the page fully loads
 window.onload = function () {
   // get the auth button and logout dialog elements
@@ -42,6 +68,8 @@ window.onload = function () {
     localStorage.removeItem("refreshToken");
     // close the dialog
     logoutDialog.close();
+    // show goodbye popup
+    showGoodbyePopup();
     // change button back to "Log In"
     authBtn.textContent = "Log In";
     // when clicked → redirect to login page
@@ -87,6 +115,7 @@ function initAuthBtn() {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     logoutDialog.close();
+    showGoodbyePopup();
     authBtn.textContent = "Log In";
     authBtn.onclick = () => {
       window.location.href = "/KanUbake/client/LogIn-SinUp/html/LogIn.html";
