@@ -2,12 +2,71 @@
 
 main {
   background: linear-gradient(180deg, rgb(241, 167, 177) 0%, #f3c1d4 100%);
+  border-left: rgb(211, 172, 185) solid;
+  border-right: rgb(211, 172, 185) solid;
 }
 
-form {
-  width: 1000px;
+/* ── Cards ── */
+.intro-card,
+.questionnaire-card {
+  background: white;
+  border-radius: 30px;
+  padding: 40px;
+  width: 85%;
+  max-width: 800px;
+  margin: 30px auto;
+  border-right: rgb(203, 152, 152) 5px solid;
+  border-bottom: rgb(203, 152, 152) 5px solid;
 }
 
+/* ── Start button ── */
+#startQuestionnaireButton {
+  background-color: #eeafaf;
+  border: 1.5px solid #5f3526;
+  color: #5f3526;
+  padding: 12px 32px;
+  border-radius: 18px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: block;
+  margin: 20px auto 0;
+}
+
+#startQuestionnaireButton:hover {
+  background-color: #e07a5f;
+  color: white;
+  border-color: transparent;
+}
+
+/* ── Progress steps ── */
+.progress-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.progress-step {
+  background-color: #fde5e5;
+  border: 1.5px solid #5f3526;
+  color: #5f3526;
+  padding: 8px 18px;
+  border-radius: 18px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.progress-step.active {
+  background-color: #eeafaf;
+  color: #5f3526;
+}
+
+/* ── Form fields ── */
 .form-field {
   display: flex;
   align-items: center;
@@ -15,9 +74,12 @@ form {
   margin-bottom: 20px;
 }
 
-label {
+label,
+.field-label {
   width: 180px;
   font-weight: bold;
+  color: #5f3526;
+  flex-shrink: 0;
   padding-top: 6px;
 }
 
@@ -25,79 +87,25 @@ input,
 select,
 textarea {
   flex: 1;
-  min-width: 300px;
-}
-
-/* Hides elements that should not be visible yet */
-.hidden {
-  display: none;
-}
-
-/* Validation error styling */
-.field-error {
-  border: 2px solid #c62828;
-  background-color: #fff5f5;
-}
-
-.field-error-message {
-  color: #c62828;
-  font-size: 0.9rem;
-  margin-top: 4px;
-}
-
-.checkbox-group.field-error,
-.radio-group.field-error {
-  border: 2px solid #c62828;
-  border-radius: 8px;
-  padding: 10px;
-  background-color: #fff5f5;
-}
-
-.summary-section {
-  margin-bottom: 24px;
-  padding: 16px;
+  min-width: 200px;
+  padding: 8px 12px;
+  border: 1.5px solid #e0a0b0;
   border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.75);
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: #fff9fb;
 }
 
-.summary-section h4 {
-  margin-top: 0;
-  margin-bottom: 12px;
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #e07a5f;
 }
 
-.summary-list {
-  margin: 0;
-}
-
-.summary-row {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 16px;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.summary-row dt {
-  font-weight: bold;
-}
-
-.summary-row dd {
-  margin: 0;
-}
-
-.summary-warning {
-  padding: 12px;
-  border-radius: 8px;
-  background-color: #fff5d6;
-}
-
+/* ── Checkboxes ── */
 .checkbox-field {
   display: block;
-}
-
-.field-label {
-  font-weight: bold;
-  margin-bottom: 10px;
 }
 
 .checkbox-group {
@@ -115,7 +123,7 @@ textarea {
   font-weight: normal;
   padding: 6px 8px;
   border-radius: 8px;
-  background-color: rgba(255, 255, 255, 0.35);
+  background-color: #fde5e5;
 }
 
 .checkbox-option input {
@@ -123,20 +131,101 @@ textarea {
   min-width: auto;
 }
 
+/* ── Navigation buttons ── */
+.form-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.form-navigation-right {
+  display: flex;
+  gap: 10px;
+}
+
+.form-navigation button {
+  background-color: #fde5e5;
+  border: 1.5px solid #5f3526;
+  color: #5f3526;
+  padding: 10px 22px;
+  border-radius: 18px;
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.form-navigation button:hover {
+  background-color: #eeafaf;
+}
+
+#nextButton {
+  background-color: #eeafaf;
+}
+
+/* ── Misc ── */
+.hidden {
+  display: none;
+}
+
 .conditional-section {
-  margin-top: 20px;
+  margin-top: 16px;
   padding: 16px;
   border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.35);
+  background-color: #fff4f4;
 }
 
 .field-hint {
   max-width: 850px;
-  margin: 8px 0 20px 200px;
+  margin: 8px 0 20px 192px;
   padding: 12px 16px;
   border-radius: 16px;
   background-color: rgba(255, 255, 255, 0.75);
   line-height: 1.5;
+}
+
+.summary-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  border-radius: 12px;
+  background-color: #fff4f4;
+}
+
+.summary-row {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.summary-row dt { font-weight: bold; }
+.summary-row dd { margin: 0; }
+
+.summary-warning {
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #fff5d6;
+}
+
+.field-error {
+  border: 2px solid #c62828;
+  background-color: #fff5f5;
+}
+
+.field-error-message {
+  color: #c62828;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.reference-card {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  background-color: #fff4f4;
 }
 
 .reference-preview {
@@ -148,14 +237,42 @@ textarea {
   margin: 10px 0;
 }
 
-.reference-card {
-  margin-top: 16px;
-  padding: 16px;
-  border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
 .optional-note {
   font-weight: normal;
   font-size: 0.9em;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .intro-card,
+  .questionnaire-card {
+    padding: 24px 16px;
+    width: 92%;
+  }
+
+  .form-field {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  label, .field-label {
+    width: 100%;
+  }
+
+  .field-hint {
+    margin-left: 0;
+  }
+
+  .form-navigation {
+    flex-direction: column;
+  }
+
+  .form-navigation-right {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .form-navigation button {
+    width: 100%;
+  }
 }
