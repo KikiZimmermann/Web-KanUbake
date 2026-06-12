@@ -1,0 +1,4 @@
+KanUbake/server/users.json
+node_modules/
+**/.env
+**/.env.*
