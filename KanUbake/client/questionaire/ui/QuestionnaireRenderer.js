@@ -9,16 +9,19 @@
 */
 
 import { questionnaireOptions } from "../data/questionnaireOptions.js";
-import { SummaryBuilder } from "./SummaryBuilder.js";
+import { SummaryBuilder } from "../services/SummaryBuilder.js";
+import { SummaryRenderer } from "../ui/SummaryRenderer.js";
 import { TierFlavor } from "../models/TierFlavor.js";
 import { ReferenceItem } from "../models/ReferenceItem.js";
-import { CakeSizeApiService } from "./api/CakeSizeApiService.js";
+import { CakeSizeApiService } from "../services/api/CakeSizeApiService.js";
+import { ColorSelector } from "./ColorSelector.js";
 
 export class QuestionnaireRenderer {
   constructor(state) {
     this.state = state;
     this.summaryBuilder = new SummaryBuilder();
     this.cakeSizeApiService = new CakeSizeApiService();
+    this.colorSelector = new ColorSelector(this.state);
 
     this.chapterIntroElement = document.getElementById("chapterIntro");
     this.chapterContainerElement = document.getElementById("chapterContainer");
@@ -28,6 +31,9 @@ export class QuestionnaireRenderer {
     this.nextButton = document.getElementById("nextButton");
     this.saveButton = document.getElementById("saveButton");
     this.cancelButton = document.getElementById("cancelButton");
+
+    this.summaryRenderer = new SummaryRenderer(
+      this.chapterContainerElement);
   }
 
   render() {
@@ -244,6 +250,14 @@ export class QuestionnaireRenderer {
     `;
 
     this.attachDesignChapterEvents();
+
+    const colorSelectorContainer =
+      document.getElementById("colorSelectorContainer");
+
+    this.colorSelector.mount(
+      colorSelectorContainer,
+      request.colorMode
+    );
   }
 
   renderReferencesChapter() {
@@ -806,47 +820,13 @@ export class QuestionnaireRenderer {
   }
 
   createColorDetailsField(request) {
-    if (request.colorMode === "choose_colors") {
+    if (
+      request.colorMode === "choose_colors" ||
+      request.colorMode === "suggest_palette"
+    ) {
       return `
-        <div class="conditional-section">
-          <div class="form-field">
-            <label for="mainColor">Main color</label>
-            <input
-              type="text"
-              id="mainColor"
-              data-field="mainColor"
-              value="${request.colors[0] || ""}"
-              placeholder="For example: pink"
-            >
-          </div>
-
-          <div class="form-field">
-            <label for="accentColor">
-              Accent color <span class="optional-note">(optional)</span>
-            </label>
-            <input
-              type="text"
-              id="accentColor"
-              data-field="accentColor"
-              value="${request.colors[1] || ""}"
-              placeholder="For example: gold"
-            >
-          </div>
-
-          <div class="form-field">
-            <label for="additionalColor">
-              Additional color <span class="optional-note">(optional)</span>
-            </label>
-            <input
-              type="text"
-              id="additionalColor"
-              data-field="additionalColor"
-              value="${request.colors[2] || ""}"
-              placeholder="Optional"
-            >
-          </div>
-        </div>
-      `;
+            <div id="colorSelectorContainer"></div>
+        `;
     }
 
     if (request.colorMode === "choose_color_theme") {
@@ -856,28 +836,6 @@ export class QuestionnaireRenderer {
         questionnaireOptions.colorThemes,
         request.colorTheme || ""
       );
-    }
-
-    if (request.colorMode === "suggest_palette") {
-      return `
-        <div class="form-field">
-          <label for="paletteBaseColor">
-            Starting color for palette suggestion
-          </label>
-          <input
-            type="text"
-            id="paletteBaseColor"
-            data-field="paletteBaseColor"
-            value="${request.paletteBaseColor || ""}"
-            placeholder="For example: blush pink, sage green, navy blue"
-          >
-        </div>
-
-        <p class="field-hint">
-          A color palette suggestion can be generated later. For now, this stores
-          the starting color you would like to use.
-        </p>
-      `;
     }
 
     return "";
@@ -1508,28 +1466,6 @@ export class QuestionnaireRenderer {
       this.attachFondantLayerDetailEvents(layer, index);
     });
 
-    const mainColor = document.getElementById("mainColor");
-    const accentColor = document.getElementById("accentColor");
-    const additionalColor = document.getElementById("additionalColor");
-
-    if (mainColor) {
-      mainColor.addEventListener("input", () => {
-        this.updateColorArray();
-      });
-    }
-
-    if (accentColor) {
-      accentColor.addEventListener("input", () => {
-        this.updateColorArray();
-      });
-    }
-
-    if (additionalColor) {
-      additionalColor.addEventListener("input", () => {
-        this.updateColorArray();
-      });
-    }
-
     this.attachCheckboxGroupChange("decorations", (selectedValues) => {
       this.state.updateField("decorations", selectedValues);
 
@@ -1717,18 +1653,6 @@ export class QuestionnaireRenderer {
     });
   }
 
-  updateColorArray() {
-    const mainColor = document.getElementById("mainColor")?.value || "";
-    const accentColor = document.getElementById("accentColor")?.value || "";
-    const additionalColor = document.getElementById("additionalColor")?.value || "";
-
-    const colors = [mainColor, accentColor, additionalColor].filter(
-      (color) => color.trim() !== ""
-    );
-
-    this.state.updateField("colors", colors);
-  }
-
   updateTextDetails(fieldName, value) {
     const request = this.state.getCakeRequest();
 
@@ -1778,41 +1702,11 @@ export class QuestionnaireRenderer {
 
   renderSummary() {
     const cakeRequest = this.state.getCakeRequest();
-    const summarySections = this.summaryBuilder.buildSummary(cakeRequest);
 
-    this.chapterContainerElement.innerHTML = `
-      <div class="summary-content">
-        <h3>Your Request Summary</h3>
+    const summarySections =
+      this.summaryBuilder.buildSummary(cakeRequest);
 
-        <p class="summary-warning">
-          This is not a binding order yet. All details and prices must be confirmed
-          directly with the bakery.
-        </p>
-
-        ${summarySections
-        .map((section) => {
-          return `
-              <section class="summary-section">
-                <h4>${section.title}</h4>
-
-                <dl class="summary-list">
-                  ${section.items
-              .map((item) => {
-                return `
-                        <div class="summary-row">
-                          <dt>${item.label}</dt>
-                          <dd>${item.value}</dd>
-                        </div>
-                      `;
-              })
-              .join("")}
-                </dl>
-              </section>
-            `;
-        })
-        .join("")}
-      </div>
-    `;
+    this.summaryRenderer.render(summarySections);
   }
 
   renderNavigationButtons() {

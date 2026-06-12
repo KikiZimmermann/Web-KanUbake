@@ -9,9 +9,9 @@
   the questionnaire and coordinates the other modules.
 */
 
-import { QuestionnaireState } from "./services/QuestionnaireState.js";
-import { QuestionnaireRenderer } from "./services/QuestionnaireRenderer.js";
-import { QuestionnaireValidator } from "./services/QuestionnaireValidator.js";
+import { QuestionnaireState } from "./state/QuestionnaireState.js";
+import { QuestionnaireRenderer } from "./ui/QuestionnaireRenderer.js";
+import { QuestionnaireValidator } from "./validation/QuestionnaireValidator.js";
 import { DraftStorageService } from "./services/DraftStorageService.js";
 
 document.addEventListener("DOMContentLoaded", () => {

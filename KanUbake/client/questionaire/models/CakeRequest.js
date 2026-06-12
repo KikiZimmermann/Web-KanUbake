@@ -63,8 +63,12 @@ export class CakeRequest {
 
         this.colorMode = "";
         this.colorTheme = "";
-        this.paletteBaseColor = "";
+
         this.colors = [];
+
+        this.paletteBaseColor = null;
+        this.paletteSchemeMode = "analogic";
+        this.paletteColors = [];
 
         this.decorations = [];
         this.textDetails = null;

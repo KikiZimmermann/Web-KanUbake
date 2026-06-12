@@ -45,7 +45,7 @@ export class SummaryBuilder {
                     this.createSummaryItem("Design Style", cakeRequest.designStyle, questionnaireOptions.designStyles),
                     this.createPlainSummaryItem("Theme Description", cakeRequest.themeDescription),
                     this.createSummaryItem("Color Mode", cakeRequest.colorMode, questionnaireOptions.colorModes),
-                    this.createMultiPlainSummaryItem("Colors", cakeRequest.colors),
+                    this.createColorSummaryItem(cakeRequest.colors, cakeRequest.paletteBaseColor, cakeRequest.paletteSchemeMode, cakeRequest.paletteColors, cakeRequest.colorMode),
                     this.createMultiSummaryItem("Decorations", cakeRequest.decorations, questionnaireOptions.decorations),
                     this.createObjectSummaryItem("Text Details", cakeRequest.textDetails),
                     this.createObjectSummaryItem("Number / Age Details", cakeRequest.numberAgeDetails)
@@ -62,6 +62,65 @@ export class SummaryBuilder {
                 ]
             }
         ];
+    }
+
+    createColorSummaryItem(
+        colors,
+        paletteBaseColor,
+        paletteSchemeMode,
+        paletteColors,
+        colorMode
+    ) {
+        if (colorMode === "choose_colors") {
+            if (!Array.isArray(colors) || colors.length === 0) {
+                return {
+                    label: "Colors",
+                    value: "Not specified"
+                };
+            }
+
+            return {
+                label: "Colors",
+                value: colors
+                    .filter(Boolean)
+                    .map((color) => `${color.name} (${color.hex})`)
+                    .join(", ")
+            };
+        }
+
+        if (colorMode === "suggest_palette") {
+            if (!paletteBaseColor) {
+                return {
+                    label: "Color Palette",
+                    value: "Not specified"
+                };
+            }
+
+            const paletteText =
+                Array.isArray(paletteColors) &&
+                    paletteColors.length > 0
+                    ? paletteColors
+                        .map(
+                            (color) =>
+                                `${color.name} (${color.hex})`
+                        )
+                        .join(", ")
+                    : "No palette generated";
+
+            return {
+                label: "Color Palette",
+                value:
+                    `Starting color: ${paletteBaseColor.name} ` +
+                    `(${paletteBaseColor.hex}); ` +
+                    `Scheme: ${paletteSchemeMode}; ` +
+                    `Colors: ${paletteText}`
+            };
+        }
+
+        return {
+            label: "Colors",
+            value: "Not specified"
+        };
     }
 
     createSummaryItem(label, value, options) {
