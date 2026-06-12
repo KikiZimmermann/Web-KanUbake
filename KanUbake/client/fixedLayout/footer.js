@@ -1,4 +1,4 @@
-fetch("/KanUbake/client/fixedLayout/footer.html")
+fetch("../fixedLayout/footer.html")
     .then(response => response.text())
     .then(data => {
         document.getElementById("footer").innerHTML = data;
