@@ -68,6 +68,7 @@ input:focus {
     box-shadow: 0 0 0 0px rgba(122, 59, 30, 0.4);
     border-color: #7a3b1e;
   }
+
   100% {
     box-shadow: 0 0 0 8px rgba(122, 59, 30, 0);
     border-color: #7a3b1e;
@@ -98,3 +99,21 @@ input:focus {
   color: var(--light-pink) !important;
 }
 
+@media (max-width: 600px) {
+
+  h1,
+  h2,
+  h3,
+  p {
+    padding: 2%;
+  }
+
+  h1 {
+    font-size: 1.5em;
+  }
+
+  p {
+    font-size: 0.7em;
+  }
+
+}
