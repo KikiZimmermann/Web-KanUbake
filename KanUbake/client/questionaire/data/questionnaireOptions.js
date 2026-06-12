@@ -19,7 +19,7 @@ export const questionnaireOptions = {
     ],
 
     cakeTypes: [
-        { value: "classic_cream", label: "Classic Cream Cake" },
+        { value: "classic_cream", label: "Standard Decorated Cake" },
         { value: "fruit_cake", label: "Fruit Cake / Fresh Fruit Cake" },
         { value: "themed_cake", label: "Themed Cake" },
         { value: "naked_cake", label: "Naked Cake" },
@@ -117,6 +117,43 @@ export const questionnaireOptions = {
         { value: "peach", label: "Peach" },
         { value: "other", label: "Other Fruit" },
         { value: "unsure_advise", label: "I’m Not Sure Yet – Please Advise" }
+    ],
+
+    fruitPreserves: [
+        { value: "apricot", label: "Apricot" },
+        { value: "strawberry", label: "Strawberry" },
+        { value: "raspberry", label: "Raspberry" },
+        { value: "cherry", label: "Cherry" },
+        { value: "mixed_berries", label: "Mixed Berries" },
+        { value: "orange", label: "Orange" },
+        { value: "other", label: "Other Fruit" },
+        {
+            value: "unsure_advise",
+            label: "I’m Not Sure Yet – Please Advise"
+        }
+    ],
+
+    nutTypes: [
+        { value: "hazelnut", label: "Hazelnut" },
+        { value: "walnut", label: "Walnut" },
+        { value: "almond", label: "Almond" },
+        { value: "pistachio", label: "Pistachio" },
+        { value: "peanut", label: "Peanut" },
+        { value: "mixed_nuts", label: "Mixed Nuts" },
+        { value: "other", label: "Other Nut" },
+        {
+            value: "unsure_advise",
+            label: "I’m Not Sure Yet – Please Advise"
+        }
+    ],
+
+    yesNoUnsure: [
+        { value: "yes", label: "Yes" },
+        { value: "no", label: "No" },
+        {
+            value: "unsure_advise",
+            label: "I’m Not Sure Yet – Please Advise"
+        }
     ],
 
     coverings: [

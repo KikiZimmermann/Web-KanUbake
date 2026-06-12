@@ -161,6 +161,48 @@ export class QuestionnaireValidator {
                 messages.push("Please choose a ganache chocolate type.");
                 fields.push(`ganacheChocolateType-${index}`);
             }
+
+            if (tierFlavor.cakeFlavor === "nut" && !tierFlavor.cakeNutType) {
+                messages.push("Please choose a nut for the cake.");
+                fields.push(`cakeNutType-${index}`);
+            }
+
+            if (
+                tierFlavor.cakeNutType === "other" &&
+                !tierFlavor.otherCakeNut
+            ) {
+                messages.push("Please enter the other nut.");
+                fields.push(`otherCakeNut-${index}`);
+            }
+
+            if (
+                tierFlavor.filling === "nut_cream" &&
+                !tierFlavor.fillingNutType
+            ) {
+                messages.push("Please choose a nut cream.");
+                fields.push(`fillingNutType-${index}`);
+            }
+
+            if (
+                tierFlavor.fillingNutType === "other" &&
+                !tierFlavor.otherFillingNut
+            ) {
+                messages.push("Please enter the other nut.");
+                fields.push(`otherFillingNut-${index}`);
+            }
+
+            if (tierFlavor.filling === "jam" && !tierFlavor.jamFlavor) {
+                messages.push("Please choose a fruit preserve.");
+                fields.push(`jamFlavor-${index}`);
+            }
+
+            if (
+                tierFlavor.jamFlavor === "other" &&
+                !tierFlavor.otherJamFlavor
+            ) {
+                messages.push("Please enter the other fruit preserve.");
+                fields.push(`otherJamFlavor-${index}`);
+            }
         });
 
         return {
@@ -212,6 +254,20 @@ export class QuestionnaireValidator {
                         messages.push(`Please choose a ganache chocolate type for tier ${layer.tierNumber}.`);
                         fields.push(`fondantGanacheChocolateType-${index}`);
                     }
+
+                    if (
+                        layer.layerType === "marmalade" && !layer.marmaladeFlavor
+                    ) {
+                        messages.push(`Please choose a fruit preserve for tier ${layer.tierNumber}.`);
+                        fields.push(`fondantMarmaladeFlavor-${index}`);
+                    }
+
+                    if (
+                        layer.layerType === "marmalade" && layer.marmaladeFlavor === "other" && !layer.otherMarmaladeFlavor
+                    ) {
+                        messages.push(`Please enter the other fruit preserve for tier ${layer.tierNumber}.`);
+                        fields.push(`fondantOtherMarmaladeFlavor-${index}`);
+                    }
                 });
             } else {
                 if (!request.fondantLayer) {
@@ -227,6 +283,18 @@ export class QuestionnaireValidator {
                 if (request.fondantLayer === "ganache" && !request.fondantGanacheChocolateType) {
                     messages.push("Please choose a ganache chocolate type for the fondant layer.");
                     fields.push("fondantGanacheChocolateType");
+                }
+
+                if (request.fondantLayer === "marmalade" && !request.fondantMarmaladeFlavor
+                ) {
+                    messages.push("Please choose a fruit preserve for the fondant layer.");
+                    fields.push("fondantMarmaladeFlavor");
+                }
+
+                if (request.fondantLayer === "marmalade" && request.fondantMarmaladeFlavor === "other" && !request.fondantOtherMarmaladeFlavor
+                ) {
+                    messages.push("Please enter the other fruit preserve for the fondant layer.");
+                    fields.push("fondantOtherMarmaladeFlavor");
                 }
             }
         }
@@ -254,6 +322,35 @@ export class QuestionnaireValidator {
         if (request.colorMode === "choose_color_theme" && !request.colorTheme) {
             messages.push("Please choose a color theme.");
             fields.push("colorTheme");
+        }
+
+        if (
+            request.covering === "chocolate_glaze" &&
+            !request.chocolateGlazePreserveChoice
+        ) {
+            messages.push(
+                "Please choose whether you would like fruit preserve underneath the chocolate glaze."
+            );
+            fields.push("chocolateGlazePreserveChoice");
+        }
+
+        if (
+            request.covering === "chocolate_glaze" &&
+            request.chocolateGlazePreserveChoice === "yes" &&
+            !request.chocolateGlazePreserveFlavor
+        ) {
+            messages.push("Please choose a fruit preserve.");
+            fields.push("chocolateGlazePreserveFlavor");
+        }
+
+        if (
+            request.covering === "chocolate_glaze" &&
+            request.chocolateGlazePreserveChoice === "yes" &&
+            request.chocolateGlazePreserveFlavor === "other" &&
+            !request.chocolateGlazeOtherPreserveFlavor
+        ) {
+            messages.push("Please enter the other fruit preserve.");
+            fields.push("chocolateGlazeOtherPreserveFlavor");
         }
 
         return {

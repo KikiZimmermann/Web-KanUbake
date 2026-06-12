@@ -48,7 +48,8 @@ export class SummaryBuilder {
                     this.createColorSummaryItem(cakeRequest.colors, cakeRequest.paletteBaseColor, cakeRequest.paletteSchemeMode, cakeRequest.paletteColors, cakeRequest.colorMode),
                     this.createMultiSummaryItem("Decorations", cakeRequest.decorations, questionnaireOptions.decorations),
                     this.createObjectSummaryItem("Text Details", cakeRequest.textDetails),
-                    this.createObjectSummaryItem("Number / Age Details", cakeRequest.numberAgeDetails)
+                    this.createObjectSummaryItem("Number / Age Details", cakeRequest.numberAgeDetails),
+                    this.createSummaryItem("Chocolate Glaze Preserve", cakeRequest.chocolateGlazePreserveFlavor, questionnaireOptions.fruitPreserves),
                 ]
             },
             {
@@ -194,7 +195,79 @@ export class SummaryBuilder {
         }
 
         const tierSummaries = tierFlavors.map((tierFlavor) => {
-            return `Tier ${tierFlavor.tierNumber}: ${tierFlavor.cakeFlavor}, ${tierFlavor.filling}`;
+            const details = [];
+
+            details.push(
+                this.getOptionLabel(
+                    tierFlavor.cakeFlavor,
+                    questionnaireOptions.cakeFlavors
+                )
+            );
+
+            if (tierFlavor.cakeFlavor === "other") {
+                details.push(tierFlavor.otherCakeFlavor);
+            }
+
+            if (tierFlavor.cakeFlavor === "nut") {
+                const nut =
+                    tierFlavor.cakeNutType === "other"
+                        ? tierFlavor.otherCakeNut
+                        : this.getOptionLabel(
+                            tierFlavor.cakeNutType,
+                            questionnaireOptions.nutTypes
+                        );
+
+                details.push(`Cake nut: ${nut}`);
+            }
+
+            details.push(
+                this.getOptionLabel(
+                    tierFlavor.filling,
+                    questionnaireOptions.fillings
+                )
+            );
+
+            if (tierFlavor.filling === "other") {
+                details.push(tierFlavor.otherFilling);
+            }
+
+            if (tierFlavor.filling === "fruit_filling") {
+                const fruit =
+                    tierFlavor.fruitFilling === "other"
+                        ? tierFlavor.otherFruitFilling
+                        : this.getOptionLabel(
+                            tierFlavor.fruitFilling,
+                            questionnaireOptions.fruitFillings
+                        );
+
+                details.push(`Fruit: ${fruit}`);
+            }
+
+            if (tierFlavor.filling === "nut_cream") {
+                const nut =
+                    tierFlavor.fillingNutType === "other"
+                        ? tierFlavor.otherFillingNut
+                        : this.getOptionLabel(
+                            tierFlavor.fillingNutType,
+                            questionnaireOptions.nutTypes
+                        );
+
+                details.push(`Nut cream: ${nut}`);
+            }
+
+            if (tierFlavor.filling === "jam") {
+                const preserve =
+                    tierFlavor.jamFlavor === "other"
+                        ? tierFlavor.otherJamFlavor
+                        : this.getOptionLabel(
+                            tierFlavor.jamFlavor,
+                            questionnaireOptions.fruitPreserves
+                        );
+
+                details.push(`Fruit preserve: ${preserve}`);
+            }
+
+            return `Tier ${tierFlavor.tierNumber}: ${details.join(", ")}`;
         });
 
         return {

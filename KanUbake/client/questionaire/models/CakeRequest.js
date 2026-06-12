@@ -46,6 +46,10 @@ export class CakeRequest {
         this.coveringGanacheChocolateType = "";
         this.coveringGanacheColor = "";
 
+        this.chocolateGlazePreserveChoice = "";
+        this.chocolateGlazePreserveFlavor = "";
+        this.chocolateGlazeOtherPreserveFlavor = "";
+
         this.fondantLayer = "";
         this.fondantLayerDetails = [];
 
@@ -57,6 +61,7 @@ export class CakeRequest {
         this.fondantGanacheColor = "";
 
         this.fondantMarmaladeFlavor = "";
+        this.fondantOtherMarmaladeFlavor = "";
 
         this.designStyle = "";
         this.themeDescription = "";

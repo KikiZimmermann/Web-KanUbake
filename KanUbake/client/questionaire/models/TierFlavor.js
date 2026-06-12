@@ -22,6 +22,15 @@ export class TierFlavor {
         this.otherFilling = "";
         this.otherFruitFilling = "";
 
+        this.cakeNutType = "";
+        this.otherCakeNut = "";
+
+        this.fillingNutType = "";
+        this.otherFillingNut = "";
+
+        this.jamFlavor = "";
+        this.otherJamFlavor = "";
+
         this.cakeColor = "";
 
         this.buttercreamType = "";
@@ -38,6 +47,11 @@ export class TierFlavor {
         if (cakeFlavor !== "other") {
             this.otherCakeFlavor = "";
         }
+
+        if (cakeFlavor !== "nut") {
+            this.cakeNutType = "";
+            this.otherCakeNut = "";
+        }
     }
 
     updateFilling(filling) {
@@ -50,6 +64,16 @@ export class TierFlavor {
 
         if (filling !== "other") {
             this.otherFilling = "";
+        }
+
+        if (filling !== "nut_cream") {
+            this.fillingNutType = "";
+            this.otherFillingNut = "";
+        }
+
+        if (filling !== "jam") {
+            this.jamFlavor = "";
+            this.otherJamFlavor = "";
         }
 
         if (filling !== "buttercream_filling") {
@@ -69,6 +93,30 @@ export class TierFlavor {
 
         if (fruitFilling !== "other") {
             this.otherFruitFilling = "";
+        }
+    }
+
+    updateCakeNutType(nutType) {
+        this.cakeNutType = nutType;
+
+        if (nutType !== "other") {
+            this.otherCakeNut = "";
+        }
+    }
+
+    updateFillingNutType(nutType) {
+        this.fillingNutType = nutType;
+
+        if (nutType !== "other") {
+            this.otherFillingNut = "";
+        }
+    }
+
+    updateJamFlavor(jamFlavor) {
+        this.jamFlavor = jamFlavor;
+
+        if (jamFlavor !== "other") {
+            this.otherJamFlavor = "";
         }
     }
 
@@ -98,6 +146,42 @@ export class TierFlavor {
         }
 
         if (this.filling === "ganache" && !this.ganacheChocolateType) {
+            return false;
+        }
+
+        if (this.cakeFlavor === "nut" && !this.cakeNutType) {
+            return false;
+        }
+
+        if (
+            this.cakeFlavor === "nut" &&
+            this.cakeNutType === "other" &&
+            !this.otherCakeNut
+        ) {
+            return false;
+        }
+
+        if (
+            this.filling === "nut_cream" &&
+            this.fillingNutType === "other" &&
+            !this.otherFillingNut
+        ) {
+            return false;
+        }
+
+        if (this.fillingNutType === "other" && !this.otherFillingNut) {
+            return false;
+        }
+
+        if (
+            this.filling === "jam" &&
+            this.jamFlavor === "other" &&
+            !this.otherJamFlavor
+        ) {
+            return false;
+        }
+
+        if (this.jamFlavor === "other" && !this.otherJamFlavor) {
             return false;
         }
 

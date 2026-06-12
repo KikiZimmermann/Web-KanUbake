@@ -353,7 +353,8 @@ export class QuestionnaireRenderer {
           buttercreamFlavor: "",
           ganacheChocolateType: "",
           ganacheColor: "",
-          marmaladeFlavor: ""
+          marmaladeFlavor: "",
+          otherMarmaladeFlavor: ""
         });
       }
 
@@ -397,6 +398,23 @@ export class QuestionnaireRenderer {
           tierFlavor.cakeFlavor === "other"
         )}
 
+        ${tierFlavor.cakeFlavor === "nut"
+            ? this.createSelectField(
+              `cakeNutType-${index}`,
+              "Which nut would you like for the cake?",
+              questionnaireOptions.nutTypes,
+              tierFlavor.cakeNutType
+            )
+            : ""
+          }
+
+${this.createOtherTextField(
+            `otherCakeNut-${index}`,
+            "Which other nut would you like?",
+            tierFlavor.otherCakeNut,
+            tierFlavor.cakeNutType === "other"
+          )}
+
             <div class="form-field">
               <label for="cakeColor-${index}">
                 Cake color <span class="optional-note">(optional)</span>
@@ -417,18 +435,18 @@ export class QuestionnaireRenderer {
             </p>
 
             ${this.createSelectField(
-          `filling-${index}`,
-          "What filling would you like?",
-          questionnaireOptions.fillings,
-          tierFlavor.filling
-        )}
+            `filling-${index}`,
+            "What filling would you like?",
+            questionnaireOptions.fillings,
+            tierFlavor.filling
+          )}
 
             ${this.createOtherTextField(
-          `otherFilling-${index}`,
-          "Other filling",
-          tierFlavor.otherFilling,
-          tierFlavor.filling === "other"
-        )}
+            `otherFilling-${index}`,
+            "Other filling",
+            tierFlavor.otherFilling,
+            tierFlavor.filling === "other"
+          )}
 
             ${tierFlavor.filling === "fruit_filling"
             ? this.createSelectField(
@@ -445,6 +463,40 @@ export class QuestionnaireRenderer {
             "Other fruit filling",
             tierFlavor.otherFruitFilling,
             tierFlavor.fruitFilling === "other"
+          )}
+
+          ${tierFlavor.filling === "nut_cream"
+            ? this.createSelectField(
+              `fillingNutType-${index}`,
+              "Which nut cream would you like?",
+              questionnaireOptions.nutTypes,
+              tierFlavor.fillingNutType
+            )
+            : ""
+          }
+
+${this.createOtherTextField(
+            `otherFillingNut-${index}`,
+            "Which other nut would you like?",
+            tierFlavor.otherFillingNut,
+            tierFlavor.fillingNutType === "other"
+          )}
+
+          ${tierFlavor.filling === "jam"
+            ? this.createSelectField(
+              `jamFlavor-${index}`,
+              "Which fruit preserve would you like?",
+              questionnaireOptions.fruitPreserves,
+              tierFlavor.jamFlavor
+            )
+            : ""
+          }
+
+${this.createOtherTextField(
+            `otherJamFlavor-${index}`,
+            "Which other fruit preserve would you like?",
+            tierFlavor.otherJamFlavor,
+            tierFlavor.jamFlavor === "other"
           )}
 
             ${this.createButtercreamDetailsForTier(tierFlavor, index)}
@@ -617,6 +669,36 @@ export class QuestionnaireRenderer {
       `;
     }
 
+    if (request.covering === "chocolate_glaze") {
+      return `
+        <div class="conditional-section">
+            ${this.createSelectField(
+        "chocolateGlazePreserveChoice",
+        "Would you like jam / fruit preserve underneath the chocolate glaze?",
+        questionnaireOptions.yesNoUnsure,
+        request.chocolateGlazePreserveChoice
+      )}
+
+            ${request.chocolateGlazePreserveChoice === "yes"
+          ? this.createSelectField(
+            "chocolateGlazePreserveFlavor",
+            "Which fruit preserve would you like?",
+            questionnaireOptions.fruitPreserves,
+            request.chocolateGlazePreserveFlavor
+          )
+          : ""
+        }
+
+            ${this.createOtherTextField(
+          "chocolateGlazeOtherPreserveFlavor",
+          "Which other fruit preserve would you like?",
+          request.chocolateGlazeOtherPreserveFlavor,
+          request.chocolateGlazePreserveFlavor === "other"
+        )}
+        </div>
+    `;
+    }
+
     if (request.covering === "other") {
       return `
         <div class="form-field">
@@ -703,7 +785,8 @@ export class QuestionnaireRenderer {
       buttercreamFlavor: request.fondantButtercreamFlavor,
       ganacheChocolateType: request.fondantGanacheChocolateType,
       ganacheColor: request.fondantGanacheColor,
-      marmaladeFlavor: request.fondantMarmaladeFlavor
+      marmaladeFlavor: request.fondantMarmaladeFlavor,
+      otherMarmaladeFlavor: request.fondantOtherMarmaladeFlavor
     };
 
     return this.createFondantLayerDetailsForLayer(layer, null);
@@ -781,19 +864,20 @@ export class QuestionnaireRenderer {
 
     if (layer.layerType === "marmalade") {
       return `
-        <div class="form-field">
-          <label for="fondantMarmaladeFlavor${suffix}">
-            Marmalade / fruit preserve flavor <span class="optional-note">(optional)</span>
-          </label>
-          <input
-            type="text"
-            id="fondantMarmaladeFlavor${suffix}"
-            data-field="fondantMarmaladeFlavor${suffix}"
-            value="${layer.marmaladeFlavor}"
-            placeholder="For example: apricot, raspberry, strawberry"
-          >
-        </div>
-      `;
+        ${this.createSelectField(
+        `fondantMarmaladeFlavor${suffix}`,
+        "Which fruit preserve would you like?",
+        questionnaireOptions.fruitPreserves,
+        layer.marmaladeFlavor
+      )}
+
+        ${this.createOtherTextField(
+        `fondantOtherMarmaladeFlavor${suffix}`,
+        "Which other fruit preserve would you like?",
+        layer.otherMarmaladeFlavor || "",
+        layer.marmaladeFlavor === "other"
+      )}
+    `;
     }
 
     return "";
@@ -1303,11 +1387,35 @@ export class QuestionnaireRenderer {
       const ganacheChocolateTypeSelect = document.getElementById(`ganacheChocolateType-${index}`);
       const ganacheColorInput = document.getElementById(`ganacheColor-${index}`);
 
+      const cakeNutTypeSelect = document.getElementById(`cakeNutType-${index}`);
+      const otherCakeNutInput = document.getElementById(`otherCakeNut-${index}`);
+
+      const fillingNutTypeSelect = document.getElementById(`fillingNutType-${index}`);
+      const otherFillingNutInput = document.getElementById(`otherFillingNut-${index}`);
+
+      const jamFlavorSelect = document.getElementById(`jamFlavor-${index}`);
+      const otherJamFlavorInput = document.getElementById(`otherJamFlavor-${index}`);
+
       if (cakeFlavorSelect) {
         cakeFlavorSelect.addEventListener("change", (event) => {
           tierFlavor.updateCakeFlavor(event.target.value);
           request.markUpdated();
           this.render();
+        });
+      }
+
+      if (cakeNutTypeSelect) {
+        cakeNutTypeSelect.addEventListener("change", (event) => {
+          tierFlavor.updateCakeNutType(event.target.value);
+          request.markUpdated();
+          this.render();
+        });
+      }
+
+      if (otherCakeNutInput) {
+        otherCakeNutInput.addEventListener("input", (event) => {
+          tierFlavor.otherCakeNut = event.target.value;
+          request.markUpdated();
         });
       }
 
@@ -1344,6 +1452,36 @@ export class QuestionnaireRenderer {
       if (otherFruitFillingInput) {
         otherFruitFillingInput.addEventListener("input", (event) => {
           tierFlavor.otherFruitFilling = event.target.value;
+          request.markUpdated();
+        });
+      }
+
+      if (fillingNutTypeSelect) {
+        fillingNutTypeSelect.addEventListener("change", (event) => {
+          tierFlavor.updateFillingNutType(event.target.value);
+          request.markUpdated();
+          this.render();
+        });
+      }
+
+      if (otherFillingNutInput) {
+        otherFillingNutInput.addEventListener("input", (event) => {
+          tierFlavor.otherFillingNut = event.target.value;
+          request.markUpdated();
+        });
+      }
+
+      if (jamFlavorSelect) {
+        jamFlavorSelect.addEventListener("change", (event) => {
+          tierFlavor.updateJamFlavor(event.target.value);
+          request.markUpdated();
+          this.render();
+        });
+      }
+
+      if (otherJamFlavorInput) {
+        otherJamFlavorInput.addEventListener("input", (event) => {
+          tierFlavor.otherJamFlavor = event.target.value;
           request.markUpdated();
         });
       }
@@ -1399,13 +1537,18 @@ export class QuestionnaireRenderer {
 
     const request = this.state.getCakeRequest();
 
+    // Normale Textfelder
     const normalTextFields = [
       "coveringOther",
       "coveringButtercreamColor",
       "coveringButtercreamFlavor",
       "coveringGanacheColor",
       "themeDescription",
-      "paletteBaseColor"
+      "paletteBaseColor",
+      "fondantButtercreamColor",
+      "fondantButtercreamFlavor",
+      "fondantGanacheColor",
+      "fondantOtherMarmaladeFlavor"
     ];
 
     normalTextFields.forEach((fieldName) => {
@@ -1418,54 +1561,118 @@ export class QuestionnaireRenderer {
       }
     });
 
+    // Normale Select-Felder
     const normalSelectFields = [
       "coveringButtercreamType",
       "coveringGanacheChocolateType",
       "fondantLayer",
       "fondantButtercreamType",
       "fondantGanacheChocolateType",
+      "fondantMarmaladeFlavor",
       "colorTheme"
     ];
 
     normalSelectFields.forEach((fieldName) => {
       const select = document.getElementById(fieldName);
 
-      if (select) {
-        select.addEventListener("change", (event) => {
-          this.state.updateField(fieldName, event.target.value);
+      if (!select) {
+        return;
+      }
 
+      select.addEventListener("change", (event) => {
+        this.state.updateField(fieldName, event.target.value);
+
+        if (
+
+          fieldName === "fondantLayer" ||
+          fieldName === "fondantButtercreamType" ||
+          fieldName === "fondantGanacheChocolateType" ||
+          fieldName === "fondantMarmaladeFlavor"
+        ) {
           if (
-            fieldName === "fondantLayer" ||
-            fieldName === "fondantButtercreamType" ||
-            fieldName === "fondantGanacheChocolateType"
+            fieldName === "fondantMarmaladeFlavor" &&
+            event.target.value !== "other"
           ) {
-            this.render();
+            this.state.updateField(
+              "fondantOtherMarmaladeFlavor",
+              ""
+            );
           }
-        });
-      }
+          this.render();
+        }
+      });
     });
 
-    const fondantTextFields = [
-      "fondantButtercreamColor",
-      "fondantButtercreamFlavor",
-      "fondantGanacheColor",
-      "fondantMarmaladeFlavor"
-    ];
 
-    fondantTextFields.forEach((fieldName) => {
-      const input = document.getElementById(fieldName);
+    // Chocolate Glaze: Jam yes or no?
+    const chocolateGlazePreserveChoice =
+      document.getElementById("chocolateGlazePreserveChoice");
 
-      if (input) {
-        input.addEventListener("input", (event) => {
-          this.state.updateField(fieldName, event.target.value);
+    if (chocolateGlazePreserveChoice) {
+      chocolateGlazePreserveChoice.addEventListener("change", (event) => {
+        const value = event.target.value;
+
+        this.state.updateMultipleFields({
+          chocolateGlazePreserveChoice: value,
+          chocolateGlazePreserveFlavor:
+            value === "yes"
+              ? request.chocolateGlazePreserveFlavor
+              : "",
+          chocolateGlazeOtherPreserveFlavor:
+            value === "yes"
+              ? request.chocolateGlazeOtherPreserveFlavor
+              : ""
         });
-      }
-    });
 
+        this.render();
+      });
+    }
+
+    // Chocolate Glaze: Which Jam?
+    const chocolateGlazePreserveFlavor =
+      document.getElementById("chocolateGlazePreserveFlavor");
+
+    if (chocolateGlazePreserveFlavor) {
+      chocolateGlazePreserveFlavor.addEventListener("change", (event) => {
+        this.state.updateField(
+          "chocolateGlazePreserveFlavor",
+          event.target.value
+        );
+
+        if (event.target.value !== "other") {
+          this.state.updateField(
+            "chocolateGlazeOtherPreserveFlavor",
+            ""
+          );
+        }
+
+        this.render();
+      });
+    }
+
+    // Chocolate Glaze: Other Fruit
+    const chocolateGlazeOtherPreserveFlavor =
+      document.getElementById("chocolateGlazeOtherPreserveFlavor");
+
+    if (chocolateGlazeOtherPreserveFlavor) {
+      chocolateGlazeOtherPreserveFlavor.addEventListener("input", (event) => {
+        this.state.updateField(
+          "chocolateGlazeOtherPreserveFlavor",
+          event.target.value
+        );
+      }
+
+
+      );
+    }
+
+
+    // Individual Fondant Layer per Tier
     request.fondantLayerDetails.forEach((layer, index) => {
       this.attachFondantLayerDetailEvents(layer, index);
     });
 
+    // Decorations
     this.attachCheckboxGroupChange("decorations", (selectedValues) => {
       this.state.updateField("decorations", selectedValues);
 
@@ -1516,6 +1723,15 @@ export class QuestionnaireRenderer {
     if (layerTypeSelect) {
       layerTypeSelect.addEventListener("change", (event) => {
         layer.layerType = event.target.value;
+
+        layer.buttercreamType = "";
+        layer.buttercreamColor = "";
+        layer.buttercreamFlavor = "";
+        layer.ganacheChocolateType = "";
+        layer.ganacheColor = "";
+        layer.marmaladeFlavor = "";
+        layer.otherMarmaladeFlavor = "";
+
         this.state.getCakeRequest().markUpdated();
         this.render();
       });
@@ -1527,7 +1743,8 @@ export class QuestionnaireRenderer {
       [`fondantButtercreamFlavor-${index}`]: "buttercreamFlavor",
       [`fondantGanacheChocolateType-${index}`]: "ganacheChocolateType",
       [`fondantGanacheColor-${index}`]: "ganacheColor",
-      [`fondantMarmaladeFlavor-${index}`]: "marmaladeFlavor"
+      [`fondantMarmaladeFlavor-${index}`]: "marmaladeFlavor",
+      [`fondantOtherMarmaladeFlavor-${index}`]: "otherMarmaladeFlavor"
     };
 
     Object.entries(fieldMap).forEach(([elementId, propertyName]) => {
@@ -1541,7 +1758,19 @@ export class QuestionnaireRenderer {
 
       element.addEventListener(eventType, (event) => {
         layer[propertyName] = event.target.value;
+
+        if (
+          propertyName === "marmaladeFlavor" &&
+          event.target.value !== "other"
+        ) {
+          layer.otherMarmaladeFlavor = "";
+        }
+
         this.state.getCakeRequest().markUpdated();
+
+        if (propertyName === "marmaladeFlavor") {
+          this.render();
+        }
       });
     });
   }
