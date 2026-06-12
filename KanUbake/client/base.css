@@ -84,9 +84,9 @@ a:hover {
 }
 
 .login {
-  display: flex;
-  justify-content: flex-end;
-  padding-right: 10%;
+  position: absolute;
+  right: 10%;
+  bottom: 95px;
 }
 
 .login a {
@@ -138,6 +138,7 @@ article:hover {
 }
 
 header {
+  position: relative;
   padding: 15px 0 20px 0;
   background: linear-gradient(45deg, #e07a5f, #e99494);
   grid-area: h;
@@ -228,7 +229,7 @@ footer {
 
 #authBtn {
   background-color: #f77575;
-  padding: 30px;
+  padding: 8px 16px;
   border-radius: 10px;
   color: #5f3526;
   border: #5f3526 solid 1.5px;
