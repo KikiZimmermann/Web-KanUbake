@@ -49,7 +49,8 @@ export class SummaryBuilder {
                     this.createMultiSummaryItem("Decorations", cakeRequest.decorations, questionnaireOptions.decorations),
                     this.createObjectSummaryItem("Text Details", cakeRequest.textDetails),
                     this.createObjectSummaryItem("Number / Age Details", cakeRequest.numberAgeDetails),
-                    this.createSummaryItem("Chocolate Glaze Preserve", cakeRequest.chocolateGlazePreserveFlavor, questionnaireOptions.fruitPreserves),
+                    this.createSummaryItem("Chocolate Glaze Preserve", cakeRequest.chocolateGlazePreserveFlavor, questionnaireOptions.fruitPreserves
+                    ),
                 ]
             },
             {
