@@ -776,14 +776,25 @@ export class ColorSelector {
         }
     }
 
+    getPaletteColorLimit(schemeMode) {
+        switch (schemeMode) {
+            case "complement":
+            case "triad":
+                return 2;
+
+            case "quad":
+                return 3;
+
+            default:
+                return 5;
+        }
+    }
+
     async generatePalette() {
-        const request =
-            this.state.getCakeRequest();
+        const request = this.state.getCakeRequest();
 
         const statusElement =
-            document.getElementById(
-                "paletteStatus"
-            );
+            document.getElementById("paletteStatus");
 
         if (!request.paletteBaseColor?.hex) {
             return;
@@ -795,16 +806,29 @@ export class ColorSelector {
         }
 
         try {
-            const schemeData =
-                await this.colorApiService
-                    .getColorScheme(
-                        request.paletteBaseColor.hex,
-                        request.paletteSchemeMode,
-                        5
-                    );
+            const colorLimit =
+                this.getPaletteColorLimit(
+                    request.paletteSchemeMode
+                );
 
-            request.paletteColors =
-                schemeData.colors.map((color) => ({
+            const schemeData =
+                await this.colorApiService.getColorScheme(
+                    request.paletteBaseColor.hex,
+                    request.paletteSchemeMode,
+                    5
+                );
+
+            /*
+              The API may return additional shades.
+    
+              For complement and triad, only the first two
+              generated color cards are needed.
+    
+              For quad, only the first three are needed.
+            */
+            request.paletteColors = schemeData.colors
+                .slice(0, colorLimit)
+                .map((color) => ({
                     hex: color.hex.value,
                     name: color.name.value,
                     contrast: color.contrast.value
