@@ -1,3 +1,5 @@
+// [ •••••••• ]  👁  ←  Button erscheint neben jedem Passwortfeld
+// Klick drauf → Passwort wird sichtbar, Icon wechselt. Nochmal klick → wieder versteckt.
 document.querySelectorAll('input[type="password"]').forEach(input => {
   const wrap = document.createElement('div');
   wrap.className = 'pass-wrap';

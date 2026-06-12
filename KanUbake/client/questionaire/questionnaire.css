@@ -1,38 +1,673 @@
 @import url(../base.css);
 
-
-
 main {
-  
   background: linear-gradient(180deg, rgb(241, 167, 177) 0%, #f3c1d4 100%);
+
+  border-left: rgb(211, 172, 185) solid;
+  border-right: rgb(211, 172, 185) solid;
 }
 
-form {
-  width: 1000px;
+/* ── Cards ── */
+
+.intro-card,
+.questionnaire-card {
+  width: 85%;
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 40px;
+
+  background: white;
+
+  border-radius: 30px;
+  border-right: 5px solid rgb(203, 152, 152);
+  border-bottom: 5px solid rgb(203, 152, 152);
+
+  box-sizing: border-box;
 }
 
+/* ── Start button ── */
+#startQuestionnaireButton {
+  display: block;
 
-form div {
+  margin: 20px auto 0;
+  padding: 12px 32px;
+
+  background-color: #eeafaf;
+  color: #5f3526;
+
+  border: 1.5px solid #5f3526;
+  border-radius: 18px;
+
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+#startQuestionnaireButton:hover {
+  background-color: #e07a5f;
+  color: white;
+  border-color: transparent;
+}
+
+/* ── Progress steps ── */
+
+.progress-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.progress-step {
+  padding: 8px 18px;
+
+  background-color: #fde5e5;
+  color: #5f3526;
+
+  border: 1.5px solid #5f3526;
+  border-radius: 18px;
+
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+.progress-step.active {
+  background-color: #eeafaf;
+  color: #5f3526;
+}
+
+/* ── General Form fields ── */
+
+.form-field {
   display: flex;
   align-items: center;
+
   gap: 12px;
   margin-bottom: 20px;
 }
 
-
-
-label {
+label,
+.field-label {
   width: 180px;
-  font-weight: bold;
+  flex-shrink: 0;
+
   padding-top: 6px;
+
+  color: #5f3526;
+  font-weight: bold;
 }
 
 input,
 select,
 textarea {
   flex: 1;
-  min-width: 300px; /* optional, damit sie nicht zu klein werden */
+  min-width: 200px;
+
+  padding: 8px 12px;
+
+  background-color: #fff9fb;
+
+  border: 1.5px solid #e0a0b0;
+  border-radius: 12px;
+
+  font-family: inherit;
+  font-size: 0.95rem;
+
+  box-sizing: border-box;
 }
 
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #e07a5f;
+}
 
+/* ── Checkboxes ── */
 
+.checkbox-field {
+  display: block;
+}
+
+.checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+  gap: 10px 18px;
+  margin-top: 10px;
+}
+
+.checkbox-option {
+  width: auto;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+  padding: 6px 8px;
+
+  background-color: #fde5e5;
+
+  border-radius: 8px;
+
+  font-weight: normal;
+}
+
+.checkbox-option input {
+  flex: 0;
+  min-width: auto;
+}
+
+/* ── Form Navigation ── */
+
+.form-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.form-navigation-right {
+  display: flex;
+  gap: 10px;
+}
+
+.form-navigation button {
+  padding: 10px 22px;
+
+  background-color: #fde5e5;
+  color: #5f3526;
+
+  border: 1.5px solid #5f3526;
+  border-radius: 18px;
+
+  font-family: inherit;
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+.form-navigation button:hover {
+  background-color: #eeafaf;
+}
+
+#nextButton {
+  background-color: #eeafaf;
+}
+
+/* ── General Utility and Conditional Areas ── */
+
+.hidden {
+  display: none;
+}
+
+.conditional-section {
+  margin-top: 16px;
+  padding: 16px;
+
+  background-color: #fff4f4;
+
+  border-radius: 12px;
+}
+
+.field-hint {
+  max-width: 850px;
+
+  margin: 8px 0 20px 192px;
+  padding: 12px 16px;
+
+  background-color: rgb(255 255 255 / 75%);
+
+  border-radius: 16px;
+
+  line-height: 1.5;
+}
+
+.optional-note {
+  font-size: 0.9em;
+  font-weight: normal;
+}
+
+/* ── Validation ── */
+
+.field-error {
+  background-color: #fff5f5;
+  border: 2px solid #c62828;
+}
+
+.field-error-message {
+  margin-top: 4px;
+
+  color: #c62828;
+
+  font-size: 0.9rem;
+}
+
+/* ── Summary ── */
+
+.summary-section {
+  margin-bottom: 24px;
+  padding: 16px;
+
+  background-color: #fff4f4;
+
+  border-radius: 12px;
+}
+
+.summary-row {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+
+  gap: 16px;
+  padding: 8px 0;
+
+  border-bottom: 1px solid rgb(0 0 0 / 10%);
+}
+
+.summary-row dt {
+  font-weight: bold;
+}
+
+.summary-row dd {
+  margin: 0;
+}
+
+.summary-warning {
+  padding: 12px;
+
+  background-color: #fff5d6;
+
+  border-radius: 8px;
+}
+
+/* ── References ── */
+
+.reference-card {
+  margin-top: 16px;
+  padding: 16px;
+
+  background-color: #fff4f4;
+
+  border-radius: 12px;
+}
+
+.reference-preview {
+  display: block;
+
+  max-width: 220px;
+  max-height: 220px;
+  margin: 10px 0;
+
+  border-radius: 12px;
+
+  object-fit: cover;
+}
+
+/* ── Color Selector: General ── */
+
+.color-selector {
+  display: flex;
+  flex-direction: column;
+
+  gap: 1.5rem;
+}
+
+/*
+  Prevent empty API status paragraphs from appearing as
+  blank white bars.
+*/
+.color-selector .field-hint:empty {
+  display: none;
+}
+
+/*
+  Status messages inside the color selector should not use
+  the large left margin of ordinary form hints.
+*/
+.color-selector .field-hint {
+  width: auto;
+  max-width: none;
+
+  margin: 0;
+}
+
+/* ── Inline iro.js Color Picker ── */
+
+.shared-color-picker {
+  width: min(100%, 320px);
+  margin: 0 auto;
+}
+
+.shared-color-picker svg {
+  display: block;
+
+  width: 100%;
+  height: auto;
+}
+
+.active-color-label {
+  margin: 0;
+  padding: 14px 18px;
+
+  background-color: rgb(255 255 255 / 80%);
+  color: #5f3526;
+
+  border-radius: 18px;
+
+  text-align: center;
+}
+
+/* ── Individual Color Cards ── */
+
+.individual-color-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 210px));
+
+  justify-content: space-between;
+  align-items: start;
+
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.color-picker-field {
+  width: 210px;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.75rem;
+}
+
+.color-picker-label {
+  display: block;
+
+  width: 100%;
+  min-height: 48px;
+  padding: 0;
+
+  color: #5f3526;
+
+  font-weight: bold;
+  line-height: 1.35;
+}
+
+/*
+  Shared appearance for both:
+  - individual color buttons
+  - the palette base-color preview card
+*/
+.single-color-card {
+  width: 210px;
+  height: 210px;
+  min-width: 0;
+  padding: 1rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: transparent;
+  color: inherit;
+
+  border: 1.5px solid rgb(95 53 38 / 35%);
+  border-radius: 10px;
+
+  box-sizing: border-box;
+
+  font-family: inherit;
+  font-size: 1rem;
+  text-align: center;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+/*
+  Only the individual cards are interactive.
+  The palette base-color card is only a preview.
+*/
+.single-color-card[data-color-id] {
+  cursor: pointer;
+}
+
+.single-color-card[data-color-id]:hover {
+  transform: translateY(-2px);
+
+  box-shadow: 0 5px 12px rgb(95 53 38 / 18%);
+}
+
+.single-color-card[data-color-id]:focus-visible {
+  outline: 3px solid #e07a5f;
+  outline-offset: 3px;
+}
+
+.single-color-card span {
+  font-size: 1.05rem;
+  line-height: 1.3;
+
+  pointer-events: none;
+}
+
+/*
+  Marks which individual color is currently controlled
+  by the shared picker.
+*/
+.single-color-card.active {
+  outline: 4px solid #e07a5f;
+  outline-offset: 3px;
+
+  box-shadow: 0 6px 14px rgb(95 53 38 / 20%);
+}
+
+.color-action-area {
+  min-height: 36px;
+}
+
+.clear-color-button {
+  min-height: 34px;
+  padding: 6px 12px;
+
+  background-color: #fde5e5;
+  color: #5f3526;
+
+  border: 1.5px solid #5f3526;
+  border-radius: 12px;
+
+  font-family: inherit;
+  font-size: 0.85rem;
+
+  cursor: pointer;
+}
+
+.clear-color-button:hover {
+  background-color: #eeafaf;
+}
+
+/* ── Palette Base Color and Picker ── */
+
+/*
+  Left side:
+  palette base-color card
+
+  Right side:
+  embedded iro.js picker
+*/
+.palette-top-row {
+  display: grid;
+  grid-template-columns: 210px minmax(280px, 320px);
+
+  justify-content: center;
+  align-items: start;
+
+  gap: 2rem;
+  width: 100%;
+}
+
+.palette-base-card-column,
+.palette-picker-column {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.75rem;
+}
+
+.palette-base-card-column {
+  width: 210px;
+}
+
+.palette-picker-column {
+  width: min(100%, 320px);
+}
+
+/*
+  Do not center the palette picker inside its own column.
+*/
+.palette-picker-column .shared-color-picker {
+  margin: 0;
+}
+
+.palette-base-color-card {
+  width: 210px;
+  height: 210px;
+}
+
+.palette-scheme-field {
+  margin-top: 1rem;
+}
+
+/* ── Generated Color Scheme ── */
+
+.palette-scheme-preview {
+  display: flex;
+  flex-direction: row;
+
+  width: 100%;
+  min-height: 180px;
+
+  overflow: hidden;
+
+  border: 1px solid rgb(0 0 0 / 20%);
+  border-radius: 8px;
+}
+
+.palette-color-band {
+  flex: 1;
+  min-width: 0;
+  min-height: 180px;
+  padding: 1rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  text-align: center;
+}
+
+/* ── Responsive General Form ── */
+
+@media (max-width: 600px) {
+  .intro-card,
+  .questionnaire-card {
+    width: 92%;
+    padding: 24px 16px;
+  }
+
+  .form-field {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  label,
+  .field-label {
+    width: 100%;
+  }
+
+  .field-hint {
+    margin-left: 0;
+  }
+
+  .form-navigation {
+    flex-direction: column;
+  }
+
+  .form-navigation-right {
+    flex-direction: column;
+
+    width: 100%;
+  }
+
+  .form-navigation button {
+    width: 100%;
+  }
+}
+
+/* ── Responsive Color Selector ── */
+
+@media (max-width: 700px) {
+  /*
+    Stack the individual color cards vertically.
+  */
+  .individual-color-grid {
+    grid-template-columns: 210px;
+    justify-content: center;
+  }
+
+  .color-picker-field {
+    width: 210px;
+  }
+
+  /*
+    Stack the base-color card and palette picker.
+  */
+  .palette-top-row {
+    grid-template-columns: 1fr;
+
+    justify-items: center;
+
+    gap: 1.5rem;
+  }
+
+  .palette-base-card-column,
+  .palette-picker-column {
+    width: 100%;
+    align-items: center;
+  }
+
+  .palette-picker-column .shared-color-picker {
+    margin: 0 auto;
+  }
+
+  .palette-scheme-field {
+    margin-top: 0.5rem;
+  }
+
+  /*
+    Show generated scheme colors vertically.
+  */
+  .palette-scheme-preview {
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .palette-color-band {
+    min-height: 80px;
+  }
+}

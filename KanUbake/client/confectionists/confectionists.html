@@ -1,65 +1,31 @@
 <!DOCTYPE html>
 
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Confectionists</title>
-    <link rel="stylesheet" href="confectionists.css" />
-    <link rel="stylesheet" href="../authBtn.css">
-    <script src="../authBtn.js"></script>
-  </head>
 
-  <body>
-    <header>
-      <div class="login">
-        <button id="authBtn">Log In</button>
-      </div>
+<head>
+  <meta charset="UTF-8" />
+  <title>Confectionists</title>
+  <link rel="stylesheet" href="confectionists.css" />
+  <link rel="stylesheet" href="../authBtn.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../authBtn.js"></script>
+</head>
 
-      <a href="../index/index.html">
-        <img
-          src="../img/logos/imglogo.png"
-          class="imglogo"
-          id="imglogo"
-          height="100px"
-          alt="Image logo, violet lineart of a cake with candle"
-        />
-      </a>
+<body>
 
-      <a href="../index/index.html">
-        <img
-          src="../img/logos/textlogo.png"
-          class="textlogo"
-          id="textlogo"
-          height="80px"
-          alt="Text logo reading KanUbake in handwritten font"
-        />
-      </a>
+  <div id="header"></div>
+  <script src="../fixedLayout/header.js"></script>
+  <script>
+    window.pageTitle = "Let's make it happen!";
+  </script>
 
-      <h1>Let's make it happen!</h1>
-    </header>
+  <nav id="nav"></nav>
+  <script src="../fixedLayout/nav.js"></script>
 
-    <nav>
-<<<<<<< HEAD
-        <div class="nav-buttons">
-            <a href="../index/index.html">Home</a>
-            <a href="../questionaire/questionnaire.html">Questionnaire</a>
-            <a href="../mission/mission.html">Our Mission</a>
-            <a href="../aboutus/aboutus.html">About Us</a>
-            <a href="../confectionists/confectionists.html">Confectionists</a>
-        </div>
-=======
-      <div class="nav-buttons">
-        <a href="../index/index.html">Home</a>
-        <a href="../mission/mission.html">Our Mission</a>
-        <a href="../aboutus/aboutus.html">About Us</a>
-        <a href="../confectionists/confectionists.html">Confectionists</a>
-      </div>
->>>>>>> 48e6eb09aec57d83fdbc35c650c9fd9bdd94d65d
-    </nav>
+  <main>
+    <h2>The confectionists making your vision come to life</h2>
 
-    <main>
-      <h2>The confectionists making your vision come to life</h2>
-
+    <div class="core">
       <p>
         Whenever we can, we like to try the confectionists we feature ourselves.
         <br />
@@ -68,104 +34,85 @@
         <br />
         So that you know you're going to be working with real professionals.
       </p>
+    </div>
 
-      <h2>Contact them here</h2>
+    <h2>Contact them here</h2>
 
+    <div class="core">
       <p>
         To ensure all info is up to date, please check their websites for
         contact info, address and opening times.
       </p>
+    </div>
 
-      <article>
+    <div class="showcase-container">
+
+      <article class="showcase">
         <div class="introduction">
           <h3>Kiki's Delivery Service</h3>
-          <img
-            src="../img/confectionists/anastasia.png"
-            height="250px"
-            alt="A white and pink cake with the name Anastasia"
-          />
+          <img src="../img/confectionists/anastasia.png" alt="A white and pink cake with the name Anastasia" />
           <p class="websitelink">
             Contact: <a href="">www.example-extraordinary-cakes.com</a>
           </p>
         </div>
       </article>
 
-      <article>
+      <article class="showcase">
         <div class="introduction">
           <h3>Confectionist Perfectionist</h3>
-          <img
-            src="../img/confectionists/rainbow.png"
-            height="250px"
-            alt="A cupcake-shaped cake cut open with layered rainbow inside"
-          />
+          <img src="../img/confectionists/rainbow.png"
+            alt="A cupcake-shaped cake cut open with layered rainbow inside" />
           <p class="websitelink">
             Contact: <a href="">www.example-extraordinary-cakes.com</a>
           </p>
         </div>
       </article>
 
-      <article>
+      <article class="showcase">
         <div class="introduction">
           <h3>Example Extraordinary Cakes</h3>
-          <img
-            src="../img/confectionists/lightning.png"
-            height="250px"
-            alt="A cake in the shape of the car Lightning of an animation movie"
-          />
+          <img src="../img/confectionists/lightning.png"
+            alt="A cake in the shape of the car Lightning of an animation movie" />
           <p class="websitelink">
             Contact: <a href="">www.example-extraordinary-cakes.com</a>
           </p>
         </div>
       </article>
 
-      <article>
+      <article class="showcase">
         <div class="introduction">
           <h3>Example Extraordinary Cakes</h3>
-          <img
-            src="../img/confectionists/alice.png"
-            height="250px"
-            alt="A cake shaped like the 'Mad Hatter's' hat, Alice is falling into it"
-          />
+          <img src="../img/confectionists/alice.png"
+            alt="A cake shaped like the 'Mad Hatter's' hat, Alice is falling into it" />
           <p class="websitelink">
             Contact: <a href="">www.example-extraordinary-cakes.com</a>
           </p>
         </div>
       </article>
 
-      <article>
+      <article class="showcase">
         <div class="introduction">
           <h3>This could be you!</h3>
-          <img
-            src="../img/confectionists/placeholder.png"
-            height="250px"
-            alt="A confectionist's cake's photo may be displayed here"
-          />
+          <img src="../img/confectionists/placeholder.png" alt="A confectionist's cake's photo may be displayed here" />
           <p class="websitelink">
             Contact: <a href="">www.example-extraordinary-cakes.com</a>
           </p>
         </div>
       </article>
-    </main>
 
-    <footer>
-      <p class="footerbox">
-        Brought to you by KanUbake, a brand of KanUproject, 2026
-        <br />
-        <br />
-        <a href="https://jigsaw.w3.org/css-validator/check/referer">
-          <img
-            style="border: 0; width: 88px; height: 31px"
-            src="https://jigsaw.w3.org/css-validator/images/vcss"
-            alt="CSS ist valide!"
-          />
-        </a>
-      </p>
-    </footer>
-    <script src="../js/transition-between-pages.js"></script>
-    <dialog id="logoutDialog">
-      <p>Are you sure you want to log out?</p>
-      <button id="confirmLogout">Yes, Log Out</button>
-      <button id="cancelLogout">Cancel</button>
+    </div>
+
+  </main>
+
+  <div id="footer"></div>
+  <script src="../fixedLayout/footer.js"></script>
+
+  <script src="../js/transition-between-pages.js"></script>
+  <dialog id="logoutDialog">
+    <p>Are you sure you want to log out?</p>
+    <button id="confirmLogout">Yes, Log Out</button>
+    <button id="cancelLogout">Cancel</button>
   </dialog>
-  </body>
+</body>
+
 </html>
