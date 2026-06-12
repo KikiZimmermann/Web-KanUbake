@@ -1,4 +1,4 @@
-fetch("../fixedLayout/nav.html")
+fetch("/KanUbake/client/fixedLayout/nav.html")
     .then(response => response.text())
     .then(data => {
         document.getElementById("nav").innerHTML = data;

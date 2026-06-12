@@ -13,12 +13,14 @@ import { SummaryBuilder } from "./SummaryBuilder.js";
 import { TierFlavor } from "../models/TierFlavor.js";
 import { ReferenceItem } from "../models/ReferenceItem.js";
 import { CakeSizeApiService } from "./api/CakeSizeApiService.js";
+import { ColorApiService } from "./api/ColorApiService.js";
 
 export class QuestionnaireRenderer {
   constructor(state) {
     this.state = state;
     this.summaryBuilder = new SummaryBuilder();
     this.cakeSizeApiService = new CakeSizeApiService();
+    this.colorApiService = new ColorApiService();
 
     this.chapterIntroElement = document.getElementById("chapterIntro");
     this.chapterContainerElement = document.getElementById("chapterContainer");
@@ -864,19 +866,20 @@ export class QuestionnaireRenderer {
           <label for="paletteBaseColor">
             Starting color for palette suggestion
           </label>
-          <input
-            type="text"
-            id="paletteBaseColor"
-            data-field="paletteBaseColor"
-            value="${request.paletteBaseColor || ""}"
-            placeholder="For example: blush pink, sage green, navy blue"
-          >
+          <div class="color-autocomplete-wrapper">
+            <input
+              type="text"
+              id="paletteBaseColor"
+              data-field="paletteBaseColor"
+              value="${request.paletteBaseColor || ""}"
+              placeholder="For example: pink, sage, navy"
+              autocomplete="off"
+            >
+            <ul id="colorSuggestions" class="color-suggestions"></ul>
+          </div>
         </div>
 
-        <p class="field-hint">
-          A color palette suggestion can be generated later. For now, this stores
-          the starting color you would like to use.
-        </p>
+        <div id="colorPaletteResult"></div>
       `;
     }
 
@@ -1530,6 +1533,70 @@ export class QuestionnaireRenderer {
       });
     }
 
+    const paletteInput = document.getElementById("paletteBaseColor");
+    const suggestionsList = document.getElementById("colorSuggestions");
+
+    if (paletteInput && suggestionsList) {
+      paletteInput.addEventListener("input", () => {
+        const typed = paletteInput.value.trim();
+        suggestionsList.innerHTML = "";
+
+        if (typed.length < 2) return;
+
+        const matches = this.colorApiService.getAutocompleteSuggestions(typed);
+        if (matches.length === 0) return;
+
+        matches.forEach(({ name, hex }) => {
+            const li = document.createElement("li");
+            li.className = "color-suggestion-item";
+            li.innerHTML = `
+              <span class="color-suggestion-swatch" style="background:${hex};"></span>
+              ${name}
+            `;
+            li.addEventListener("mousedown", (e) => {
+              e.preventDefault();
+              paletteInput.value = name;
+              this.state.updateField("paletteBaseColor", name);
+              suggestionsList.innerHTML = "";
+              this.generateColorPalette();
+            });
+            suggestionsList.appendChild(li);
+        });
+      });
+
+      paletteInput.addEventListener("keydown", (e) => {
+        const items = suggestionsList.querySelectorAll(".color-suggestion-item");
+        if (items.length === 0) return;
+
+        const highlighted = suggestionsList.querySelector(".highlighted");
+        let index = Array.from(items).indexOf(highlighted);
+
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          if (highlighted) highlighted.classList.remove("highlighted");
+          index = (index + 1) % items.length;
+          items[index].classList.add("highlighted");
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          if (highlighted) highlighted.classList.remove("highlighted");
+          index = (index - 1 + items.length) % items.length;
+          items[index].classList.add("highlighted");
+        } else if (e.key === "Enter" && highlighted) {
+          e.preventDefault();
+          highlighted.dispatchEvent(new Event("mousedown"));
+        } else if (e.key === "Escape") {
+          suggestionsList.innerHTML = "";
+        }
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!paletteInput.contains(e.target)) {
+          suggestionsList.innerHTML = "";
+        }
+      });
+    }
+
+
     this.attachCheckboxGroupChange("decorations", (selectedValues) => {
       this.state.updateField("decorations", selectedValues);
 
@@ -1829,6 +1896,82 @@ export class QuestionnaireRenderer {
     return sectionName
       .replace(/([A-Z])/g, " $1")
       .replace(/^./, (firstLetter) => firstLetter.toUpperCase());
+  }
+
+  updateSelectedPaletteColors(colors) {
+    const box = document.getElementById("selectedPaletteColors");
+    if (!box) return;
+
+    if (colors.length === 0) {
+      box.innerHTML = "";
+      return;
+    }
+
+    box.innerHTML = `
+      <p class="field-hint">Selected colors: <strong>${colors.join(", ")}</strong></p>
+    `;
+  }
+
+  async generateColorPalette() {
+    const request = this.state.getCakeRequest();
+    const colorName = request.paletteBaseColor;
+    const resultBox = document.getElementById("colorPaletteResult");
+
+    if (!colorName || colorName.trim() === "") {
+      resultBox.innerHTML = `<p class="field-hint">Please enter a starting color first.</p>`;
+      return;
+    }
+
+    resultBox.innerHTML = `<p class="field-hint">Loading palette...</p>`;
+
+    // clear previously selected palette colors before loading new palette
+    const request2 = this.state.getCakeRequest();
+    request2.colors = [];
+    request2.markUpdated();
+
+    try {
+      const result = await this.colorApiService.getSuggestedPalette(colorName);
+
+      resultBox.innerHTML = `
+        <p class="field-hint">
+          Palette based on <strong>${result.baseColor.name}</strong> (${result.baseColor.hex}):
+          Click a color to add it to your selection.
+        </p>
+        <div class="palette-swatches">
+          ${result.palette.map(color => `
+            <div class="palette-swatch" data-color-name="${color.name}" data-color-hex="${color.hex}">
+              <div class="palette-swatch-color" style="background-color:${color.hex};"></div>
+              <span>${color.name}</span><br>
+              <span>${color.hex}</span>
+            </div>
+          `).join("")}
+        </div>
+        <div id="selectedPaletteColors" class="selected-palette-colors"></div>
+      `;
+
+      resultBox.querySelectorAll(".palette-swatch").forEach(swatch => {
+        swatch.addEventListener("click", () => {
+          const colorHex = swatch.dataset.colorHex;
+          const colorName = swatch.dataset.colorName;
+          const colorEntry = `${colorName} (${colorHex})`;
+          const request = this.state.getCakeRequest();
+
+          if (!request.colors.includes(colorEntry)) {
+            request.colors.push(colorEntry);
+            request.markUpdated();
+            swatch.classList.add("palette-swatch-selected");
+          } else {
+            request.colors = request.colors.filter(c => c !== colorEntry);
+            request.markUpdated();
+            swatch.classList.remove("palette-swatch-selected");
+          }
+
+          this.updateSelectedPaletteColors(request.colors);
+        });
+      });
+    } catch (error) {
+      resultBox.innerHTML = `<p class="field-hint">${error.message}</p>`;
+    }
   }
 
 
