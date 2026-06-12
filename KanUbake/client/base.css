@@ -155,7 +155,7 @@ nav {
     align-items: center;
     grid-area: n;
     padding: 20px;
-    border: double, #e07a5f, 10px;
+    border: #e07a5f double 10px;
 }
 
 main {
@@ -308,7 +308,6 @@ footer {
     body,
     nav {
         width: auto;
-        border: none;
     }
 
     img.imglogo {
