@@ -236,13 +236,34 @@ footer {
     font-size: medium;
 }
 
-
 #authBtn:hover {
     background: #e55b67;
     color: white;
 }
 
-@media (max-width: 600px) {
+.nav-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.nav-buttons a {
+    background-color: #fde5e5;
+    padding: 10px 20px;
+    border-radius: 10px;
+    color: #5f3526;
+    font-weight: bold;
+    border: #5f3526 solid 1.5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+
+
+@media (max-width: 760px) {
 
     main {
         margin-left: 0;
