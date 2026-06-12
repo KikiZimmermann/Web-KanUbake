@@ -4,6 +4,7 @@
 body {
   min-height: 100vh;
   overflow-y: auto;
+  background-color: var(--warm-white);
 }
 
 html {
@@ -41,7 +42,7 @@ html {
 }
 
 /* ── Submit button ───────────────────────────────────── */
-.form_basic > .btn:last-child {
+.form_basic>.btn:last-child {
   font-weight: bold;
   padding: 1.8rem;
   margin: 0 0.5rem 0.2rem;
@@ -94,4 +95,19 @@ header {
 
 input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
+}
+
+@media (max-width: 600px) {
+
+  .form_basic {
+    gap: 1.2rem;
+  }
+
+  .nav-btn {
+    height: auto;
+  }
+
+  input::placeholder {
+    font-size: 1rem;
+  }
 }
