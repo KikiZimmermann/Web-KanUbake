@@ -51,7 +51,7 @@ export class QuestionnaireRenderer {
 
       try {
         const savedRequest =
-          await CakeRequestApiService.save(cakeRequest);
+          await CakeRequestApiService.saveCakeRequest(cakeRequest);
 
         console.log(
           "Cake request saved:",
