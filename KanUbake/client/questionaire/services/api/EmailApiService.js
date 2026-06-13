@@ -7,11 +7,11 @@
 const API_BASE_URL = "http://localhost:3010";
 
 export class EmailApiService {
-    async sendDraft({ customerEmail, customerName, summary }) {
+    async sendDraft({ customerEmail, customerName, summary, allergens, analysis }) {
         const response = await fetch(`${API_BASE_URL}/api/email/send-draft`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ customerEmail, customerName, summary })
+            body: JSON.stringify({ customerEmail, customerName, summary, allergens, analysis })
         });
 
         if (!response.ok) {
