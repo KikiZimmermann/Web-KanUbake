@@ -9,10 +9,10 @@ function buildIngredientList(cakeRequest) {
   const data = cakeRequest.requestData || cakeRequest;
 
   const gramsPerServing = 100;
+  const totalServings = parseInt(data.knownServings) || parseInt(data.estimatedServings) || 1;
 
-data.tierFlavors.forEach((tier) => {
-  const servings = tier.servings || 1;
-  const amount = gramsPerServing * servings;
+  data.tierFlavors.forEach((tier) => {
+  const amount = gramsPerServing * totalServings;
 
   switch (tier.cakeFlavor) {
     case "vanilla":
