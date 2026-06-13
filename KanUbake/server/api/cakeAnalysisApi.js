@@ -69,7 +69,10 @@ function extractAllergens(cakeRequest) {
 }
 
 async function analyzeCake(cakeRequest) {
+  const data = cakeRequest.requestData || cakeRequest;
+  const totalServings = parseInt(data.knownServings) || parseInt(data.estimatedServings) || 1;
   const ingredients = buildIngredientList(cakeRequest);
+
   const response = await fetch(
     `https://api.spoonacular.com/recipes/analyze?apiKey=${process.env.SPOONACULAR_API_KEY}&includeNutrition=true`,
     {
@@ -79,6 +82,7 @@ async function analyzeCake(cakeRequest) {
       },
       body: JSON.stringify({
         title: "Custom Cake",
+        servings: totalServings,
         ingredients,
       }),
     }
