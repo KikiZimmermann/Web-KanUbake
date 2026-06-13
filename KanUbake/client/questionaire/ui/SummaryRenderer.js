@@ -41,8 +41,6 @@ export class SummaryRenderer {
             );
         });
 
-        summaryContent.append(this.createEmailSection());
-
         this.containerElement.append(summaryContent);
     }
 
@@ -114,6 +112,7 @@ export class SummaryRenderer {
     renderAnalysisResults(allergens, analysis) {
         const el = document.getElementById("analysisSection");
         if (!el) return;
+        const container = el.parentElement;
 
         const allergenText = allergens && allergens.length > 0
             ? allergens.join(", ")
@@ -144,12 +143,20 @@ export class SummaryRenderer {
             </dl>
             <h4 style="margin-top:12px;">Estimated Nutrients (per serving)</h4>
             ${nutrientsHtml}`;
+
+        if (container && !container.querySelector(".email-draft-section")) {
+            container.append(this.createEmailSection());
+        }
     }
 
     renderAnalysisError() {
         const el = document.getElementById("analysisSection");
         if (!el) return;
         el.innerHTML = `<h4>Cake Analysis</h4><p class="summary-warning">Could not load analysis data. Please try again later.</p>`;
+        const container = el.parentElement;
+        if (container && !container.querySelector(".email-draft-section")) {
+            container.append(this.createEmailSection());
+        }
     }
 
     createEmailSection() {
