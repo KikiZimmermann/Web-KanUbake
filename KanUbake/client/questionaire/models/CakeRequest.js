@@ -9,7 +9,7 @@
 export class CakeRequest {
     constructor() {
         this.id = crypto.randomUUID();
-
+        this.displayName = "";
         this.status = "draft_incomplete";
 
         this.createdAt = new Date().toISOString();

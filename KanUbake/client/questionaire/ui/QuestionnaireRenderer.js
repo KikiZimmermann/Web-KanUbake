@@ -15,6 +15,7 @@ import { TierFlavor } from "../models/TierFlavor.js";
 import { ReferenceItem } from "../models/ReferenceItem.js";
 import { CakeSizeApiService } from "../services/api/CakeSizeApiService.js";
 import { ColorSelector } from "./ColorSelector.js";
+import { CakeRequestApiService } from "../services/api/CakeRequestApiService.js";
 
 export class QuestionnaireRenderer {
   constructor(state) {
@@ -32,8 +33,37 @@ export class QuestionnaireRenderer {
     this.saveButton = document.getElementById("saveButton");
     this.cancelButton = document.getElementById("cancelButton");
 
-    this.summaryRenderer = new SummaryRenderer(
-      this.chapterContainerElement);
+    this.summaryRenderer = new SummaryRenderer(this.chapterContainerElement);
+    this.attachSaveButtonEvent();
+  }
+
+  //Save Button
+  attachSaveButtonEvent() {
+    if (!this.saveButton) {
+      return;
+    }
+
+    this.saveButton.addEventListener("click", async () => {
+      const cakeRequest =
+        this.state.getCakeRequest();
+
+      cakeRequest.markIncompleteDraft();
+
+      try {
+        const savedRequest =
+          await CakeRequestApiService.save(cakeRequest);
+
+        console.log(
+          "Cake request saved:",
+          savedRequest
+        );
+      } catch (error) {
+        console.error(
+          "Cake request could not be saved:",
+          error
+        );
+      }
+    });
   }
 
   render() {
@@ -94,6 +124,21 @@ export class QuestionnaireRenderer {
 
     this.chapterContainerElement.innerHTML = `
     <div class="chapter-content">
+
+      <div class="form-field">
+        <label for="displayName">
+          Project name
+        </label>
+
+        <input
+          type="text"
+          id="displayName"
+          data-field="displayName"
+          maxlength="150"
+          value="${request.displayName}"
+          placeholder="For example: Emma's Birthday Cake"
+        >
+      </div>
 
       ${this.createSelectField(
       "occasion",
@@ -1305,6 +1350,18 @@ ${this.createOtherTextField(
   }
 
   attachBasicChapterEvents() {
+    const displayNameInput =
+      document.getElementById("displayName");
+
+    if (displayNameInput) {
+      displayNameInput.addEventListener("input", (event) => {
+        this.state.updateField(
+          "displayName",
+          event.target.value
+        );
+      });
+    }
+
     this.attachSelectChangeEvent("occasion");
     this.attachSelectChangeEvent("cakeType");
 

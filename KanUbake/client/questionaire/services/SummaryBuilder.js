@@ -18,6 +18,7 @@ export class SummaryBuilder {
             {
                 title: "Basic Information & Size",
                 items: [
+                    this.createPlainSummaryItem("Project Name", cakeRequest.displayName),
                     this.createSummaryItem("Occasion", cakeRequest.occasion, questionnaireOptions.occasions),
                     this.createSummaryItem("Cake Type", cakeRequest.cakeType, questionnaireOptions.cakeTypes),
                     this.createSummaryItem("Serving Size", cakeRequest.servingSize, questionnaireOptions.servingSizes),
