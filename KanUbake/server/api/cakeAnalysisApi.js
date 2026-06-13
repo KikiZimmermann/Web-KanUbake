@@ -71,7 +71,7 @@ function extractAllergens(cakeRequest) {
 async function analyzeCake(cakeRequest) {
   const ingredients = buildIngredientList(cakeRequest);
   const response = await fetch(
-    `https://api.spoonacular.com/recipes/analyze?apiKey=${process.env.SPOONACULAR_API_KEY}`,
+    `https://api.spoonacular.com/recipes/analyze?apiKey=${process.env.SPOONACULAR_API_KEY}&includeNutrition=true`,
     {
       method: "POST",
       headers: {
