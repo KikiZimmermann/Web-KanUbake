@@ -46,7 +46,7 @@ window.onload = function () {
     authBtn.textContent = "Log In";
     // when clicked → redirect to login page
     authBtn.onclick = () => {
-      window.location.href = "/KanUbake/client/LogIn-SinUp/html/LogIn.html";
+      window.location.href = "/LogIn-SinUp/html/LogIn.html";
     };
   }
 
@@ -74,7 +74,7 @@ window.onload = function () {
     authBtn.textContent = "Log In";
     // when clicked → redirect to login page
     authBtn.onclick = () => {
-      window.location.href = "/KanUbake/client/LogIn-SinUp/html/LogIn.html";
+      window.location.href = "/LogIn-SinUp/html/LogIn.html";
     };
   });
 
@@ -97,7 +97,7 @@ function initAuthBtn() {
   } else {
     authBtn.textContent = "Log In";
     authBtn.onclick = () => {
-      window.location.href = "/KanUbake/client/LogIn-SinUp/html/LogIn.html";
+      window.location.href = "/LogIn-SinUp/html/LogIn.html";
     };
   }
 
@@ -118,7 +118,7 @@ function initAuthBtn() {
     showGoodbyePopup();
     authBtn.textContent = "Log In";
     authBtn.onclick = () => {
-      window.location.href = "/KanUbake/client/LogIn-SinUp/html/LogIn.html";
+      window.location.href = "/LogIn-SinUp/html/LogIn.html";
     };
   });
 

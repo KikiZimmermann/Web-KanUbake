@@ -51,7 +51,7 @@ export class QuestionnaireRenderer {
 
       try {
         const savedRequest =
-          await CakeRequestApiService.save(cakeRequest);
+          await CakeRequestApiService.saveCakeRequest(cakeRequest);
 
         console.log(
           "Cake request saved:",
@@ -1986,13 +1986,27 @@ ${this.createOtherTextField(
     `;
   }
 
-  renderSummary() {
+  async renderSummary() {
     const cakeRequest = this.state.getCakeRequest();
 
-    const summarySections =
-      this.summaryBuilder.buildSummary(cakeRequest);
-
+    const summarySections = this.summaryBuilder.buildSummary(cakeRequest);
     this.summaryRenderer.render(summarySections);
+
+    this.summaryRenderer.renderAnalysisLoading();
+
+    try {
+      const [allergensResult, nutrientsResult] = await Promise.all([
+        CakeRequestApiService.nutrientsCakeRequest(cakeRequest),
+        CakeRequestApiService.analyzeCakeRequest(cakeRequest)
+      ]);
+
+      this.summaryRenderer.renderAnalysisResults(
+        allergensResult.allergens,
+        nutrientsResult.analysis
+      );
+    } catch (err) {
+      this.summaryRenderer.renderAnalysisError();
+    }
   }
 
   renderNavigationButtons() {
