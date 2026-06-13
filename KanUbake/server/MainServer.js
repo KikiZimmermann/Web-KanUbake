@@ -36,11 +36,19 @@ registerEmailApi(app);
 registerCakeAnalysisApi(app);
 
 //Eine Funktion zum testen
+<<<<<<< HEAD
 app.get("/test", authenticateToken, function (req, res) {
   const users = JSON.parse(fs.readFileSync(__dirname + "/users.json"));
   const existingUser = users.find((user) => user.email === req.user.email);
   res.json(existingUser);
 });
+=======
+//app.get('/test', authenticateToken, function (req, res) {
+//    const users = JSON.parse(fs.readFileSync(__dirname + "/users.json"));
+//    const existingUser = users.find((user) => user.email === req.user.email);
+//    res.json(existingUser);
+//})
+>>>>>>> 2669b2ac8ec2f57adccfbe6c9819827ca0d71b12
 
 //Schaut ob der Token richitig ist
 function authenticateToken(req, res, next) {
