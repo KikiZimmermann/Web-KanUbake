@@ -8,6 +8,7 @@ const cors = require("cors");
 
 const { registerCakeSizeApi } = require("./api/cakeSize/cakeSizeApi");
 const { registerEmailApi } = require("./api/emailApi");
+const { registerCakeAnalysisApi } = require("./api/cakeAnalysisApi");
 
 app.use(express.json())
 
@@ -25,6 +26,7 @@ app.use(
 //starts API
 registerCakeSizeApi(app);
 registerEmailApi(app);
+registerCakeAnalysisApi(app);
 
 //Eine Funktion zum testen
 app.get('/test', authenticateToken, function (req, res) {

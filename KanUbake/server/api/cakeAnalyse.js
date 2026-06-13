@@ -1,12 +1,9 @@
-const app = express();
-app.use(express.json());
-
 const path = require("path");
+
 require("dotenv").config({
     path: path.join(__dirname, "..", ".env")
 });
 
-//Analyse logic
 function buildIngredientList(cakeRequest) {
     const ingredients = [];
 
@@ -42,7 +39,7 @@ function buildIngredientList(cakeRequest) {
 
     return ingredients;
 }
-//alagerne logic
+
 function extractAllergens(cakeRequest) {
     const allergens = new Set();
 
@@ -70,59 +67,59 @@ function extractAllergens(cakeRequest) {
     return [...allergens];
 }
 
-
-//allergene
-app.post("/allergens", function (req, res) {
-    try {
-        const cakeRequest = req.body;
-
-        const allergens = extractAllergens(cakeRequest);
-
-        res.json({
-            allergens
-        });
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Something went wrong" });
-    }
-});
-
-
-//Analysieren
-async function analyzeCake(cakeRequest, apiKey) {
+async function analyzeCake(cakeRequest) {
     const ingredients = buildIngredientList(cakeRequest);
 
     const response = await fetch(
-        `https://api.spoonacular.com/recipes/analyze?apiKey=${apiKey}`,
+        `https://api.spoonacular.com/recipes/analyze?apiKey=${process.env.SPOONACULAR_API_KEY}`,
         {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 title: "Custom Cake",
-                ingredients,
-            }),
+                ingredients
+            })
         }
     );
 
-    return await response.json();
+    return response.json();
 }
 
-app.post("/nutrients", async function (req, res) {
-    try {
-        const cakeRequest = req.body;
-        const apiKey = process.env.SPOONACULAR_API_KEY;
+function registerCakeAnalysisApi(app) {
 
-        const analysis = await analyzeCake(cakeRequest, apiKey);
+    app.post("/api/cake-analysis/allergens", (req, res) => {
+        try {
+            const allergens = extractAllergens(req.body);
 
-        res.json({
-            analysis
-        });
+            res.json({
+                allergens
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({
+                error: "Something went wrong"
+            });
+        }
+    });
 
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Something went wrong" });
-    }
-});
+    app.post("/api/cake-analysis/nutrients", async (req, res) => {
+        try {
+            const analysis = await analyzeCake(req.body);
+
+            res.json({
+                analysis
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({
+                error: "Something went wrong"
+            });
+        }
+    });
+}
+
+module.exports = {
+    registerCakeAnalysisApi
+};
