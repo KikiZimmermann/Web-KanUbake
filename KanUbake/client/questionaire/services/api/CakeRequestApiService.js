@@ -1,4 +1,4 @@
-import { CakeRequestMapper } from "../../mappers/CakeRequestMapper.js";
+import { CakeRequestMapper } from "../../mapper/CakeRequestMapper.js";
 
 export class CakeRequestApiService {
     static async saveCakeRequest(cakeRequest) {

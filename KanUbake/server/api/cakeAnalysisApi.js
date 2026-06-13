@@ -107,7 +107,7 @@ function registerCakeAnalysisApi(app) {
     app.post("/api/cake-analysis/nutrients", async (req, res) => {
         try {
             const analysis = await analyzeCake(req.body);
-
+            console.log("test");
             res.json({
                 analysis
             });
