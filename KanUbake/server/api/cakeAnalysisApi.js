@@ -8,35 +8,40 @@ function buildIngredientList(cakeRequest) {
   const ingredients = [];
   const data = cakeRequest.requestData || cakeRequest;
 
-  data.tierFlavors.forEach((tier) => {
-    switch (tier.cakeFlavor) {
-      case "vanilla":
-        ingredients.push("100g vanilla sponge cake");
-        break;
+  const gramsPerServing = 100;
 
-      case "chocolate":
-        ingredients.push("100g chocolate sponge cake");
-        break;
+data.tierFlavors.forEach((tier) => {
+  const servings = tier.servings || 1;
+  const amount = gramsPerServing * servings;
 
-      case "nut":
-        ingredients.push(`${tier.cakeNutType} sponge cake`);
-        break;
-    }
+  switch (tier.cakeFlavor) {
+    case "vanilla":
+      ingredients.push(`${amount}g vanilla sponge cake`);
+      break;
 
-    switch (tier.filling) {
-      case "fruit_filling":
-        ingredients.push(`${tier.fruitFilling} filling`);
-        break;
+    case "chocolate":
+      ingredients.push(`${amount}g chocolate sponge cake`);
+      break;
 
-      case "buttercream_filling":
-        ingredients.push(`${tier.buttercreamType} buttercream`);
-        break;
+    case "nut":
+      ingredients.push(`${amount}g ${tier.cakeNutType} sponge cake`);
+      break;
+  }
 
-      case "ganache":
-        ingredients.push(`${tier.ganacheChocolateType} ganache`);
-        break;
-    }
-  });
+  switch (tier.filling) {
+    case "fruit_filling":
+      ingredients.push(`${amount}g ${tier.fruitFilling} filling`);
+      break;
+
+    case "buttercream_filling":
+      ingredients.push(`${amount}g ${tier.buttercreamType} buttercream`);
+      break;
+
+    case "ganache":
+      ingredients.push(`${amount}g ${tier.ganacheChocolateType} ganache`);
+      break;
+  }
+});
 
   return ingredients;
 }
