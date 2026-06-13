@@ -100,6 +100,58 @@ export class SummaryRenderer {
         return row;
     }
 
+    renderAnalysisLoading() {
+        const container = this.containerElement.querySelector(".summary-content");
+        if (!container) return;
+
+        const el = document.createElement("div");
+        el.id = "analysisSection";
+        el.classList.add("summary-section");
+        el.innerHTML = `<h4>Cake Analysis</h4><p class="summary-warning">Loading allergens and nutrition info...</p>`;
+        container.appendChild(el);
+    }
+
+    renderAnalysisResults(allergens, analysis) {
+        const el = document.getElementById("analysisSection");
+        if (!el) return;
+
+        const allergenText = allergens && allergens.length > 0
+            ? allergens.join(", ")
+            : "None detected";
+
+        let nutrientsHtml = "";
+        if (analysis && analysis.nutrition && analysis.nutrition.nutrients) {
+            const nutrients = analysis.nutrition.nutrients.slice(0, 5);
+            nutrientsHtml = `
+                <dl class="summary-list">
+                    ${nutrients.map(n => `
+                        <div class="summary-row">
+                            <dt>${n.name}</dt>
+                            <dd>${n.amount} ${n.unit}</dd>
+                        </div>`).join("")}
+                </dl>`;
+        } else {
+            nutrientsHtml = `<p>Nutrition data not available.</p>`;
+        }
+
+        el.innerHTML = `
+            <h4>Cake Analysis</h4>
+            <dl class="summary-list">
+                <div class="summary-row">
+                    <dt>Allergens</dt>
+                    <dd>${allergenText}</dd>
+                </div>
+            </dl>
+            <h4 style="margin-top:12px;">Estimated Nutrients (per serving)</h4>
+            ${nutrientsHtml}`;
+    }
+
+    renderAnalysisError() {
+        const el = document.getElementById("analysisSection");
+        if (!el) return;
+        el.innerHTML = `<h4>Cake Analysis</h4><p class="summary-warning">Could not load analysis data. Please try again later.</p>`;
+    }
+
     createEmailSection() {
         const section = document.createElement("div");
         section.classList.add("email-draft-section");

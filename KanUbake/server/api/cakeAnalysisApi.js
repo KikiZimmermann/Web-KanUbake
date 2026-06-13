@@ -1,125 +1,119 @@
 const path = require("path");
 
 require("dotenv").config({
-    path: path.join(__dirname, "..", ".env")
+  path: path.join(__dirname, "..", ".env"),
 });
 
 function buildIngredientList(cakeRequest) {
-    const ingredients = [];
+  const ingredients = [];
+  const data = cakeRequest.requestData || cakeRequest;
 
-    cakeRequest.tierFlavors.forEach((tier) => {
-        switch (tier.cakeFlavor) {
-            case "vanilla":
-                ingredients.push("100g vanilla sponge cake");
-                break;
+  data.tierFlavors.forEach((tier) => {
+    switch (tier.cakeFlavor) {
+      case "vanilla":
+        ingredients.push("100g vanilla sponge cake");
+        break;
 
-            case "chocolate":
-                ingredients.push("100g chocolate sponge cake");
-                break;
+      case "chocolate":
+        ingredients.push("100g chocolate sponge cake");
+        break;
 
-            case "nut":
-                ingredients.push(`${tier.cakeNutType} sponge cake`);
-                break;
-        }
+      case "nut":
+        ingredients.push(`${tier.cakeNutType} sponge cake`);
+        break;
+    }
 
-        switch (tier.filling) {
-            case "fruit_filling":
-                ingredients.push(`${tier.fruitFilling} filling`);
-                break;
+    switch (tier.filling) {
+      case "fruit_filling":
+        ingredients.push(`${tier.fruitFilling} filling`);
+        break;
 
-            case "buttercream_filling":
-                ingredients.push(`${tier.buttercreamType} buttercream`);
-                break;
+      case "buttercream_filling":
+        ingredients.push(`${tier.buttercreamType} buttercream`);
+        break;
 
-            case "ganache":
-                ingredients.push(`${tier.ganacheChocolateType} ganache`);
-                break;
-        }
-    });
+      case "ganache":
+        ingredients.push(`${tier.ganacheChocolateType} ganache`);
+        break;
+    }
+  });
 
-    return ingredients;
+  return ingredients;
 }
 
 function extractAllergens(cakeRequest) {
-    const allergens = new Set();
+  const allergens = new Set();
+  const data = cakeRequest.requestData || cakeRequest;
 
-    cakeRequest.tierFlavors.forEach((tier) => {
-        if (tier.cakeFlavor === "nut") {
-            allergens.add("nuts");
-        }
+  data.tierFlavors.forEach((tier) => {
+    if (tier.cakeFlavor === "nut") {
+      allergens.add("nuts");
+    }
 
-        if (
-            tier.filling === "buttercream_filling" ||
-            tier.filling === "ganache"
-        ) {
-            allergens.add("milk");
-        }
+    if (tier.filling === "buttercream_filling" || tier.filling === "ganache") {
+      allergens.add("milk");
+    }
 
-        if (
-            tier.cakeFlavor === "vanilla" ||
-            tier.cakeFlavor === "chocolate"
-        ) {
-            allergens.add("gluten");
-            allergens.add("egg");
-        }
-    });
+    if (tier.cakeFlavor === "vanilla" || tier.cakeFlavor === "chocolate") {
+      allergens.add("gluten");
+      allergens.add("egg");
+    }
+  });
 
-    return [...allergens];
+  return [...allergens];
 }
 
 async function analyzeCake(cakeRequest) {
-    const ingredients = buildIngredientList(cakeRequest);
+  const ingredients = buildIngredientList(cakeRequest);
+  const response = await fetch(
+    `https://api.spoonacular.com/recipes/analyze?apiKey=${process.env.SPOONACULAR_API_KEY}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: "Custom Cake",
+        ingredients,
+      }),
+    }
+  );
 
-    const response = await fetch(
-        `https://api.spoonacular.com/recipes/analyze?apiKey=${process.env.SPOONACULAR_API_KEY}`,
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                title: "Custom Cake",
-                ingredients
-            })
-        }
-    );
-
-    return response.json();
+  return response.json();
 }
 
 function registerCakeAnalysisApi(app) {
+  app.post("/api/cake-analysis/allergens", (req, res) => {
+    try {
+      const allergens = extractAllergens(req.body);
 
-    app.post("/api/cake-analysis/allergens", (req, res) => {
-        try {
-            const allergens = extractAllergens(req.body);
+      res.json({
+        allergens,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        error: "Something went wrong",
+      });
+    }
+  });
 
-            res.json({
-                allergens
-            });
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({
-                error: "Something went wrong"
-            });
-        }
-    });
-
-    app.post("/api/cake-analysis/nutrients", async (req, res) => {
-        try {
-            const analysis = await analyzeCake(req.body);
-            console.log("test");
-            res.json({
-                analysis
-            });
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({
-                error: "Something went wrong"
-            });
-        }
-    });
+  app.post("/api/cake-analysis/nutrients", async (req, res) => {
+    try {
+      const analysis = await analyzeCake(req.body);
+      console.log("test");
+      res.json({
+        analysis,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        error: "Something went wrong",
+      });
+    }
+  });
 }
 
 module.exports = {
-    registerCakeAnalysisApi
+  registerCakeAnalysisApi,
 };
