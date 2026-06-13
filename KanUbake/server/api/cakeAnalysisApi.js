@@ -10,9 +10,10 @@ function buildIngredientList(cakeRequest) {
 
   const gramsPerServing = 100;
   const totalServings = parseInt(data.knownServings) || parseInt(data.estimatedServings) || 1;
+  const tierCount = data.tierFlavors.length || 1;
 
   data.tierFlavors.forEach((tier) => {
-  const amount = gramsPerServing * totalServings;
+  const amount = Math.round((gramsPerServing * totalServings) / tierCount);
 
   switch (tier.cakeFlavor) {
     case "vanilla":
@@ -25,6 +26,10 @@ function buildIngredientList(cakeRequest) {
 
     case "nut":
       ingredients.push(`${amount}g ${tier.cakeNutType} sponge cake`);
+      break;
+
+    default:
+      ingredients.push(`${amount}g sponge cake`);
       break;
   }
 
@@ -39,6 +44,10 @@ function buildIngredientList(cakeRequest) {
 
     case "ganache":
       ingredients.push(`${amount}g ${tier.ganacheChocolateType} ganache`);
+      break;
+
+    default:
+      ingredients.push(`${amount}g cream filling`);
       break;
   }
 });
