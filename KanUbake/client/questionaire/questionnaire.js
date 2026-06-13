@@ -13,6 +13,8 @@ import { QuestionnaireState } from "./state/QuestionnaireState.js";
 import { QuestionnaireRenderer } from "./ui/QuestionnaireRenderer.js";
 import { QuestionnaireValidator } from "./validation/QuestionnaireValidator.js";
 import { DraftStorageService } from "./services/DraftStorageService.js";
+import { EmailApiService } from "./services/api/EmailApiService.js";
+import { SummaryBuilder } from "./services/SummaryBuilder.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const startScreen = document.getElementById("startScreen");
@@ -32,6 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const renderer = new QuestionnaireRenderer(state);
     const validator = new QuestionnaireValidator(state);
     const draftStorageService = new DraftStorageService();
+    const emailApiService = new EmailApiService();
+    const summaryBuilder = new SummaryBuilder();
 
     function clearValidationErrors() {
         document.querySelectorAll(".field-error").forEach((element) => {
@@ -133,6 +137,39 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Draft saved as complete.");
         } else {
             alert("Draft saved as incomplete. You can continue editing it later.");
+        }
+    });
+
+    document.addEventListener("click", async (event) => {
+        if (event.target.id !== "sendDraftEmailButton") return;
+
+        const emailInput = document.getElementById("draftEmailInput");
+        const statusEl = document.getElementById("emailDraftStatus");
+        const email = emailInput.value.trim();
+
+        if (!email) {
+            statusEl.textContent = "Please enter an email address.";
+            statusEl.className = "email-draft-status email-draft-status--error";
+            return;
+        }
+
+        const button = event.target;
+        button.disabled = true;
+        button.textContent = "Sending…";
+        statusEl.textContent = "";
+        statusEl.className = "email-draft-status";
+
+        try {
+            const summary = summaryBuilder.buildSummary(state.getCakeRequest());
+            await emailApiService.sendDraft({ customerEmail: email, summary });
+            statusEl.textContent = "Draft sent! Check your inbox.";
+            statusEl.className = "email-draft-status email-draft-status--success";
+        } catch {
+            statusEl.textContent = "Failed to send. Please try again.";
+            statusEl.className = "email-draft-status email-draft-status--error";
+        } finally {
+            button.disabled = false;
+            button.textContent = "Send";
         }
     });
 

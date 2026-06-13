@@ -41,6 +41,8 @@ export class SummaryRenderer {
             );
         });
 
+        summaryContent.append(this.createEmailSection());
+
         this.containerElement.append(summaryContent);
     }
 
@@ -96,6 +98,38 @@ export class SummaryRenderer {
         row.append(label, value);
 
         return row;
+    }
+
+    createEmailSection() {
+        const section = document.createElement("div");
+        section.classList.add("email-draft-section");
+
+        const heading = document.createElement("h4");
+        heading.textContent = "Send draft to your email";
+
+        const row = document.createElement("div");
+        row.classList.add("email-draft-row");
+
+        const input = document.createElement("input");
+        input.type = "email";
+        input.placeholder = "your@email.com";
+        input.id = "draftEmailInput";
+        input.classList.add("email-draft-input");
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = "Send";
+        button.id = "sendDraftEmailButton";
+        button.classList.add("email-draft-button");
+
+        const status = document.createElement("p");
+        status.id = "emailDraftStatus";
+        status.classList.add("email-draft-status");
+
+        row.append(input, button);
+        section.append(heading, row, status);
+
+        return section;
     }
 
     clear() {

@@ -290,6 +290,72 @@ textarea:focus {
   border-radius: 8px;
 }
 
+/* ── Email Draft ── */
+
+.email-draft-section {
+  margin-top: 28px;
+  padding: 20px;
+
+  background-color: #fff4f4;
+
+  border-radius: 12px;
+}
+
+.email-draft-section h4 {
+  margin: 0 0 12px;
+  color: #5f3526;
+}
+
+.email-draft-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.email-draft-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.email-draft-button {
+  padding: 8px 22px;
+
+  background-color: #eeafaf;
+  color: #5f3526;
+
+  border: 1.5px solid #5f3526;
+  border-radius: 18px;
+
+  font-family: inherit;
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+.email-draft-button:hover:not(:disabled) {
+  background-color: #e07a5f;
+  color: white;
+  border-color: transparent;
+}
+
+.email-draft-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.email-draft-status {
+  margin: 10px 0 0;
+  font-size: 0.9rem;
+}
+
+.email-draft-status--success {
+  color: #2e7d32;
+}
+
+.email-draft-status--error {
+  color: #c62828;
+}
+
 /* ── References ── */
 
 .reference-card {
