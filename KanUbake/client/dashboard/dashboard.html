@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css" />
+    <link rel="stylesheet" href="../authBtn.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="../authBtn.js"></script>
+</head>
+
+<body>
+
+    <div id="header"></div>
+    <script src="../fixedLayout/header.js"></script>
+    <script>
+        window.pageTitle = "Your Creations";
+    </script>
+
+    <nav id="nav"></nav>
+    <script src="../fixedLayout/nav.js"></script>
+
+    <script src="./dashboard.js"></script>
+
+    <main>
+        <h2>Showcase of your Designs</h2>
+
+        <div class="core">
+            <p>
+                Check out your drafts and finished designs. <br>
+                <br>
+                You can always come back here to adapt them, or delete those you don't need anymore.
+            </p>
+        </div>
+
+        <div class="showcase-container">
+
+            <article class="showcase">
+                <div class="introduction">
+                    <h3>Project Title</h3>
+                    <p>Last Updated: 12 June 2026</p>
+                    <button>View / Edit</button>
+                    <button>Delete</button>
+                </div>
+            </article>
+
+            <article class="showcase">
+                <div class="introduction">
+                    <h3>Confectionist Perfectionist</h3>
+                    <img src="../img/confectionists/rainbow.png"
+                        alt="A cupcake-shaped cake cut open with layered rainbow inside" />
+                    <p class="websitelink">
+                        Contact: <a href="">www.example-extraordinary-cakes.com</a>
+                    </p>
+                </div>
+            </article>
+
+        </div>
+
+    </main>
+
+    <div id="footer"></div>
+    <script src="../fixedLayout/footer.js"></script>
+
+    <script src="../LogIn-SInUp/js/transition-between-pages.js"></script>
+    <dialog id="logoutDialog">
+        <p>Are you sure you want to log out?</p>
+        <button id="confirmLogout">Yes, Log Out</button>
+        <button id="cancelLogout">Cancel</button>
+    </dialog>
+</body>
+
+</html>

@@ -19,16 +19,6 @@ body {
   background-size: 800px;
   margin: 0;
   font-size: medium;
-
-  /*
-    display: grid;
-    grid-template-rows: auto auto 1fr auto;
-    grid-template-areas:
-        "h"
-        "n"
-        "m"
-        "f";
-        */
 }
 
 h2,

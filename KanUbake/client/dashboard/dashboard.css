@@ -1,0 +1,51 @@
+@import url(../base.css);
+
+@media (max-width: 600px) {
+    .showcase-container {
+        grid-template-columns: 1fr;
+        padding: 10px;
+    }
+}
+
+.showcase-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 30px;
+}
+
+.showcase img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: contain;
+    display: block;
+    padding-bottom: 5%;
+}
+
+main {
+    background: linear-gradient(180deg, rgb(200, 246, 248) 0%, #70bdbe 100%);
+    border-left: rgb(100, 182, 201) solid;
+    border-right: rgb(100, 182, 201) solid;
+}
+
+div.introduction {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+article.showcase {
+    padding: 20px;
+    margin: 0;
+    background: rgb(236, 255, 254);
+    border: rgb(100, 182, 201) dashed;
+}
+
+p a {
+    color: rgb(3, 58, 74);
+}
+
+.core {
+    margin-bottom: 10px;
+}
