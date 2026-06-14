@@ -1,138 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Edit Account</title>
-    <link rel="stylesheet" href="../css/logInSingUp.css" />
-    <link rel="stylesheet" href="../css/responsive.css" />
-    <link rel="stylesheet" href="../css/transition-between-pages.css" />
-    <link rel="stylesheet" href="../css/validation.css" />
-    <link rel="stylesheet" href="../css/popup.css" />
-  </head>
-  <body class="page-edit">
-    <div id="popup" class="popup">
-      <img src="../../img/logos/fail-svgrepo-com.svg" alt="error" />
-      <p id="popupMessage">Something went wrong</p>
-    </div>
 
-    <a href="../../index/index.html" title="Go to Home Page">
-      <img
-        class="hompage-btn btn"
-        src="../../img/logos/home-icon-silhouette-svgrepo-com.svg"
-        alt="Back To Homepage"
-      />
-    </a>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Account</title>
+  <link rel="stylesheet" href="../css/logInSingUp.css" />
+  <link rel="stylesheet" href="../css/responsive.css" />
+  <link rel="stylesheet" href="../css/transition-between-pages.css" />
+  <link rel="stylesheet" href="../css/validation.css" />
+  <link rel="stylesheet" href="../css/popup.css" />
+  <link rel="icon" type="image/png" href="/img/logos/icon.png">
+</head>
 
-    <section class="card">
-      <form autocomplete="off" action="" class="form_basic">
-        <header>
-          <h1>Edit Account</h1>
-          <p>Update your personal information</p>
-        </header>
+<body class="page-edit">
+  <div id="popup" class="popup">
+    <img src="../../img/logos/fail-svgrepo-com.svg" alt="error" />
+    <p id="popupMessage">Something went wrong</p>
+  </div>
 
-        <label for="first_name" class="lbl">
-          First Name
-          <input
-            maxlength="50"
-            title="Please enter your first name"
-            placeholder="KanU"
-            id="first_name"
-            type="text"
-          />
-          <p></p>
-        </label>
+  <a href="../../index/index.html" title="Go to Home Page">
+    <img class="hompage-btn btn" src="../../img/logos/home-icon-silhouette-svgrepo-com.svg" alt="Back To Homepage" />
+  </a>
 
-        <label for="last_name" class="lbl">
-          Last Name
-          <input
-            maxlength="50"
-            title="Please enter your last name"
-            placeholder="Bake"
-            id="last_name"
-            type="text"
-          />
-          <p></p>
-        </label>
+  <section class="card">
+    <form autocomplete="off" action="" class="form_basic">
+      <header>
+        <h1>Edit Account</h1>
+        <p>Update your personal information</p>
+      </header>
 
-        <label for="date_of_birth" class="lbl">
-          Date of Birth
-          <input
-            title="Please pick your date of birth"
-            id="date_of_birth"
-            type="date"
-          />
-          <p></p>
-        </label>
-
-        <p class="pass-hint">To keep your current password,<br>leave the fields below empty.</p>
-
-        <label for="current_pass" class="lbl">
-          Current Password
-          <input
-            maxlength="50"
-            title="Enter your current password to change it"
-            placeholder="••••••••"
-            id="current_pass"
-            type="password"
-          />
-          <p></p>
-        </label>
-
-        <label for="new_pass" class="lbl">
-          New Password
-          <input
-            maxlength="50"
-            title="Enter your new password"
-            placeholder="••••••••"
-            id="new_pass"
-            type="password"
-          />
-          <p></p>
-        </label>
-
-        <label for="new_pass_confirm" class="lbl">
-          Confirm New Password
-          <input
-            maxlength="50"
-            title="Repeat your new password"
-            placeholder="••••••••"
-            id="new_pass_confirm"
-            type="password"
-          />
-          <p></p>
-        </label>
-
-        <div class="action-btns">
-          <button title="Save changes" type="button" id="save_changes" class="btn">
-            Save Changes
-          </button>
-          <button title="Delete your account" type="button" id="delete_account" class="btn">
-            Delete Account
-          </button>
-        </div>
-      </form>
-    </section>
-
-    <!-- delete confirmation dialog -->
-    <dialog id="deleteDialog">
-      <p class="delete-dialog-text">Are you sure you want to delete your account? This cannot be undone.</p>
-      <label class="delete-pass-label">
-        Confirm your password
-        <input type="password" id="deletePassInput" placeholder="••••••••" />
-        <span id="deletePassError" class="delete-pass-error"></span>
+      <label for="first_name" class="lbl">
+        First Name
+        <input maxlength="50" title="Please enter your first name" placeholder="KanU" id="first_name" type="text" />
+        <p></p>
       </label>
-      <div class="delete-dialog-btns">
-        <button id="confirmDelete" class="btn delete-confirm-btn">Yes, delete</button>
-        <button id="cancelDelete" class="btn delete-cancel-btn">Cancel</button>
-      </div>
-    </dialog>
 
-    <script src="../../fetchWithAuth.js"></script>
-    <script src="../js/transition-between-pages.js"></script>
-    <script src="../js/show-hide-pass.js"></script>
-    <script src="../js/validation.js"></script>
-    <script src="../js/popup.js"></script>
-    <script src="../js/edit-account.js"></script>
-  </body>
+      <label for="last_name" class="lbl">
+        Last Name
+        <input maxlength="50" title="Please enter your last name" placeholder="Bake" id="last_name" type="text" />
+        <p></p>
+      </label>
+
+      <label for="date_of_birth" class="lbl">
+        Date of Birth
+        <input title="Please pick your date of birth" id="date_of_birth" type="date" />
+        <p></p>
+      </label>
+
+      <p class="pass-hint">To keep your current password,<br>leave the fields below empty.</p>
+
+      <label for="current_pass" class="lbl">
+        Current Password
+        <input maxlength="50" title="Enter your current password to change it" placeholder="••••••••" id="current_pass"
+          type="password" />
+        <p></p>
+      </label>
+
+      <label for="new_pass" class="lbl">
+        New Password
+        <input maxlength="50" title="Enter your new password" placeholder="••••••••" id="new_pass" type="password" />
+        <p></p>
+      </label>
+
+      <label for="new_pass_confirm" class="lbl">
+        Confirm New Password
+        <input maxlength="50" title="Repeat your new password" placeholder="••••••••" id="new_pass_confirm"
+          type="password" />
+        <p></p>
+      </label>
+
+      <div class="action-btns">
+        <button title="Save changes" type="button" id="save_changes" class="btn">
+          Save Changes
+        </button>
+        <button title="Delete your account" type="button" id="delete_account" class="btn">
+          Delete Account
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- delete confirmation dialog -->
+  <dialog id="deleteDialog">
+    <p class="delete-dialog-text">Are you sure you want to delete your account? This cannot be undone.</p>
+    <label class="delete-pass-label">
+      Confirm your password
+      <input type="password" id="deletePassInput" placeholder="••••••••" />
+      <span id="deletePassError" class="delete-pass-error"></span>
+    </label>
+    <div class="delete-dialog-btns">
+      <button id="confirmDelete" class="btn delete-confirm-btn">Yes, delete</button>
+      <button id="cancelDelete" class="btn delete-cancel-btn">Cancel</button>
+    </div>
+  </dialog>
+
+  <script src="../../fetchWithAuth.js"></script>
+  <script src="../js/transition-between-pages.js"></script>
+  <script src="../js/show-hide-pass.js"></script>
+  <script src="../js/validation.js"></script>
+  <script src="../js/popup.js"></script>
+  <script src="../js/edit-account.js"></script>
+</body>
+
 </html>
