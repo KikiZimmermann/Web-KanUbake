@@ -32,18 +32,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const progressButtons = document.querySelectorAll(".progress-step");
 
     const state = new QuestionnaireState();
+
     const renderer = new QuestionnaireRenderer(state);
+    renderer.setValidationRefreshCallback(refreshCurrentValidationErrors);
+
     const validator = new QuestionnaireValidator(state);
     const draftStorageService = new DraftStorageService();
     const emailApiService = new EmailApiService();
+
     const summaryBuilder = new SummaryBuilder();
+    let validationErrorsActive = false;
 
     function clearValidationErrors() {
         document.querySelectorAll(".field-error").forEach((element) => {
             element.classList.remove("field-error");
         });
 
-        document.querySelectorAll(".field-error-message").forEach((element) => {
+        document.querySelectorAll('[data-validation-error="true"]').forEach((element) => {
             element.remove();
         });
     }
@@ -64,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            const existingMessage = parentField.querySelector(".field-error-message");
+            const existingMessage = parentField.querySelector('[data-validation-error="true"]');
 
             if (existingMessage) {
                 existingMessage.textContent = messages[index];
@@ -73,11 +78,96 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const errorMessage = document.createElement("p");
             errorMessage.classList.add("field-error-message");
+            errorMessage.dataset.validationError = "true";
             errorMessage.textContent = messages[index];
 
             parentField.appendChild(errorMessage);
         });
     }
+
+    function refreshCurrentValidationErrors() {
+        const result = validator.validateCurrentChapter();
+
+        clearValidationErrors();
+
+        if (!result.isValid) {
+            showValidationErrors(result.fields, result.messages);
+        }
+    }
+
+    function clearSingleValidationError(fieldName) {
+        const fieldElement = document.querySelector(`[data-field="${fieldName}"]`);
+
+        if (!fieldElement) {
+            return;
+        }
+
+        fieldElement.classList.remove("field-error");
+
+        const parentField = fieldElement.closest(".form-field") || fieldElement.parentElement;
+
+        if (!parentField) {
+            return;
+        }
+
+        const errorMessage = parentField.querySelector('[data-validation-error="true"]');
+
+        if (errorMessage) {
+            errorMessage.remove();
+        }
+    }
+
+    document.addEventListener("change", (event) => {
+        const fieldElement = event.target.closest("[data-field]");
+
+        if (!fieldElement) {
+            return;
+        }
+
+        if (event.target.type === "checkbox") {
+            const fieldName = fieldElement.dataset.field;
+            const checkedFields = document.querySelectorAll(`input[name="${fieldName}"]:checked`);
+
+            if (checkedFields.length > 0) {
+                clearSingleValidationError(fieldName);
+            }
+
+            return;
+        }
+
+        if (event.target.value !== "") {
+            clearSingleValidationError(fieldElement.dataset.field);
+        }
+    });
+
+    document.addEventListener("input", (event) => {
+        const fieldElement = event.target.closest("[data-field]");
+
+        if (!fieldElement) {
+            return;
+        }
+
+        if (typeof event.target.value === "string" && event.target.value.trim() !== "") {
+            clearSingleValidationError(fieldElement.dataset.field);
+        }
+    });
+
+    document.addEventListener("questionnaireRendered", () => {
+        if (!validationErrorsActive) {
+            return;
+        }
+
+        const result = validator.validateCurrentChapter();
+
+        clearValidationErrors();
+
+        if (!result.isValid) {
+            showValidationErrors(result.fields, result.messages);
+            return;
+        }
+
+        validationErrorsActive = false;
+    });
 
     startQuestionnaireButton.addEventListener("click", () => {
         startScreen.classList.add("hidden");
@@ -87,6 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     backButton.addEventListener("click", () => {
+        validationErrorsActive = false;
         clearValidationErrors();
 
         state.goToPreviousChapter();
@@ -96,12 +187,15 @@ document.addEventListener("DOMContentLoaded", () => {
     nextButton.addEventListener("click", () => {
         const result = validator.validateCurrentChapter();
 
+        clearValidationErrors();
+
         if (!result.isValid) {
+            validationErrorsActive = true;
             showValidationErrors(result.fields, result.messages);
             return;
         }
 
-        clearValidationErrors();
+        validationErrorsActive = false;
 
         const nextChapterIndex = state.getCurrentChapterIndex() + 1;
         const isMovingToSummary = nextChapterIndex === state.getChapterCount() - 1;
@@ -190,6 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         if (shouldCancel) {
+            validationErrorsActive = false;
             clearValidationErrors();
 
             state.resetRequest();
@@ -200,6 +295,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     progressButtons.forEach((button) => {
         button.addEventListener("click", () => {
+            validationErrorsActive = false;
             clearValidationErrors();
 
             const chapterIndex = Number(button.dataset.chapter);
@@ -208,50 +304,4 @@ document.addEventListener("DOMContentLoaded", () => {
             renderer.render();
         });
     });
-});
-
-function clearSingleValidationError(fieldName) {
-    const fieldElement = document.querySelector(`[data-field="${fieldName}"]`);
-
-    if (!fieldElement) {
-        return;
-    }
-
-    fieldElement.classList.remove("field-error");
-
-    const parentField = fieldElement.closest(".form-field") || fieldElement.parentElement;
-
-    if (!parentField) {
-        return;
-    }
-
-    const errorMessage = parentField.querySelector(".field-error-message");
-
-    if (errorMessage) {
-        errorMessage.remove();
-    }
-}
-
-document.addEventListener("change", (event) => {
-    const fieldElement = event.target.closest("[data-field]");
-
-    if (!fieldElement) {
-        return;
-    }
-
-    if (event.target.value !== "") {
-        clearSingleValidationError(fieldElement.dataset.field);
-    }
-});
-
-document.addEventListener("input", (event) => {
-    const fieldElement = event.target.closest("[data-field]");
-
-    if (!fieldElement) {
-        return;
-    }
-
-    if (event.target.value.trim() !== "") {
-        clearSingleValidationError(fieldElement.dataset.field);
-    }
 });

@@ -50,11 +50,6 @@ export class QuestionnaireValidator {
         const messages = [];
         const fields = [];
 
-        if (!request.occasion) {
-            messages.push("Please choose an occasion.");
-            fields.push("occasion");
-        }
-
         if (!request.cakeType) {
             messages.push("Please choose a cake type.");
             fields.push("cakeType");
@@ -353,6 +348,8 @@ export class QuestionnaireValidator {
             fields.push("chocolateGlazeOtherPreserveFlavor");
         }
 
+        this.validateDecorationDetails(request, messages, fields);
+
         return {
             isValid: messages.length === 0,
             messages,
@@ -360,12 +357,186 @@ export class QuestionnaireValidator {
         };
     }
 
+    validateDecorationDetails(request, messages, fields) {
+        if (!Array.isArray(request.decorations)) {
+            return;
+        }
+
+        if (request.decorations.includes("text_lettering")) {
+            if (!request.textDetails?.text?.trim()) {
+                messages.push("Please enter the text that should appear on the cake.");
+                fields.push("cakeText");
+            }
+
+            if (!request.textDetails?.letteringStyle) {
+                messages.push("Please choose a lettering style.");
+                fields.push("letteringStyle");
+            }
+        }
+
+        if (request.decorations.includes("number_age")) {
+            if (!request.numberAgeDetails?.numberOrAge?.trim()) {
+                messages.push("Please enter the number or age that should be displayed.");
+                fields.push("numberOrAge");
+            }
+
+            if (!request.numberAgeDetails?.displayType) {
+                messages.push("Please choose how the number or age should be displayed.");
+                fields.push("numberDisplayType");
+            }
+        }
+
+        if (request.decorations.includes("candles")) {
+            const quantity = Number(request.candleDetails?.quantity);
+
+            if (!Number.isInteger(quantity) || quantity <= 0) {
+                messages.push("Please enter a valid number of candles.");
+                fields.push("candleQuantity");
+            }
+        }
+
+        if (request.decorations.includes("cake_topper")) {
+            this.validateSizedDecoration(
+                request.cakeTopperDetails,
+                "cake topper",
+                "cakeTopper",
+                messages,
+                fields
+            );
+        }
+
+        if (request.decorations.includes("figurines")) {
+            this.validateSizedDecoration(
+                request.figurineDetails,
+                "figurine",
+                "figurine",
+                messages,
+                fields
+            );
+        }
+
+        if (request.decorations.includes("edible_print") && !request.ediblePrintDescription?.trim()) {
+            messages.push("Please describe the edible print or image you would like.");
+            fields.push("ediblePrintDescription");
+        }
+
+        if (request.decorations.includes("other") && !request.otherDecorationDescription?.trim()) {
+            messages.push("Please describe the other decoration you would like.");
+            fields.push("otherDecorationDescription");
+        }
+    }
+
+    validateSizedDecoration(details, label, fieldPrefix, messages, fields) {
+        if (!details) {
+            messages.push(`Please choose how many ${label}s you would like.`);
+            fields.push(`${fieldPrefix}Quantity`);
+            return;
+        }
+
+        if (!details.quantity) {
+            messages.push(`Please choose how many ${label}s you would like.`);
+            fields.push(`${fieldPrefix}Quantity`);
+            return;
+        }
+
+        if (details.quantity === "4_plus") {
+            if (!details.description?.trim()) {
+                messages.push(`Please describe the ${label}s you would like.`);
+                fields.push(`${fieldPrefix}GeneralDescription`);
+            }
+
+            return;
+        }
+
+        const quantity = Number(details.quantity);
+
+        if (!Number.isInteger(quantity) || quantity < 1 || quantity > 3) {
+            messages.push(`Please choose a valid number of ${label}s.`);
+            fields.push(`${fieldPrefix}Quantity`);
+            return;
+        }
+
+        if (!Array.isArray(details.items) || details.items.length !== quantity) {
+            messages.push(`Please complete the details for every ${label}.`);
+            fields.push(`${fieldPrefix}Quantity`);
+            return;
+        }
+
+        details.items.forEach((item, index) => {
+            if (!item.description?.trim()) {
+                messages.push(`Please describe ${label} ${index + 1}.`);
+                fields.push(`${fieldPrefix}Description-${index}`);
+            }
+
+            if (!["small", "medium", "large"].includes(item.size)) {
+                messages.push(`Please choose a size for ${label} ${index + 1}.`);
+                fields.push(`${fieldPrefix}Size-${index}`);
+            }
+        });
+    }
+
     validateReferencesChapter() {
+        const request = this.state.getCakeRequest();
+        const messages = [];
+        const fields = [];
+
+        if (!request.referenceMode) {
+            messages.push("Please choose whether you would like to add references.");
+            fields.push("referenceMode");
+        }
+
+        if (request.referenceMode === "add_references") {
+            if (!Array.isArray(request.referenceItems) || request.referenceItems.length === 0) {
+                messages.push("Please add at least one reference image or link.");
+                fields.push("referenceImage");
+                fields.push("referenceUrl");
+            }
+
+            request.referenceItems.forEach((item, index) => {
+                if (item.type === "link" && !this.isValidReferenceUrl(item.url)) {
+                    messages.push(`Reference link ${index + 1} is not a valid URL.`);
+                    fields.push("referenceUrl");
+                }
+            });
+        }
+
+        if (!request.budgetMode) {
+            messages.push("Please choose a budget option.");
+            fields.push("budgetMode");
+        }
+
+        if (request.budgetMode === "enter_budget" && !request.budgetRange) {
+            messages.push("Please choose a budget range.");
+            fields.push("budgetRange");
+        }
+
+        if (request.budgetMode === "enter_budget" && request.budgetRange === "custom_budget") {
+            const customBudget = Number(request.customBudget);
+
+            if (!Number.isFinite(customBudget) || customBudget <= 0) {
+                messages.push("Please enter a valid custom budget.");
+                fields.push("customBudget");
+            }
+        }
+
         return {
-            isValid: true,
-            messages: [],
-            fields: []
+            isValid: messages.length === 0,
+            messages,
+            fields
         };
+    }
+
+    isValidReferenceUrl(value) {
+        if (typeof value !== "string" || !value.trim()) {
+            return false;
+        }
+
+        try {
+            const url = new URL(value.trim());
+            return url.protocol === "http:" || url.protocol === "https:";
+        } catch {
+            return false;
+        }
     }
 
     isRequestComplete() {
