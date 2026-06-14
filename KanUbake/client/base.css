@@ -309,18 +309,14 @@ footer {
     width: 100%;
   }
 
-<<<<<<< HEAD
-  .nav-buttons a,
-  #dashboard a {
-=======
   #dashboard {
     flex-direction: column;
     align-items: center;
     width: 100%;
   }
 
-  .nav-buttons a {
->>>>>>> 29ce2d115d66288809b111239d3b7442f3089075
+  .nav-buttons a,
+  #dashboard a {
     width: 80%;
     text-align: center;
   }
