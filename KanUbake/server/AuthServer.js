@@ -7,7 +7,10 @@ const jwt = require("jsonwebtoken"); // creates and verifies tokens
 const bcrypt = require("bcrypt");   // hashes and compares passwords
 const fs = require("fs");           // reads and writes files
 const cors = require("cors");       // allows browser to talk to this server
+const UserRepository = require("./repositories/UserRepository");
+const db = require("./db/db");
 
+const userRepository = new UserRepository(db);
 // start the server on port 4010
 app.listen(4010);
 
@@ -65,7 +68,7 @@ app.post("/login", async function (req, res) {
   const email = req.body.email;
 
   // read the current list of users from the file
-  const users = JSON.parse(fs.readFileSync(__dirname + "/users.json"));
+  const users = await userRepository.findUser();
 
   // check if a user with this email exists
   const existingUser = users.find((user) => user.email === email);
@@ -107,9 +110,6 @@ function generateAccessToken(user) {
 
 // endpoint to sign up — creates a new user account
 app.post("/signup", async function (req, res) {
-  // read the current list of users from the file
-  const users = JSON.parse(fs.readFileSync(__dirname + "/users.json"));
-
   // get all the fields the browser sent
   const firstName = req.body.first_name;
   const lastName = req.body.last_name;
@@ -118,7 +118,7 @@ app.post("/signup", async function (req, res) {
   const loginPass = req.body.login_pass;
 
   // check if this email is already registered
-  const existingUser = users.find((user) => user.email === loginEmail);
+  const existingUser = await userRepository.findUserbyEmail(loginEmail);
   if (existingUser) {
     return res.sendStatus(409); // 409 = Conflict — email already exists
   }
@@ -136,9 +136,7 @@ app.post("/signup", async function (req, res) {
     password: hashedPassword, // always save the hashed version!
   };
 
-  // add to the list and save back to file
-  users.push(newUser); //Json
-  fs.writeFileSync(__dirname + "/users.json", JSON.stringify(users, null, 2)); //Datenbank
+  await userRepository.createUser(newUser); //Datenbank
 
   // 201 = Created — account was successfully created
   res.sendStatus(201);

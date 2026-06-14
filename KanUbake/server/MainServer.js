@@ -35,13 +35,6 @@ registerCakeSizeApi(app);
 registerEmailApi(app);
 registerCakeAnalysisApi(app);
 
-//Eine Funktion zum testen
-//app.get("/test", authenticateToken, function (req, res) {
-//  const users = JSON.parse(fs.readFileSync(__dirname + "/users.json"));
-//  const existingUser = users.find((user) => user.email === req.user.email);
-//  res.json(existingUser);
-//});
-
 //Schaut ob der Token richitig ist
 function authenticateToken(req, res, next) {
   //token holen
