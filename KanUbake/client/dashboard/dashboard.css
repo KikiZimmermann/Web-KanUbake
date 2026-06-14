@@ -8,18 +8,12 @@
 }
 
 .showcase-container {
-    display: grid;
+    display: flex;
+    flex-wrap: wrap;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
     padding: 30px;
-}
-
-.showcase img {
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    object-fit: contain;
-    display: block;
-    padding-bottom: 5%;
+    justify-content: center;
 }
 
 main {
@@ -43,7 +37,7 @@ article.showcase {
 }
 
 .showcase:hover {
-    background: rgb(255, 255, 255);
+    background: rgb(247, 196, 154);
 }
 
 p a {
@@ -76,4 +70,13 @@ button:hover {
     background: #f27f72;
     color: white;
     border: none;
+}
+
+.introduction p {
+    text-align: left;
+    width: 90%;
+}
+
+article {
+    width: 400px;
 }
