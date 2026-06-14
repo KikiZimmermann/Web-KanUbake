@@ -9,15 +9,26 @@
   inside the route.
 */
 
+const { PricingService } = require("./PricingService");
+
 function registerPricingApi(app) {
     app.post("/api/pricing/estimate", (req, res) => {
-        const requestData = req.body.requestData;
+        try {
+            const requestData = req.body.requestData;
 
-        console.log("Pricing request received:", requestData);
+            const result = PricingService.estimatePrice(requestData);
 
-        res.status(200).json({
-            message: "Pricing API is connected successfully."
-        });
+            res.status(200).json(result);
+        } catch (error) {
+            console.error("Pricing estimate failed:", error);
+
+            res.status(error.statusCode || 500).json({
+                message:
+                    error.message || "The price estimate could not be calculated.",
+                errors:
+                    Array.isArray(error.details) ? error.details : []
+            });
+        }
     });
 }
 
