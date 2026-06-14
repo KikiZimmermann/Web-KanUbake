@@ -1,5 +1,3 @@
-import { CakeRequestApiService } from "../questionaire/services/api/CakeRequestApiService.js";
-
 async function loadCakes() {
     const token = localStorage.getItem("accessToken");
 
@@ -58,8 +56,9 @@ function renderCakes(cakes) {
 }
 
 async function editCake(cakeId) {
-    const token = localStorage.getItem("accessToken");
-    const savedRequest = await CakeRequestApiService.loadCakeRequest(cakeId);
+    // Navigate zur questionnaire mit der cakeRequestId
+    // Die loadSavedCakeRequestIfPresent Funktion wird dann automatisch aufgerufen
+    window.location.href = `../questionaire/questionnaire.html?cakeRequestId=${cakeId}`;
 }
 
 async function deleteCake(cakeId) {
