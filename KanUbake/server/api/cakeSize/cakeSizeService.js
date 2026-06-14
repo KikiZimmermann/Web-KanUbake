@@ -18,7 +18,6 @@ function estimateSizeByServings({
     tiers
 }) {
     const requestedServings = Number(servings);
-    const tierCount = Number(tiers);
 
     if (!requestedServings || requestedServings <= 0) {
         return createErrorResult("Please provide a valid number of servings.");
@@ -32,8 +31,14 @@ function estimateSizeByServings({
         return createErrorResult("Please provide a serving size.");
     }
 
-    if (requiresCustomPlanning(shape)) {
-        return createCustomPlanningResult();
+    if (requiresSizeConsultation(shape, tiers)) {
+        return createSizeConsultationResult(requestedServings);
+    }
+
+    const tierCount = Number(tiers);
+
+    if (![1, 2, 3].includes(tierCount)) {
+        return createSizeConsultationResult(requestedServings);
     }
 
     const servingsWithBuffer = addPlanningBuffer(requestedServings);
@@ -77,12 +82,6 @@ function estimateServingsBySize({
     servingSize,
     tiers
 }) {
-    const tierCount = Number(tiers);
-
-    if (!sizeId) {
-        return createErrorResult("Please provide a cake size.");
-    }
-
     if (!shape) {
         return createErrorResult("Please provide a cake shape.");
     }
@@ -91,8 +90,20 @@ function estimateServingsBySize({
         return createErrorResult("Please provide a serving size.");
     }
 
-    if (requiresCustomPlanning(shape)) {
-        return createCustomPlanningResult();
+    if (requiresSizeConsultation(shape, tiers)) {
+        return createSizeConsultationResult();
+    }
+
+    if (!sizeId) {
+        return createErrorResult(
+            "Please provide a cake size."
+        );
+    }
+
+    const tierCount = Number(tiers);
+
+    if (![1, 2, 3].includes(tierCount)) {
+        return createSizeConsultationResult();
     }
 
     const servingKey = getServingKey(servingSize);
@@ -125,9 +136,17 @@ function estimateServingsBySize({
 }
 
 function getAvailableCakeSizes({ shape, tiers }) {
+    if (!shape) {
+        return [];
+    }
+
+    if (requiresSizeConsultation(shape, tiers)) {
+        return [];
+    }
+
     const tierCount = Number(tiers);
 
-    if (!shape || requiresCustomPlanning(shape)) {
+    if (![1, 2, 3].includes(tierCount)) {
         return [];
     }
 
@@ -173,8 +192,28 @@ function addPlanningBuffer(servings) {
     return Math.ceil(servings * 1.1);
 }
 
-function requiresCustomPlanning(shape) {
-    return shape === "sculpted_3d" || shape === "geometric";
+function requiresSizeConsultation(shape, tiers) {
+    return (
+        shape === "sculpted_3d" ||
+        shape === "other" ||
+        shape === "unsure_advise" ||
+        tiers === "unsure_advise"
+    );
+}
+
+function createSizeConsultationResult(requestedServings = null) {
+    return {
+        success: true,
+        consultationRequired: true,
+        recommendedSize: "",
+        sizeId: "",
+        estimatedServings: "",
+        requestedServings: requestedServings,
+        plannedServingsWithBuffer: null,
+        message:
+            "A standard cake size cannot be calculated for this selection. " +
+            "Please discuss the suitable cake size with the confectionist."
+    };
 }
 
 function createCustomPlanningResult() {
