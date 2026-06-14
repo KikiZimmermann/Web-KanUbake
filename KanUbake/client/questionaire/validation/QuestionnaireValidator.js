@@ -414,6 +414,16 @@ export class QuestionnaireValidator {
                 fields
             );
         }
+
+        if (request.decorations.includes("edible_print") && !request.ediblePrintDescription?.trim()) {
+            messages.push("Please describe the edible print or image you would like.");
+            fields.push("ediblePrintDescription");
+        }
+
+        if (request.decorations.includes("other") && !request.otherDecorationDescription?.trim()) {
+            messages.push("Please describe the other decoration you would like.");
+            fields.push("otherDecorationDescription");
+        }
     }
 
     validateSizedDecoration(details, label, fieldPrefix, messages, fields) {
@@ -466,11 +476,67 @@ export class QuestionnaireValidator {
     }
 
     validateReferencesChapter() {
+        const request = this.state.getCakeRequest();
+        const messages = [];
+        const fields = [];
+
+        if (!request.referenceMode) {
+            messages.push("Please choose whether you would like to add references.");
+            fields.push("referenceMode");
+        }
+
+        if (request.referenceMode === "add_references") {
+            if (!Array.isArray(request.referenceItems) || request.referenceItems.length === 0) {
+                messages.push("Please add at least one reference image or link.");
+                fields.push("referenceImage");
+                fields.push("referenceUrl");
+            }
+
+            request.referenceItems.forEach((item, index) => {
+                if (item.type === "link" && !this.isValidReferenceUrl(item.url)) {
+                    messages.push(`Reference link ${index + 1} is not a valid URL.`);
+                    fields.push("referenceUrl");
+                }
+            });
+        }
+
+        if (!request.budgetMode) {
+            messages.push("Please choose a budget option.");
+            fields.push("budgetMode");
+        }
+
+        if (request.budgetMode === "enter_budget" && !request.budgetRange) {
+            messages.push("Please choose a budget range.");
+            fields.push("budgetRange");
+        }
+
+        if (request.budgetMode === "enter_budget" && request.budgetRange === "custom_budget") {
+            const customBudget = Number(request.customBudget);
+
+            if (!Number.isFinite(customBudget) || customBudget <= 0) {
+                messages.push("Please enter a valid custom budget.");
+                fields.push("customBudget");
+            }
+        }
+
         return {
-            isValid: true,
-            messages: [],
-            fields: []
+            isValid: messages.length === 0,
+            messages,
+            fields
         };
+    }
+
+    isValidReferenceUrl(value) {
+        if (typeof value !== "string" || !value.trim()) {
+            return false;
+        }
+
+        try {
+            const url = new URL(value.trim());
+            return url.protocol === "http:" || url.protocol === "https:";
+        } catch {
+            return false;
+        }
     }
 
     isRequestComplete() {

@@ -9,63 +9,68 @@
 */
 
 export class ReferenceItem {
-    constructor(type) {
-        this.id = crypto.randomUUID();
+  constructor(type) {
+    this.id = crypto.randomUUID();
 
-        this.type = type; // "image" or "link"
+    this.type = type; // "image" or "link"
 
-        this.file = null;
-        this.fileName = "";
-        this.filePreviewUrl = "";
+    this.file = null;
+    this.fileName = "";
+    this.filePreviewUrl = "";
 
-        this.url = "";
+    this.url = "";
 
-        this.likes = "";
-        this.dislikes = "";
-        this.tags = [];
+    this.likes = "";
+    this.dislikes = "";
+    this.tags = [];
+  }
+
+  setImageFile(file, previewUrl) {
+    this.type = "image";
+    this.file = file;
+    this.fileName = file ? file.name : "";
+    this.filePreviewUrl = previewUrl || "";
+    this.url = "";
+  }
+
+  setUrl(url) {
+    this.type = "link";
+    this.url = url;
+    this.file = null;
+    this.fileName = "";
+    this.filePreviewUrl = "";
+  }
+
+  updateLikes(likes) {
+    this.likes = likes;
+  }
+
+  updateDislikes(dislikes) {
+    this.dislikes = dislikes;
+  }
+
+  toggleTag(tag) {
+    if (this.tags.includes(tag)) {
+      this.tags = this.tags.filter((currentTag) => currentTag !== tag);
+    } else {
+      this.tags.push(tag);
+    }
+  }
+
+  isValid() {
+    if (this.type === "image") {
+      return this.file !== null;
     }
 
-    setImageFile(file, previewUrl) {
-        this.type = "image";
-        this.file = file;
-        this.fileName = file ? file.name : "";
-        this.filePreviewUrl = previewUrl || "";
-        this.url = "";
-    }
-
-    setUrl(url) {
-        this.type = "link";
-        this.url = url;
-        this.file = null;
-        this.fileName = "";
-        this.filePreviewUrl = "";
-    }
-
-    updateLikes(likes) {
-        this.likes = likes;
-    }
-
-    updateDislikes(dislikes) {
-        this.dislikes = dislikes;
-    }
-
-    toggleTag(tag) {
-        if (this.tags.includes(tag)) {
-            this.tags = this.tags.filter((currentTag) => currentTag !== tag);
-        } else {
-            this.tags.push(tag);
-        }
-    }
-
-    isValid() {
-        if (this.type === "image") {
-            return this.file !== null;
-        }
-
-        if (this.type === "link") {
-            return this.url.trim() !== "";
-        }
-
+    if (this.type === "link") {
+      try {
+        const url = new URL(this.url.trim());
+        return url.protocol === "http:" || url.protocol === "https:";
+      } catch {
         return false;
+      }
     }
+
+    return false;
+  }
 }

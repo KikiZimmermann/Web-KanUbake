@@ -58,13 +58,17 @@ class PricingValidator {
             );
         }
 
-        if (
-            requestData.shape === "sculpted_3d" ||
-            requestData.shape === "other"
-        ) {
+        if (requestData.shape === "sculpted_3d") {
             consultationRequired = true;
             messages.push(
-                "The selected cake shape requires confirmation by the bakery."
+                "A 3D or sculpted cake requires an individual size, construction and price estimate based on the requested design and servings."
+            );
+        }
+
+        if (requestData.shape === "other") {
+            consultationRequired = true;
+            messages.push(
+                "A custom cake shape requires an individual size, construction and price estimate by the bakery."
             );
         }
 
@@ -300,6 +304,28 @@ class PricingValidator {
                 messages,
                 markConsultationRequired
             );
+        }
+
+        if (decorations.includes("edible_print")) {
+            if (
+                typeof requestData.ediblePrintDescription !== "string" ||
+                !requestData.ediblePrintDescription.trim()
+            ) {
+                errors.push(
+                    "A description is required when an edible print or image is selected."
+                );
+            }
+        }
+
+        if (decorations.includes("other")) {
+            if (
+                typeof requestData.otherDecorationDescription !== "string" ||
+                !requestData.otherDecorationDescription.trim()
+            ) {
+                errors.push(
+                    "A description is required when another decoration is selected."
+                );
+            }
         }
     }
 

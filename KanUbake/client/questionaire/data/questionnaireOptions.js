@@ -198,7 +198,7 @@ export const questionnaireOptions = {
         {
             value: "unsure_advise",
             label: "I’m Not Sure Yet – Please Advise",
-            description: "The confectionist can suggest the best option for your cake."
+            description: "The bakery  can suggest the best option for your cake."
         }
     ],
 
@@ -283,9 +283,7 @@ export const questionnaireOptions = {
 
     referenceTypes: [
         { value: "no", label: "No" },
-        { value: "upload_images", label: "Upload Images" },
-        { value: "add_links", label: "Add Links" },
-        { value: "upload_images_and_links", label: "Upload Images And Add Links" }
+        { value: "add_references", label: "Add References" }
     ],
 
     referenceTags: [

@@ -85,6 +85,8 @@ export class CakeRequest {
         this.candleDetails = null;
         this.cakeTopperDetails = null;
         this.figurineDetails = null;
+        this.ediblePrintDescription = "";
+        this.otherDecorationDescription = "";
 
         this.referenceMode = "";
         this.referenceItems = [];

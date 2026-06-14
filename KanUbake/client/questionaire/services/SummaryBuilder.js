@@ -23,7 +23,7 @@ export class SummaryBuilder {
                     this.createSummaryItem("Cake Type", cakeRequest.cakeType, questionnaireOptions.cakeTypes),
                     this.createSummaryItem("Serving Size", cakeRequest.servingSize, questionnaireOptions.servingSizes),
                     this.createSummaryItem("Shape", cakeRequest.shape, questionnaireOptions.shapes),
-                    this.createSummaryItem("Tiers", cakeRequest.tiers, questionnaireOptions.tiers),
+                    cakeRequest.shape !== "sculpted_3d" ? this.createSummaryItem("Tiers", cakeRequest.tiers, questionnaireOptions.tiers) : null,
                     this.createSummaryItem("Size Information", cakeRequest.sizeMode, questionnaireOptions.sizeModes),
                     this.createServingSummaryItem(cakeRequest),
                     this.createCakeSizeSummaryItem(cakeRequest),
@@ -41,7 +41,7 @@ export class SummaryBuilder {
                             questionnaireOptions.tierFlavorModes
                         )
                         : null,
-                    this.createTierFlavorSummaryItem(cakeRequest.tierFlavors)
+                    this.createTierFlavorSummaryItem(cakeRequest)
                 ].filter(Boolean)
             },
             {
@@ -79,6 +79,20 @@ export class SummaryBuilder {
                             "Figurine",
                             cakeRequest.figurineDetails
                         )
+                        : null,
+
+                    cakeRequest.decorations?.includes("edible_print")
+                        ? this.createOptionalPlainSummaryItem(
+                            "Edible Print / Image Details",
+                            cakeRequest.ediblePrintDescription
+                        )
+                        : null,
+
+                    cakeRequest.decorations?.includes("other")
+                        ? this.createOptionalPlainSummaryItem(
+                            "Other Decoration Details",
+                            cakeRequest.otherDecorationDescription
+                        )
                         : null
                 ].filter(Boolean)
             },
@@ -96,7 +110,7 @@ export class SummaryBuilder {
     createColorSummaryItem(cakeRequest) {
         if (cakeRequest.colorMode === "choose_colors") {
             const colors = Array.isArray(cakeRequest.colors)
-                ? cakeRequest.colors.filter(Boolean)
+                ? cakeRequest.colors.filter((color) => color?.hex)
                 : [];
 
             if (colors.length === 0) {
@@ -104,10 +118,9 @@ export class SummaryBuilder {
             }
 
             return {
-                label: "Colors",
-                value: colors
-                    .map((color) => `${color.name} (${color.hex})`)
-                    .join(", ")
+                label: "Selected Colors",
+                type: "color-list",
+                colors
             };
         }
 
@@ -117,20 +130,15 @@ export class SummaryBuilder {
             }
 
             const paletteColors = Array.isArray(cakeRequest.paletteColors)
-                ? cakeRequest.paletteColors
+                ? cakeRequest.paletteColors.filter((color) => color?.hex)
                 : [];
 
-            const colors = paletteColors
-                .map((color) => `${color.name} (${color.hex})`)
-                .join(", ");
-
             return {
-                label: "Color Palette",
-                value:
-                    `Starting color: ${cakeRequest.paletteBaseColor.name} ` +
-                    `(${cakeRequest.paletteBaseColor.hex}); ` +
-                    `Scheme: ${cakeRequest.paletteSchemeMode}; ` +
-                    `Colors: ${colors || "No palette generated"}`
+                label: "Suggested Color Palette",
+                type: "color-palette",
+                startingColor: cakeRequest.paletteBaseColor,
+                scheme: cakeRequest.paletteSchemeMode,
+                colors: paletteColors
             };
         }
 
@@ -189,6 +197,15 @@ export class SummaryBuilder {
     }
 
     createCakeSizeSummaryItem(cakeRequest) {
+        if (cakeRequest.shape === "sculpted_3d") {
+            return {
+                label: "3D / Sculpted Cake Size",
+                value:
+                    "The final dimensions and internal structure depend on the selected design, shape and requested servings.\n" +
+                    "The bakery will recommend a suitable size and construction."
+            };
+        }
+
         const value = this.getCakeSizeSummaryValue(cakeRequest);
 
         if (!value) {
@@ -196,85 +213,76 @@ export class SummaryBuilder {
         }
 
         return {
-            label: cakeRequest.recommendedSize
-                ? "Recommended Cake Size"
-                : "Cake Size",
+            label: cakeRequest.recommendedSize ? "Recommended Cake Size" : "Cake Size",
             value
         };
     }
 
     createCoveringDetailItems(cakeRequest) {
-        const items = [];
+        const details = [];
 
         if (cakeRequest.covering === "buttercream") {
-            items.push(
-                this.createSummaryItem(
-                    "Buttercream Type",
+            details.push(
+                `Buttercream Type: ${this.getOptionLabel(
                     cakeRequest.coveringButtercreamType,
                     questionnaireOptions.buttercreamTypes
-                )
+                )}`
             );
 
-            items.push(
-                this.createOptionalPlainSummaryItem(
-                    "Buttercream Color",
-                    cakeRequest.coveringButtercreamColor
-                )
-            );
+            if (cakeRequest.coveringButtercreamColor) {
+                details.push(`Color: ${cakeRequest.coveringButtercreamColor}`);
+            }
 
-            items.push(
-                this.createOptionalPlainSummaryItem(
-                    "Buttercream Flavor",
-                    cakeRequest.coveringButtercreamFlavor
-                )
-            );
+            if (cakeRequest.coveringButtercreamFlavor) {
+                details.push(`Flavor: ${cakeRequest.coveringButtercreamFlavor}`);
+            }
         }
 
         if (cakeRequest.covering === "ganache") {
-            items.push(
-                this.createSummaryItem(
-                    "Ganache Chocolate Type",
+            details.push(
+                `Chocolate Type: ${this.getOptionLabel(
                     cakeRequest.coveringGanacheChocolateType,
                     questionnaireOptions.ganacheChocolateTypes
-                )
+                )}`
             );
 
-            items.push(
-                this.createOptionalPlainSummaryItem(
-                    "Ganache Color",
-                    cakeRequest.coveringGanacheColor
-                )
-            );
+            if (cakeRequest.coveringGanacheColor) {
+                details.push(`Color: ${cakeRequest.coveringGanacheColor}`);
+            }
         }
 
-        if (
-            cakeRequest.covering === "chocolate_glaze" &&
-            cakeRequest.chocolateGlazePreserveChoice === "yes"
-        ) {
-            const preserve =
-                cakeRequest.chocolateGlazePreserveFlavor === "other"
+        if (cakeRequest.covering === "chocolate_glaze") {
+            const preserveChoice = this.getOptionLabel(
+                cakeRequest.chocolateGlazePreserveChoice,
+                questionnaireOptions.yesNoUnsure
+            );
+
+            details.push(`Fruit Preserve Underneath: ${preserveChoice}`);
+
+            if (cakeRequest.chocolateGlazePreserveChoice === "yes") {
+                const preserve = cakeRequest.chocolateGlazePreserveFlavor === "other"
                     ? cakeRequest.chocolateGlazeOtherPreserveFlavor
                     : this.getOptionLabel(
                         cakeRequest.chocolateGlazePreserveFlavor,
                         questionnaireOptions.fruitPreserves
                     );
 
-            items.push({
-                label: "Fruit Preserve Under Chocolate Glaze",
-                value: preserve
-            });
+                details.push(`Fruit Preserve Flavor: ${preserve}`);
+            }
         }
 
-        if (cakeRequest.covering === "other") {
-            items.push(
-                this.createOptionalPlainSummaryItem(
-                    "Other Covering",
-                    cakeRequest.coveringOther
-                )
-            );
+        if (cakeRequest.covering === "other" && cakeRequest.coveringOther) {
+            details.push(`Description: ${cakeRequest.coveringOther}`);
         }
 
-        return items.filter(Boolean);
+        if (details.length === 0) {
+            return [];
+        }
+
+        return [{
+            label: "Covering Details",
+            value: details.join("\n")
+        }];
     }
 
     createFondantLayerSummaryItems(cakeRequest) {
@@ -282,120 +290,80 @@ export class SummaryBuilder {
             return [];
         }
 
-        if (
-            Array.isArray(cakeRequest.fondantLayerDetails) &&
-            cakeRequest.fondantLayerDetails.length > 0
-        ) {
-            return cakeRequest.fondantLayerDetails.map((layer) => {
-                const details = [
-                    this.getOptionLabel(
-                        layer.layerType,
-                        questionnaireOptions.fondantLayers
-                    )
-                ];
-
-                if (layer.layerType === "buttercream") {
-                    details.push(
-                        this.getOptionLabel(
-                            layer.buttercreamType,
-                            questionnaireOptions.buttercreamTypes
-                        )
-                    );
-
-                    if (layer.buttercreamColor) {
-                        details.push(`Color: ${layer.buttercreamColor}`);
-                    }
-
-                    if (layer.buttercreamFlavor) {
-                        details.push(`Flavor: ${layer.buttercreamFlavor}`);
-                    }
-                }
-
-                if (layer.layerType === "ganache") {
-                    details.push(
-                        this.getOptionLabel(
-                            layer.ganacheChocolateType,
-                            questionnaireOptions.ganacheChocolateTypes
-                        )
-                    );
-
-                    if (layer.ganacheColor) {
-                        details.push(`Color: ${layer.ganacheColor}`);
-                    }
-                }
-
-                if (layer.layerType === "marmalade") {
-                    const preserve =
-                        layer.marmaladeFlavor === "other"
-                            ? layer.otherMarmaladeFlavor
-                            : this.getOptionLabel(
-                                layer.marmaladeFlavor,
-                                questionnaireOptions.fruitPreserves
-                            );
-
-                    details.push(preserve);
-                }
-
-                return {
-                    label: `Fondant Layer – Tier ${layer.tierNumber}`,
-                    value: details.filter(Boolean).join(", ")
-                };
-            });
+        if (Array.isArray(cakeRequest.fondantLayerDetails) && cakeRequest.fondantLayerDetails.length > 0) {
+            return cakeRequest.fondantLayerDetails.map((layer) => ({
+                label: `Fondant Layer – Tier ${layer.tierNumber}`,
+                value: this.createFondantLayerDetailsValue(layer)
+            }));
         }
 
-        const details = [
-            this.getOptionLabel(
-                cakeRequest.fondantLayer,
-                questionnaireOptions.fondantLayers
-            )
-        ];
-
-        if (cakeRequest.fondantLayer === "buttercream") {
-            details.push(
-                this.getOptionLabel(
-                    cakeRequest.fondantButtercreamType,
-                    questionnaireOptions.buttercreamTypes
-                )
-            );
-
-            if (cakeRequest.fondantButtercreamColor) {
-                details.push(`Color: ${cakeRequest.fondantButtercreamColor}`);
-            }
-
-            if (cakeRequest.fondantButtercreamFlavor) {
-                details.push(`Flavor: ${cakeRequest.fondantButtercreamFlavor}`);
-            }
-        }
-
-        if (cakeRequest.fondantLayer === "ganache") {
-            details.push(
-                this.getOptionLabel(
-                    cakeRequest.fondantGanacheChocolateType,
-                    questionnaireOptions.ganacheChocolateTypes
-                )
-            );
-
-            if (cakeRequest.fondantGanacheColor) {
-                details.push(`Color: ${cakeRequest.fondantGanacheColor}`);
-            }
-        }
-
-        if (cakeRequest.fondantLayer === "marmalade") {
-            const preserve =
-                cakeRequest.fondantMarmaladeFlavor === "other"
-                    ? cakeRequest.fondantOtherMarmaladeFlavor
-                    : this.getOptionLabel(
-                        cakeRequest.fondantMarmaladeFlavor,
-                        questionnaireOptions.fruitPreserves
-                    );
-
-            details.push(preserve);
-        }
+        const layer = {
+            layerType: cakeRequest.fondantLayer,
+            buttercreamType: cakeRequest.fondantButtercreamType,
+            buttercreamColor: cakeRequest.fondantButtercreamColor,
+            buttercreamFlavor: cakeRequest.fondantButtercreamFlavor,
+            ganacheChocolateType: cakeRequest.fondantGanacheChocolateType,
+            ganacheColor: cakeRequest.fondantGanacheColor,
+            marmaladeFlavor: cakeRequest.fondantMarmaladeFlavor,
+            otherMarmaladeFlavor: cakeRequest.fondantOtherMarmaladeFlavor
+        };
 
         return [{
-            label: "Fondant Layer",
-            value: details.filter(Boolean).join(", ")
+            label: "Fondant Layer Details",
+            value: this.createFondantLayerDetailsValue(layer)
         }];
+    }
+
+    createFondantLayerDetailsValue(layer) {
+        const details = [
+            `Layer Type: ${this.getOptionLabel(
+                layer.layerType,
+                questionnaireOptions.fondantLayers
+            )}`
+        ];
+
+        if (layer.layerType === "buttercream") {
+            details.push(
+                `Buttercream Type: ${this.getOptionLabel(
+                    layer.buttercreamType,
+                    questionnaireOptions.buttercreamTypes
+                )}`
+            );
+
+            if (layer.buttercreamColor) {
+                details.push(`Color: ${layer.buttercreamColor}`);
+            }
+
+            if (layer.buttercreamFlavor) {
+                details.push(`Flavor: ${layer.buttercreamFlavor}`);
+            }
+        }
+
+        if (layer.layerType === "ganache") {
+            details.push(
+                `Chocolate Type: ${this.getOptionLabel(
+                    layer.ganacheChocolateType,
+                    questionnaireOptions.ganacheChocolateTypes
+                )}`
+            );
+
+            if (layer.ganacheColor) {
+                details.push(`Color: ${layer.ganacheColor}`);
+            }
+        }
+
+        if (layer.layerType === "marmalade") {
+            const preserve = layer.marmaladeFlavor === "other"
+                ? layer.otherMarmaladeFlavor
+                : this.getOptionLabel(
+                    layer.marmaladeFlavor,
+                    questionnaireOptions.fruitPreserves
+                );
+
+            details.push(`Fruit Preserve: ${preserve}`);
+        }
+
+        return details.join("\n");
     }
 
     createDecorationSummaryItem(decorations) {
@@ -473,15 +441,15 @@ export class SummaryBuilder {
             return null;
         }
 
-        let value = `${candleDetails.quantity} candle(s)`;
+        const details = [`Quantity: ${candleDetails.quantity}`];
 
         if (candleDetails.colors) {
-            value += `; Colors: ${candleDetails.colors}`;
+            details.push(`Colors: ${candleDetails.colors}`);
         }
 
         return {
             label: "Candle Details",
-            value
+            value: details.join("\n")
         };
     }
 
@@ -606,94 +574,136 @@ export class SummaryBuilder {
         };
     }
 
-    createTierFlavorSummaryItem(tierFlavors) {
-        if (!tierFlavors || tierFlavors.length === 0) {
+    createTierFlavorSummaryItem(cakeRequest) {
+        const tierFlavors = cakeRequest.tierFlavors;
+
+        if (!Array.isArray(tierFlavors) || tierFlavors.length === 0) {
             return {
-                label: "Tier Flavors",
+                label: "Cake Flavor & Filling",
                 value: "Not specified"
             };
         }
 
+        const showIndividualTiers =
+            Number(cakeRequest.tiers) > 1 &&
+            cakeRequest.tierFlavorMode === "individual_per_tier";
+
+        if (!showIndividualTiers) {
+            return {
+                label: "Cake Flavor & Filling",
+                value: this.createTierFlavorDetailsValue(tierFlavors[0])
+            };
+        }
+
         const tierSummaries = tierFlavors.map((tierFlavor) => {
-            const details = [];
-
-            details.push(
-                this.getOptionLabel(
-                    tierFlavor.cakeFlavor,
-                    questionnaireOptions.cakeFlavors
-                )
-            );
-
-            if (tierFlavor.cakeFlavor === "other") {
-                details.push(tierFlavor.otherCakeFlavor);
-            }
-
-            if (tierFlavor.cakeFlavor === "nut") {
-                const nut =
-                    tierFlavor.cakeNutType === "other"
-                        ? tierFlavor.otherCakeNut
-                        : this.getOptionLabel(
-                            tierFlavor.cakeNutType,
-                            questionnaireOptions.nutTypes
-                        );
-
-                details.push(`Cake nut: ${nut} `);
-            }
-
-            details.push(
-                this.getOptionLabel(
-                    tierFlavor.filling,
-                    questionnaireOptions.fillings
-                )
-            );
-
-            if (tierFlavor.filling === "other") {
-                details.push(tierFlavor.otherFilling);
-            }
-
-            if (tierFlavor.filling === "fruit_filling") {
-                const fruit =
-                    tierFlavor.fruitFilling === "other"
-                        ? tierFlavor.otherFruitFilling
-                        : this.getOptionLabel(
-                            tierFlavor.fruitFilling,
-                            questionnaireOptions.fruitFillings
-                        );
-
-                details.push(`Fruit: ${fruit} `);
-            }
-
-            if (tierFlavor.filling === "nut_cream") {
-                const nut =
-                    tierFlavor.fillingNutType === "other"
-                        ? tierFlavor.otherFillingNut
-                        : this.getOptionLabel(
-                            tierFlavor.fillingNutType,
-                            questionnaireOptions.nutTypes
-                        );
-
-                details.push(`Nut cream: ${nut} `);
-            }
-
-            if (tierFlavor.filling === "jam") {
-                const preserve =
-                    tierFlavor.jamFlavor === "other"
-                        ? tierFlavor.otherJamFlavor
-                        : this.getOptionLabel(
-                            tierFlavor.jamFlavor,
-                            questionnaireOptions.fruitPreserves
-                        );
-
-                details.push(`Fruit preserve: ${preserve} `);
-            }
-
-            return `Tier ${tierFlavor.tierNumber}: ${details.join(", ")} `;
+            return `Tier ${tierFlavor.tierNumber}\n${this.createTierFlavorDetailsValue(tierFlavor)}`;
         });
 
         return {
-            label: "Tier Flavors",
-            value: tierSummaries.join("\n")
+            label: "Cake Flavors & Fillings",
+            value: tierSummaries.join("\n\n")
         };
+    }
+
+    createTierFlavorDetailsValue(tierFlavor) {
+        const cakeFlavor = tierFlavor.cakeFlavor === "other"
+            ? tierFlavor.otherCakeFlavor
+            : this.getOptionLabel(
+                tierFlavor.cakeFlavor,
+                questionnaireOptions.cakeFlavors
+            );
+
+        const filling = tierFlavor.filling === "other"
+            ? tierFlavor.otherFilling
+            : this.getOptionLabel(
+                tierFlavor.filling,
+                questionnaireOptions.fillings
+            );
+
+        const details = [
+            `Cake Flavor: ${cakeFlavor}`,
+            `Filling: ${filling}`
+        ];
+
+        if (tierFlavor.cakeFlavor === "nut") {
+            const cakeNut = tierFlavor.cakeNutType === "other"
+                ? tierFlavor.otherCakeNut
+                : this.getOptionLabel(
+                    tierFlavor.cakeNutType,
+                    questionnaireOptions.nutTypes
+                );
+
+            details.push(`Cake Nut: ${cakeNut}`);
+        }
+
+        if (tierFlavor.cakeColor) {
+            details.push(`Cake Color: ${tierFlavor.cakeColor}`);
+        }
+
+        if (tierFlavor.filling === "fruit_filling") {
+            const fruit = tierFlavor.fruitFilling === "other"
+                ? tierFlavor.otherFruitFilling
+                : this.getOptionLabel(
+                    tierFlavor.fruitFilling,
+                    questionnaireOptions.fruitFillings
+                );
+
+            details.push(`Fruit: ${fruit}`);
+        }
+
+        if (tierFlavor.filling === "nut_cream") {
+            const nutCream = tierFlavor.fillingNutType === "other"
+                ? tierFlavor.otherFillingNut
+                : this.getOptionLabel(
+                    tierFlavor.fillingNutType,
+                    questionnaireOptions.nutTypes
+                );
+
+            details.push(`Nut Cream: ${nutCream}`);
+        }
+
+        if (tierFlavor.filling === "jam") {
+            const preserve = tierFlavor.jamFlavor === "other"
+                ? tierFlavor.otherJamFlavor
+                : this.getOptionLabel(
+                    tierFlavor.jamFlavor,
+                    questionnaireOptions.fruitPreserves
+                );
+
+            details.push(`Fruit Preserve: ${preserve}`);
+        }
+
+        if (tierFlavor.filling === "buttercream_filling") {
+            details.push(
+                `Buttercream Type: ${this.getOptionLabel(
+                    tierFlavor.buttercreamType,
+                    questionnaireOptions.buttercreamTypes
+                )}`
+            );
+
+            if (tierFlavor.buttercreamColor) {
+                details.push(`Buttercream Color: ${tierFlavor.buttercreamColor}`);
+            }
+
+            if (tierFlavor.buttercreamFlavor) {
+                details.push(`Buttercream Flavor: ${tierFlavor.buttercreamFlavor}`);
+            }
+        }
+
+        if (tierFlavor.filling === "ganache") {
+            details.push(
+                `Ganache Chocolate Type: ${this.getOptionLabel(
+                    tierFlavor.ganacheChocolateType,
+                    questionnaireOptions.ganacheChocolateTypes
+                )}`
+            );
+
+            if (tierFlavor.ganacheColor) {
+                details.push(`Ganache Color: ${tierFlavor.ganacheColor}`);
+            }
+        }
+
+        return details.join("\n");
     }
 
     createReferenceSummaryItem(referenceItems) {

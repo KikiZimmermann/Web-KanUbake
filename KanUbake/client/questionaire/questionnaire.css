@@ -332,6 +332,58 @@ textarea:focus {
   border-radius: 8px;
 }
 
+/* ── Summary Color Cards ── */
+
+.summary-color-palette,
+.summary-color-list,
+.summary-color-group {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.summary-color-group + .summary-color-group {
+  margin-top: 12px;
+}
+
+.summary-color-scheme {
+  margin: 8px 0;
+}
+
+.summary-color-card {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+  padding: 10px 12px;
+
+  background-color: rgb(255 255 255 / 75%);
+
+  border: 1px solid rgb(95 53 38 / 18%);
+  border-radius: 10px;
+}
+
+.summary-color-swatch {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+
+  border: 1px solid rgb(0 0 0 / 20%);
+  border-radius: 8px;
+}
+
+.summary-color-information {
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.summary-color-information span {
+  font-size: 0.9rem;
+}
+
 /* ── Email Draft ── */
 
 .email-draft-section {
@@ -728,6 +780,15 @@ textarea:focus {
 
   .size-advice {
     margin-left: 0;
+  }
+
+  .summary-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .summary-row dt {
+    margin-bottom: 2px;
   }
 }
 

@@ -24,6 +24,7 @@ export class QuestionnaireRenderer {
     this.summaryBuilder = new SummaryBuilder();
     this.cakeSizeApiService = new CakeSizeApiService();
     this.colorSelector = new ColorSelector(this.state);
+    this.validationRefreshCallback = null;
 
     this.chapterIntroElement = document.getElementById("chapterIntro");
     this.chapterContainerElement = document.getElementById("chapterContainer");
@@ -38,6 +39,18 @@ export class QuestionnaireRenderer {
     this.attachSaveButtonEvent();
   }
 
+  setValidationRefreshCallback(callback) {
+    this.validationRefreshCallback = callback;
+  }
+
+  renderAndRefreshValidation() {
+    this.render();
+
+    if (typeof this.validationRefreshCallback === "function") {
+      this.validationRefreshCallback();
+    }
+  }
+
   //Save Button
   attachSaveButtonEvent() {
     if (!this.saveButton) {
@@ -45,8 +58,7 @@ export class QuestionnaireRenderer {
     }
 
     this.saveButton.addEventListener("click", async () => {
-      const cakeRequest =
-        this.state.getCakeRequest();
+      const cakeRequest = this.state.getCakeRequest();
 
       cakeRequest.markIncompleteDraft();
 
@@ -54,15 +66,9 @@ export class QuestionnaireRenderer {
         const savedRequest =
           await CakeRequestApiService.saveCakeRequest(cakeRequest);
 
-        console.log(
-          "Cake request saved:",
-          savedRequest
-        );
+        console.log("Cake request saved:", savedRequest);
       } catch (error) {
-        console.error(
-          "Cake request could not be saved:",
-          error
-        );
+        console.error("Cake request could not be saved:", error);
       }
     });
   }
@@ -72,6 +78,8 @@ export class QuestionnaireRenderer {
     this.renderChapterIntro();
     this.renderChapterContent();
     this.renderNavigationButtons();
+
+    document.dispatchEvent(new CustomEvent("questionnaireRendered"));
   }
 
   renderProgress() {
@@ -129,9 +137,6 @@ export class QuestionnaireRenderer {
       request.shape === "unsure_advise" ||
       request.tiers === "unsure_advise";
 
-    const tiersDisabled =
-      request.shape === "sculpted_3d";
-
     this.chapterContainerElement.innerHTML = `
     <div class="chapter-content">
 
@@ -154,61 +159,61 @@ export class QuestionnaireRenderer {
       "occasion",
       "What is the occasion for the cake?",
       questionnaireOptions.occasions,
-      request.occasion
+      request.occasion,
     )}
 
       ${this.createSelectField(
       "cakeType",
       "What type of cake would you like?",
       questionnaireOptions.cakeTypes,
-      request.cakeType
+      request.cakeType,
     )}
 
       ${this.createSelectField(
       "servingSize",
       "What serving size would you like?",
       questionnaireOptions.servingSizes,
-      request.servingSize
+      request.servingSize,
     )}
 
       ${this.createSelectField(
       "shape",
       "What shape should the cake have?",
       questionnaireOptions.shapes,
-      request.shape
+      request.shape,
     )}
 
-      ${this.createSelectField(
-      "tiers",
-      "How many tiers should the cake have?",
-      questionnaireOptions.tiers,
-      request.tiers,
-      {
-        disabled: tiersDisabled
+      ${request.shape !== "sculpted_3d"
+        ? this.createSelectField(
+          "tiers",
+          "How many tiers should the cake have?",
+          questionnaireOptions.tiers,
+          request.tiers,
+        )
+        : ""
       }
-    )}
 
       ${this.createSelectField(
-      "sizeMode",
-      "What do you already know about the size?",
-      questionnaireOptions.sizeModes,
-      request.sizeMode,
-      {
-        disabledValues: sizeSelectionDisabled ? ["known_size"] : []
-      }
-    )}
+        "sizeMode",
+        "What do you already know about the size?",
+        questionnaireOptions.sizeModes,
+        request.sizeMode,
+        {
+          disabledValues: sizeSelectionDisabled ? ["known_size"] : [],
+        },
+      )}
 
       ${this.createSizeDetailsField(request)}
 
       ${this.createSizeEstimateBox(request)}
 
       ${this.createCheckboxGroup(
-      "restrictions",
-      "Are there any allergies or dietary requirements?",
-      questionnaireOptions.restrictions,
-      request.restrictions,
-      "If you do not select anything, this will be treated as no restrictions. Multiple selections are possible. Complete absence of traces can only be guaranteed if confirmed by the bakery."
-    )}
+        "restrictions",
+        "Are there any allergies or dietary requirements?",
+        questionnaireOptions.restrictions,
+        request.restrictions,
+        "If you do not select anything, this will be treated as no restrictions. Multiple selections are possible. Complete absence of traces can only be guaranteed if confirmed by the bakery.",
+      )}
 
       <div class="form-field">
         <label for="restrictionNotes">
@@ -239,7 +244,7 @@ export class QuestionnaireRenderer {
         "tierFlavorMode",
         "Should all tiers have the same cake flavor and filling?",
         questionnaireOptions.tierFlavorModes,
-        request.tierFlavorMode
+        request.tierFlavorMode,
       );
     }
 
@@ -270,7 +275,7 @@ export class QuestionnaireRenderer {
       "covering",
       "What covering or outer frosting would you like?",
       questionnaireOptions.coverings,
-      request.covering
+      request.covering,
     )}
 
         ${this.createCoveringDetailsField(request)}
@@ -281,7 +286,7 @@ export class QuestionnaireRenderer {
       "designStyle",
       "What design style do you like?",
       questionnaireOptions.designStyles,
-      request.designStyle
+      request.designStyle,
     )}
 
         ${this.createThemeDescriptionField(request)}
@@ -290,7 +295,7 @@ export class QuestionnaireRenderer {
       "colorMode",
       "What colors would you like for the cake?",
       questionnaireOptions.colorModes,
-      request.colorMode
+      request.colorMode,
     )}
 
         ${this.createColorDetailsField(request)}
@@ -300,7 +305,7 @@ export class QuestionnaireRenderer {
       "Which extras or decorations would you like?",
       questionnaireOptions.decorations,
       request.decorations,
-      "If you do not select anything, no extras will be added. Multiple selections are possible."
+      "If you do not select anything, no extras will be added. Multiple selections are possible.",
     )}
 
         ${this.createTextDetailsField(request)}
@@ -313,18 +318,20 @@ export class QuestionnaireRenderer {
 
         ${this.createFigurineDetailsField(request)}
 
+        ${this.createEdiblePrintDetailsField(request)}
+
+        ${this.createOtherDecorationDetailsField(request)}
+
       </div>
     `;
 
     this.attachDesignChapterEvents();
 
-    const colorSelectorContainer =
-      document.getElementById("colorSelectorContainer");
-
-    this.colorSelector.mount(
-      colorSelectorContainer,
-      request.colorMode
+    const colorSelectorContainer = document.getElementById(
+      "colorSelectorContainer",
     );
+
+    this.colorSelector.mount(colorSelectorContainer, request.colorMode);
   }
 
   renderReferencesChapter() {
@@ -337,7 +344,7 @@ export class QuestionnaireRenderer {
       "referenceMode",
       "Would you like to add reference or inspiration images?",
       questionnaireOptions.referenceTypes,
-      request.referenceMode || ""
+      request.referenceMode || "",
     )}
 
         ${this.createReferenceDetailsSection(request)}
@@ -346,7 +353,7 @@ export class QuestionnaireRenderer {
       "budgetMode",
       "Would you like to enter a budget or see a rough price estimate?",
       questionnaireOptions.budgetModes,
-      request.budgetMode
+      request.budgetMode,
     )}
 
         ${this.createBudgetDetailsField(request)}
@@ -421,7 +428,7 @@ export class QuestionnaireRenderer {
           ganacheChocolateType: "",
           ganacheColor: "",
           marmaladeFlavor: "",
-          otherMarmaladeFlavor: ""
+          otherMarmaladeFlavor: "",
         });
       }
 
@@ -455,14 +462,14 @@ export class QuestionnaireRenderer {
           `cakeFlavor-${index}`,
           "What cake flavor would you like?",
           questionnaireOptions.cakeFlavors,
-          tierFlavor.cakeFlavor
+          tierFlavor.cakeFlavor,
         )}
 
             ${this.createOtherTextField(
           `otherCakeFlavor-${index}`,
           "Other cake flavor",
           tierFlavor.otherCakeFlavor,
-          tierFlavor.cakeFlavor === "other"
+          tierFlavor.cakeFlavor === "other",
         )}
 
         ${tierFlavor.cakeFlavor === "nut"
@@ -470,7 +477,7 @@ export class QuestionnaireRenderer {
               `cakeNutType-${index}`,
               "Which nut would you like for the cake?",
               questionnaireOptions.nutTypes,
-              tierFlavor.cakeNutType
+              tierFlavor.cakeNutType,
             )
             : ""
           }
@@ -479,7 +486,7 @@ ${this.createOtherTextField(
             `otherCakeNut-${index}`,
             "Which other nut would you like?",
             tierFlavor.otherCakeNut,
-            tierFlavor.cakeNutType === "other"
+            tierFlavor.cakeNutType === "other",
           )}
 
             <div class="form-field">
@@ -498,21 +505,21 @@ ${this.createOtherTextField(
             <p class="field-hint">
               For very dark cakes or cakes with a strong natural color, some colors
               may not be possible or only darker colors may work. This must be confirmed
-              with the confectionist.
+              with the bakery.
             </p>
 
             ${this.createSelectField(
             `filling-${index}`,
             "What filling would you like?",
             questionnaireOptions.fillings,
-            tierFlavor.filling
+            tierFlavor.filling,
           )}
 
             ${this.createOtherTextField(
             `otherFilling-${index}`,
             "Other filling",
             tierFlavor.otherFilling,
-            tierFlavor.filling === "other"
+            tierFlavor.filling === "other",
           )}
 
             ${tierFlavor.filling === "fruit_filling"
@@ -520,7 +527,7 @@ ${this.createOtherTextField(
               `fruitFilling-${index}`,
               "Which fruit filling would you like?",
               questionnaireOptions.fruitFillings,
-              tierFlavor.fruitFilling
+              tierFlavor.fruitFilling,
             )
             : ""
           }
@@ -529,7 +536,7 @@ ${this.createOtherTextField(
             `otherFruitFilling-${index}`,
             "Other fruit filling",
             tierFlavor.otherFruitFilling,
-            tierFlavor.fruitFilling === "other"
+            tierFlavor.fruitFilling === "other",
           )}
 
           ${tierFlavor.filling === "nut_cream"
@@ -537,7 +544,7 @@ ${this.createOtherTextField(
               `fillingNutType-${index}`,
               "Which nut cream would you like?",
               questionnaireOptions.nutTypes,
-              tierFlavor.fillingNutType
+              tierFlavor.fillingNutType,
             )
             : ""
           }
@@ -546,7 +553,7 @@ ${this.createOtherTextField(
             `otherFillingNut-${index}`,
             "Which other nut would you like?",
             tierFlavor.otherFillingNut,
-            tierFlavor.fillingNutType === "other"
+            tierFlavor.fillingNutType === "other",
           )}
 
           ${tierFlavor.filling === "jam"
@@ -554,7 +561,7 @@ ${this.createOtherTextField(
               `jamFlavor-${index}`,
               "Which fruit preserve would you like?",
               questionnaireOptions.fruitPreserves,
-              tierFlavor.jamFlavor
+              tierFlavor.jamFlavor,
             )
             : ""
           }
@@ -563,7 +570,7 @@ ${this.createOtherTextField(
             `otherJamFlavor-${index}`,
             "Which other fruit preserve would you like?",
             tierFlavor.otherJamFlavor,
-            tierFlavor.jamFlavor === "other"
+            tierFlavor.jamFlavor === "other",
           )}
 
             ${this.createButtercreamDetailsForTier(tierFlavor, index)}
@@ -586,7 +593,7 @@ ${this.createOtherTextField(
       `buttercreamType-${index}`,
       "Which buttercream type would you like?",
       questionnaireOptions.buttercreamTypes,
-      tierFlavor.buttercreamType
+      tierFlavor.buttercreamType,
     )}
 
         ${this.createButtercreamExplanation()}
@@ -631,7 +638,7 @@ ${this.createOtherTextField(
       `ganacheChocolateType-${index}`,
       "Which ganache chocolate type would you like?",
       questionnaireOptions.ganacheChocolateTypes,
-      tierFlavor.ganacheChocolateType
+      tierFlavor.ganacheChocolateType,
     )}
 
         <div class="form-field">
@@ -672,7 +679,7 @@ ${this.createOtherTextField(
         "coveringButtercreamType",
         "Which buttercream type would you like?",
         questionnaireOptions.buttercreamTypes,
-        request.coveringButtercreamType
+        request.coveringButtercreamType,
       )}
 
           ${this.createButtercreamExplanation()}
@@ -713,7 +720,7 @@ ${this.createOtherTextField(
         "coveringGanacheChocolateType",
         "Which ganache chocolate type would you like?",
         questionnaireOptions.ganacheChocolateTypes,
-        request.coveringGanacheChocolateType
+        request.coveringGanacheChocolateType,
       )}
 
           <div class="form-field">
@@ -743,7 +750,7 @@ ${this.createOtherTextField(
         "chocolateGlazePreserveChoice",
         "Would you like jam / fruit preserve underneath the chocolate glaze?",
         questionnaireOptions.yesNoUnsure,
-        request.chocolateGlazePreserveChoice
+        request.chocolateGlazePreserveChoice,
       )}
 
             ${request.chocolateGlazePreserveChoice === "yes"
@@ -751,7 +758,7 @@ ${this.createOtherTextField(
             "chocolateGlazePreserveFlavor",
             "Which fruit preserve would you like?",
             questionnaireOptions.fruitPreserves,
-            request.chocolateGlazePreserveFlavor
+            request.chocolateGlazePreserveFlavor,
           )
           : ""
         }
@@ -760,7 +767,7 @@ ${this.createOtherTextField(
           "chocolateGlazeOtherPreserveFlavor",
           "Which other fruit preserve would you like?",
           request.chocolateGlazeOtherPreserveFlavor,
-          request.chocolateGlazePreserveFlavor === "other"
+          request.chocolateGlazePreserveFlavor === "other",
         )}
         </div>
     `;
@@ -799,7 +806,7 @@ ${this.createOtherTextField(
       "fondantLayer",
       "Which layer should be used underneath the fondant?",
       questionnaireOptions.fondantLayers,
-      request.fondantLayer
+      request.fondantLayer,
     )}
 
         <p class="field-hint">
@@ -832,7 +839,7 @@ ${this.createOtherTextField(
             `fondantLayer-${index}`,
             `Which layer should be used underneath the fondant for tier ${layer.tierNumber}?`,
             questionnaireOptions.fondantLayers,
-            layer.layerType
+            layer.layerType,
           )}
 
                 ${this.createFondantLayerDetailsForLayer(layer, index)}
@@ -853,7 +860,7 @@ ${this.createOtherTextField(
       ganacheChocolateType: request.fondantGanacheChocolateType,
       ganacheColor: request.fondantGanacheColor,
       marmaladeFlavor: request.fondantMarmaladeFlavor,
-      otherMarmaladeFlavor: request.fondantOtherMarmaladeFlavor
+      otherMarmaladeFlavor: request.fondantOtherMarmaladeFlavor,
     };
 
     return this.createFondantLayerDetailsForLayer(layer, null);
@@ -868,7 +875,7 @@ ${this.createOtherTextField(
         `fondantButtercreamType${suffix}`,
         "Which buttercream type would you like?",
         questionnaireOptions.buttercreamTypes,
-        layer.buttercreamType
+        layer.buttercreamType,
       )}
 
         ${this.createButtercreamExplanation()}
@@ -907,7 +914,7 @@ ${this.createOtherTextField(
         `fondantGanacheChocolateType${suffix}`,
         "Which ganache chocolate type would you like?",
         questionnaireOptions.ganacheChocolateTypes,
-        layer.ganacheChocolateType
+        layer.ganacheChocolateType,
       )}
 
         <div class="form-field">
@@ -935,14 +942,14 @@ ${this.createOtherTextField(
         `fondantMarmaladeFlavor${suffix}`,
         "Which fruit preserve would you like?",
         questionnaireOptions.fruitPreserves,
-        layer.marmaladeFlavor
+        layer.marmaladeFlavor,
       )}
 
         ${this.createOtherTextField(
         `fondantOtherMarmaladeFlavor${suffix}`,
         "Which other fruit preserve would you like?",
         layer.otherMarmaladeFlavor || "",
-        layer.marmaladeFlavor === "other"
+        layer.marmaladeFlavor === "other",
       )}
     `;
     }
@@ -985,7 +992,7 @@ ${this.createOtherTextField(
         "colorTheme",
         "Which color theme would you like?",
         questionnaireOptions.colorThemes,
-        request.colorTheme || ""
+        request.colorTheme || "",
       );
     }
 
@@ -999,7 +1006,7 @@ ${this.createOtherTextField(
 
     const textDetails = request.textDetails || {
       text: "",
-      letteringStyle: ""
+      letteringStyle: "",
     };
 
     return `
@@ -1023,7 +1030,7 @@ ${this.createOtherTextField(
       "letteringStyle",
       "What lettering style would you like?",
       questionnaireOptions.letteringStyles,
-      textDetails.letteringStyle
+      textDetails.letteringStyle,
     )}
 
         <p class="field-hint">
@@ -1040,7 +1047,7 @@ ${this.createOtherTextField(
 
     const numberAgeDetails = request.numberAgeDetails || {
       numberOrAge: "",
-      displayType: ""
+      displayType: "",
     };
 
     return `
@@ -1064,7 +1071,7 @@ ${this.createOtherTextField(
       "numberDisplayType",
       "How should the number be displayed?",
       questionnaireOptions.numberDisplayTypes,
-      numberAgeDetails.displayType
+      numberAgeDetails.displayType,
     )}
       </div>
     `;
@@ -1077,7 +1084,7 @@ ${this.createOtherTextField(
 
     const candleDetails = request.candleDetails || {
       quantity: "",
-      colors: ""
+      colors: "",
     };
 
     return `
@@ -1126,7 +1133,7 @@ ${this.createOtherTextField(
       "cakeTopper",
       "Cake Topper Details",
       "topper",
-      "For example: wooden Happy Birthday topper, gold acrylic name topper"
+      "For example: wooden Happy Birthday topper, gold acrylic name topper",
     );
   }
 
@@ -1140,22 +1147,86 @@ ${this.createOtherTextField(
       "figurine",
       "Figurines / Modelling Details",
       "figurine",
-      "For example: simple fondant dog, person based on a photo, small teddy bear"
+      "For example: simple fondant dog, person based on a photo, small teddy bear",
     );
   }
 
-  createSizedDecorationDetailsField(details, fieldPrefix, heading, itemLabel, descriptionPlaceholder) {
+  createEdiblePrintDetailsField(request) {
+    if (!request.decorations.includes("edible_print")) {
+      return "";
+    }
+
+    return `
+    <div class="conditional-section">
+      <h3>Edible Print / Image Details</h3>
+
+      <div class="form-field">
+        <label for="ediblePrintDescription">
+          Please describe the image or print you would like
+        </label>
+
+        <textarea
+          id="ediblePrintDescription"
+          data-field="ediblePrintDescription"
+          rows="4"
+          placeholder="For example: a graduation photo in the center with the text Congratulations Anna underneath."
+        >${request.ediblePrintDescription}</textarea>
+      </div>
+
+      <p class="field-hint">
+        You can also add the actual image or a reference link in the References chapter.
+      </p>
+    </div>
+  `;
+  }
+
+  createOtherDecorationDetailsField(request) {
+    if (!request.decorations.includes("other")) {
+      return "";
+    }
+
+    return `
+    <div class="conditional-section">
+      <h3>Other Decoration Details</h3>
+
+      <div class="form-field">
+        <label for="otherDecorationDescription">
+          Please describe the decoration you would like
+        </label>
+
+        <textarea
+          id="otherDecorationDescription"
+          data-field="otherDecorationDescription"
+          rows="4"
+          placeholder="Please describe the decoration, material, placement and any important details."
+        >${request.otherDecorationDescription}</textarea>
+      </div>
+
+      <p class="field-hint">
+        Please discuss feasibility and final pricing with the bakery.
+      </p>
+    </div>
+  `;
+  }
+
+  createSizedDecorationDetailsField(
+    details,
+    fieldPrefix,
+    heading,
+    itemLabel,
+    descriptionPlaceholder,
+  ) {
     const currentDetails = details || {
       description: "",
       quantity: "",
-      items: []
+      items: [],
     };
 
     const quantityOptions = [
       { value: "1", label: "1" },
       { value: "2", label: "2" },
       { value: "3", label: "3" },
-      { value: "4_plus", label: "4 Or More – Please Discuss With The Bakery" }
+      { value: "4_plus", label: "4 Or More – Please Discuss With The Bakery" },
     ];
 
     return `
@@ -1166,7 +1237,7 @@ ${this.createOtherTextField(
       `${fieldPrefix}Quantity`,
       `How many ${itemLabel}s would you like?`,
       quantityOptions,
-      currentDetails.quantity
+      currentDetails.quantity,
     )}
 
       ${currentDetails.quantity === "4_plus"
@@ -1192,7 +1263,7 @@ ${this.createOtherTextField(
         : this.createSizedDecorationItems(
           currentDetails,
           fieldPrefix,
-          itemLabel
+          itemLabel,
         )
       }
     </div>
@@ -1209,13 +1280,13 @@ ${this.createOtherTextField(
     const sizeOptions = [
       { value: "small", label: "Small" },
       { value: "medium", label: "Medium" },
-      { value: "large", label: "Large" }
+      { value: "large", label: "Large" },
     ];
 
     return Array.from({ length: quantity }, (_, index) => {
       const item = details.items?.[index] || {
         description: "",
-        size: ""
+        size: "",
       };
 
       return `
@@ -1240,7 +1311,7 @@ ${this.createOtherTextField(
         `${fieldPrefix}Size-${index}`,
         "Size",
         sizeOptions,
-        item.size
+        item.size,
       )}
       </section>
     `;
@@ -1248,11 +1319,7 @@ ${this.createOtherTextField(
   }
 
   createReferenceDetailsSection(request) {
-    if (
-      !request.referenceMode ||
-      request.referenceMode === "no" ||
-      request.referenceMode === "unsure_advise"
-    ) {
+    if (request.referenceMode !== "add_references") {
       return "";
     }
 
@@ -1261,11 +1328,11 @@ ${this.createOtherTextField(
         <h3>References</h3>
 
         <p class="field-hint">
-          Reference images are used as inspiration. An exact copy cannot be guaranteed.
-          This section is optional.
+          Add at least one image or link. You may add images, links or both.
+          References are used as inspiration and an exact copy cannot be guaranteed.
         </p>
 
-        ${this.createReferenceInputArea(request)}
+        ${this.createReferenceInputArea()}
 
         <div id="referenceList" class="reference-list">
           ${this.createReferenceList(request)}
@@ -1274,107 +1341,143 @@ ${this.createOtherTextField(
     `;
   }
 
-  createReferenceInputArea(request) {
-    const allowsImages =
-      request.referenceMode === "upload_images" ||
-      request.referenceMode === "upload_images_and_links";
-
-    const allowsLinks =
-      request.referenceMode === "add_links" ||
-      request.referenceMode === "upload_images_and_links";
-
+  createReferenceInputArea() {
     return `
-      ${allowsImages
-        ? `
-            <div class="form-field">
-              <label for="referenceImage">
-                Upload reference image
-              </label>
-              <input
-                type="file"
-                id="referenceImage"
-                data-field="referenceImage"
-                accept="image/png, image/jpeg, image/webp"
-              >
-            </div>
-          `
-        : ""
-      }
+    <div class="form-field">
+      <label for="referenceImage">
+        Upload reference image
+      </label>
 
-      ${allowsLinks
-        ? `
-            <div class="form-field">
-              <label for="referenceUrl">
-                Add reference link
-              </label>
-              <input
-                type="url"
-                id="referenceUrl"
-                data-field="referenceUrl"
-                placeholder="https://..."
-              >
-            </div>
+      <input
+        type="file"
+        id="referenceImage"
+        data-field="referenceImage"
+        accept="image/png, image/jpeg, image/webp"
+      >
+    </div>
 
-            <button id="addLinkReferenceButton" type="button">
-              Add link reference
-            </button>
-          `
-        : ""
-      }
-    `;
+    <div class="form-field">
+      <label for="referenceUrl">
+        Add reference link
+      </label>
+
+      <input
+        type="url"
+        id="referenceUrl"
+        data-field="referenceUrl"
+        placeholder="https://example.com/cake-inspiration"
+      >
+
+      <p id="referenceUrlError" class="field-error-message"></p>
+    </div>
+
+    <button id="addLinkReferenceButton" type="button">
+      Add link reference
+    </button>
+  `;
   }
 
   createReferenceList(request) {
-    if (!request.referenceItems || request.referenceItems.length === 0) {
+    if (
+      !Array.isArray(request.referenceItems) ||
+      request.referenceItems.length === 0
+    ) {
       return `
-        <p class="field-hint">
-          No reference items added yet.
-        </p>
-      `;
+      <p class="field-hint">
+        No reference items added yet.
+      </p>
+    `;
     }
 
     return request.referenceItems
       .map((referenceItem, index) => {
         return `
-          <section class="reference-card">
-            <h4>Reference ${index + 1}</h4>
+      <section class="reference-card">
+        <h4>Reference ${index + 1}</h4>
 
-            ${referenceItem.type === "image"
+        ${referenceItem.type === "image"
             ? `
-                  <img
-                    class="reference-preview"
-                    src="${referenceItem.filePreviewUrl}"
-                    alt="Uploaded reference image"
-                  >
-                `
-            : `<p>URL: ${referenceItem.url}</p>`
+            <img
+              class="reference-preview"
+              src="${referenceItem.filePreviewUrl}"
+              alt="Uploaded reference image"
+            >
+
+            <p class="field-hint">
+              ${referenceItem.fileName || "Uploaded image"}
+            </p>
+          `
+            : `
+            <p>
+              <strong>Link:</strong>
+              <a href="${referenceItem.url}" target="_blank" rel="noopener noreferrer">
+                ${referenceItem.url}
+              </a>
+            </p>
+          `
           }
 
-            <button
-              class="remove-reference-button"
-              type="button"
-              data-reference-index="${index}"
-            >
-              Remove reference
-            </button>
-          </section>
-        `;
+        <div class="form-field">
+          <label for="referenceLikes-${index}">
+            What do you like about this reference?
+          </label>
+
+          <textarea
+            id="referenceLikes-${index}"
+            data-field="referenceLikes-${index}"
+            rows="3"
+            placeholder="For example: the colors, floral arrangement or overall style."
+          >${referenceItem.likes || ""}</textarea>
+        </div>
+
+        <div class="form-field">
+          <label for="referenceDislikes-${index}">
+            What do you dislike or want changed?
+          </label>
+
+          <textarea
+            id="referenceDislikes-${index}"
+            data-field="referenceDislikes-${index}"
+            rows="3"
+            placeholder="For example: not the gold details, fewer flowers or a lighter color."
+          >${referenceItem.dislikes || ""}</textarea>
+        </div>
+
+        ${this.createCheckboxGroup(
+            `referenceTags-${index}`,
+            "Which parts of this reference are relevant?",
+            questionnaireOptions.referenceTags,
+            Array.isArray(referenceItem.tags) ? referenceItem.tags : [],
+          )}
+
+        <button
+          class="remove-reference-button"
+          type="button"
+          data-reference-index="${index}"
+        >
+          Remove reference
+        </button>
+      </section>
+    `;
       })
       .join("");
   }
 
   createBudgetDetailsField(request) {
-    const automaticEstimateUnavailable = request.shape === "sculpted_3d" || request.shape === "other";
+    const automaticEstimateUnavailable =
+      request.shape === "sculpted_3d" || request.shape === "other";
 
-    if (request.budgetMode === "show_estimate" && automaticEstimateUnavailable) {
+    if (
+      request.budgetMode === "show_estimate" &&
+      automaticEstimateUnavailable
+    ) {
       return `
             <div class="conditional-section">
                 <p class="field-hint">
-                    A reliable automatic price estimate cannot be provided for
-                    3D, sculpted or custom-shaped cakes because the required work,
-                    stability, materials and level of detail can vary significantly.
-                    The price must be discussed and confirmed directly with the
-                    confectionist.
+                    An automatic price estimate is not reliable for 3D, sculpted or custom-shaped cakes.
+                    The price depends strongly on the requested shape, internal structure, materials,
+                    dimensions and level of detail. Please provide your design and reference information
+                    so the bakery can prepare an individual estimate.
                 </p>
             </div>
         `;
@@ -1388,7 +1491,7 @@ ${this.createOtherTextField(
       "budgetRange",
       "Do you have an approximate budget?",
       questionnaireOptions.budgetRanges,
-      request.budgetRange
+      request.budgetRange,
     );
 
     const customBudgetField =
@@ -1419,9 +1522,13 @@ ${this.createOtherTextField(
     `;
   }
 
-  createSelectField(fieldName, labelText, options, selectedValue,
-    { disabled = false, disabledValues = [] } = {}) {
-
+  createSelectField(
+    fieldName,
+    labelText,
+    options,
+    selectedValue,
+    { disabled = false, disabledValues = [] } = {},
+  ) {
     return `
     <div class="form-field">
       <label for="${fieldName}">${labelText}</label>
@@ -1437,7 +1544,9 @@ ${this.createOtherTextField(
         .map((option) => {
           const selected = option.value === selectedValue ? "selected" : "";
 
-          const optionDisabled = disabledValues.includes(option.value) ? "disabled" : "";
+          const optionDisabled = disabledValues.includes(option.value)
+            ? "disabled"
+            : "";
 
           return `
               <option
@@ -1474,7 +1583,13 @@ ${this.createOtherTextField(
     `;
   }
 
-  createCheckboxGroup(fieldName, labelText, options, selectedValues, hintText = "") {
+  createCheckboxGroup(
+    fieldName,
+    labelText,
+    options,
+    selectedValues,
+    hintText = "",
+  ) {
     return `
       <div class="form-field checkbox-field">
         <p class="field-label">${labelText}</p>
@@ -1482,7 +1597,9 @@ ${this.createOtherTextField(
         <div class="checkbox-group" data-field="${fieldName}">
           ${options
         .map((option) => {
-          const checked = selectedValues.includes(option.value) ? "checked" : "";
+          const checked = selectedValues.includes(option.value)
+            ? "checked"
+            : "";
 
           return `
                 <label class="checkbox-option">
@@ -1499,10 +1616,7 @@ ${this.createOtherTextField(
         .join("")}
         </div>
 
-        ${hintText
-        ? `<p class="field-hint">${hintText}</p>`
-        : ""
-      }
+        ${hintText ? `<p class="field-hint">${hintText}</p>` : ""}
       </div>
     `;
   }
@@ -1548,15 +1662,11 @@ ${this.createOtherTextField(
   }
 
   attachBasicChapterEvents() {
-    const displayNameInput =
-      document.getElementById("displayName");
+    const displayNameInput = document.getElementById("displayName");
 
     if (displayNameInput) {
       displayNameInput.addEventListener("input", (event) => {
-        this.state.updateField(
-          "displayName",
-          event.target.value
-        );
+        this.state.updateField("displayName", event.target.value);
       });
     }
 
@@ -1581,7 +1691,7 @@ ${this.createOtherTextField(
           plannedServingsWithBuffer: "",
           sizeAdvice: "",
           sizeAdviceLevel: "",
-          consultationRequired: false
+          consultationRequired: false,
         });
 
         this.render();
@@ -1632,27 +1742,53 @@ ${this.createOtherTextField(
     request.tierFlavors.forEach((tierFlavor, index) => {
       const cakeFlavorSelect = document.getElementById(`cakeFlavor-${index}`);
       const fillingSelect = document.getElementById(`filling-${index}`);
-      const fruitFillingSelect = document.getElementById(`fruitFilling-${index}`);
+      const fruitFillingSelect = document.getElementById(
+        `fruitFilling-${index}`,
+      );
 
-      const otherCakeFlavorInput = document.getElementById(`otherCakeFlavor-${index}`);
-      const otherFillingInput = document.getElementById(`otherFilling-${index}`);
-      const otherFruitFillingInput = document.getElementById(`otherFruitFilling-${index}`);
+      const otherCakeFlavorInput = document.getElementById(
+        `otherCakeFlavor-${index}`,
+      );
+      const otherFillingInput = document.getElementById(
+        `otherFilling-${index}`,
+      );
+      const otherFruitFillingInput = document.getElementById(
+        `otherFruitFilling-${index}`,
+      );
 
       const cakeColorInput = document.getElementById(`cakeColor-${index}`);
-      const buttercreamTypeSelect = document.getElementById(`buttercreamType-${index}`);
-      const buttercreamColorInput = document.getElementById(`buttercreamColor-${index}`);
-      const buttercreamFlavorInput = document.getElementById(`buttercreamFlavor-${index}`);
-      const ganacheChocolateTypeSelect = document.getElementById(`ganacheChocolateType-${index}`);
-      const ganacheColorInput = document.getElementById(`ganacheColor-${index}`);
+      const buttercreamTypeSelect = document.getElementById(
+        `buttercreamType-${index}`,
+      );
+      const buttercreamColorInput = document.getElementById(
+        `buttercreamColor-${index}`,
+      );
+      const buttercreamFlavorInput = document.getElementById(
+        `buttercreamFlavor-${index}`,
+      );
+      const ganacheChocolateTypeSelect = document.getElementById(
+        `ganacheChocolateType-${index}`,
+      );
+      const ganacheColorInput = document.getElementById(
+        `ganacheColor-${index}`,
+      );
 
       const cakeNutTypeSelect = document.getElementById(`cakeNutType-${index}`);
-      const otherCakeNutInput = document.getElementById(`otherCakeNut-${index}`);
+      const otherCakeNutInput = document.getElementById(
+        `otherCakeNut-${index}`,
+      );
 
-      const fillingNutTypeSelect = document.getElementById(`fillingNutType-${index}`);
-      const otherFillingNutInput = document.getElementById(`otherFillingNut-${index}`);
+      const fillingNutTypeSelect = document.getElementById(
+        `fillingNutType-${index}`,
+      );
+      const otherFillingNutInput = document.getElementById(
+        `otherFillingNut-${index}`,
+      );
 
       const jamFlavorSelect = document.getElementById(`jamFlavor-${index}`);
-      const otherJamFlavorInput = document.getElementById(`otherJamFlavor-${index}`);
+      const otherJamFlavorInput = document.getElementById(
+        `otherJamFlavor-${index}`,
+      );
 
       if (cakeFlavorSelect) {
         cakeFlavorSelect.addEventListener("change", (event) => {
@@ -1806,7 +1942,7 @@ ${this.createOtherTextField(
       "fondantButtercreamColor",
       "fondantButtercreamFlavor",
       "fondantGanacheColor",
-      "fondantOtherMarmaladeFlavor"
+      "fondantOtherMarmaladeFlavor",
     ];
 
     normalTextFields.forEach((fieldName) => {
@@ -1827,7 +1963,7 @@ ${this.createOtherTextField(
       "fondantButtercreamType",
       "fondantGanacheChocolateType",
       "fondantMarmaladeFlavor",
-      "colorTheme"
+      "colorTheme",
     ];
 
     normalSelectFields.forEach((fieldName) => {
@@ -1841,7 +1977,6 @@ ${this.createOtherTextField(
         this.state.updateField(fieldName, event.target.value);
 
         if (
-
           fieldName === "fondantLayer" ||
           fieldName === "fondantButtercreamType" ||
           fieldName === "fondantGanacheChocolateType" ||
@@ -1851,20 +1986,17 @@ ${this.createOtherTextField(
             fieldName === "fondantMarmaladeFlavor" &&
             event.target.value !== "other"
           ) {
-            this.state.updateField(
-              "fondantOtherMarmaladeFlavor",
-              ""
-            );
+            this.state.updateField("fondantOtherMarmaladeFlavor", "");
           }
           this.render();
         }
       });
     });
 
-
     // Chocolate Glaze: Jam yes or no?
-    const chocolateGlazePreserveChoice =
-      document.getElementById("chocolateGlazePreserveChoice");
+    const chocolateGlazePreserveChoice = document.getElementById(
+      "chocolateGlazePreserveChoice",
+    );
 
     if (chocolateGlazePreserveChoice) {
       chocolateGlazePreserveChoice.addEventListener("change", (event) => {
@@ -1873,13 +2005,9 @@ ${this.createOtherTextField(
         this.state.updateMultipleFields({
           chocolateGlazePreserveChoice: value,
           chocolateGlazePreserveFlavor:
-            value === "yes"
-              ? request.chocolateGlazePreserveFlavor
-              : "",
+            value === "yes" ? request.chocolateGlazePreserveFlavor : "",
           chocolateGlazeOtherPreserveFlavor:
-            value === "yes"
-              ? request.chocolateGlazeOtherPreserveFlavor
-              : ""
+            value === "yes" ? request.chocolateGlazeOtherPreserveFlavor : "",
         });
 
         this.render();
@@ -1887,21 +2015,19 @@ ${this.createOtherTextField(
     }
 
     // Chocolate Glaze: Which Jam?
-    const chocolateGlazePreserveFlavor =
-      document.getElementById("chocolateGlazePreserveFlavor");
+    const chocolateGlazePreserveFlavor = document.getElementById(
+      "chocolateGlazePreserveFlavor",
+    );
 
     if (chocolateGlazePreserveFlavor) {
       chocolateGlazePreserveFlavor.addEventListener("change", (event) => {
         this.state.updateField(
           "chocolateGlazePreserveFlavor",
-          event.target.value
+          event.target.value,
         );
 
         if (event.target.value !== "other") {
-          this.state.updateField(
-            "chocolateGlazeOtherPreserveFlavor",
-            ""
-          );
+          this.state.updateField("chocolateGlazeOtherPreserveFlavor", "");
         }
 
         this.render();
@@ -1909,21 +2035,18 @@ ${this.createOtherTextField(
     }
 
     // Chocolate Glaze: Other Fruit
-    const chocolateGlazeOtherPreserveFlavor =
-      document.getElementById("chocolateGlazeOtherPreserveFlavor");
+    const chocolateGlazeOtherPreserveFlavor = document.getElementById(
+      "chocolateGlazeOtherPreserveFlavor",
+    );
 
     if (chocolateGlazeOtherPreserveFlavor) {
       chocolateGlazeOtherPreserveFlavor.addEventListener("input", (event) => {
         this.state.updateField(
           "chocolateGlazeOtherPreserveFlavor",
-          event.target.value
+          event.target.value,
         );
-      }
-
-
-      );
+      });
     }
-
 
     // Individual Fondant Layer per Tier
     request.fondantLayerDetails.forEach((layer, index) => {
@@ -1952,6 +2075,14 @@ ${this.createOtherTextField(
 
       if (!selectedValues.includes("figurines")) {
         request.figurineDetails = null;
+      }
+
+      if (!selectedValues.includes("edible_print")) {
+        request.ediblePrintDescription = "";
+      }
+
+      if (!selectedValues.includes("other")) {
+        request.otherDecorationDescription = "";
       }
 
       request.markUpdated();
@@ -2002,63 +2133,80 @@ ${this.createOtherTextField(
       });
     }
 
-    const cakeTopperGeneralDescription =
-      document.getElementById("cakeTopperGeneralDescription");
+    const cakeTopperGeneralDescription = document.getElementById(
+      "cakeTopperGeneralDescription",
+    );
 
     if (cakeTopperGeneralDescription) {
       cakeTopperGeneralDescription.addEventListener("input", (event) => {
         this.updateSizedDecorationDescription(
           "cakeTopperDetails",
-          event.target.value
+          event.target.value,
         );
       });
     }
 
-    const cakeTopperQuantity =
-      document.getElementById("cakeTopperQuantity");
+    const cakeTopperQuantity = document.getElementById("cakeTopperQuantity");
 
     if (cakeTopperQuantity) {
       cakeTopperQuantity.addEventListener("change", (event) => {
         this.updateSizedDecorationQuantity(
           "cakeTopperDetails",
-          event.target.value
+          event.target.value,
         );
       });
     }
 
-    const figurineGeneralDescription =
-      document.getElementById("figurineGeneralDescription");
+    const figurineGeneralDescription = document.getElementById(
+      "figurineGeneralDescription",
+    );
 
     if (figurineGeneralDescription) {
       figurineGeneralDescription.addEventListener("input", (event) => {
         this.updateSizedDecorationDescription(
           "figurineDetails",
-          event.target.value
+          event.target.value,
         );
       });
     }
 
-    const figurineQuantity =
-      document.getElementById("figurineQuantity");
+    const figurineQuantity = document.getElementById("figurineQuantity");
 
     if (figurineQuantity) {
       figurineQuantity.addEventListener("change", (event) => {
         this.updateSizedDecorationQuantity(
           "figurineDetails",
-          event.target.value
+          event.target.value,
         );
       });
     }
 
-    this.attachSizedDecorationItemEvents(
-      "cakeTopper",
-      "cakeTopperDetails"
+    const ediblePrintDescription = document.getElementById(
+      "ediblePrintDescription",
     );
 
-    this.attachSizedDecorationItemEvents(
-      "figurine",
-      "figurineDetails"
+    if (ediblePrintDescription) {
+      ediblePrintDescription.addEventListener("input", (event) => {
+        this.state.updateField("ediblePrintDescription", event.target.value);
+      });
+    }
+
+    const otherDecorationDescription = document.getElementById(
+      "otherDecorationDescription",
     );
+
+    if (otherDecorationDescription) {
+      otherDecorationDescription.addEventListener("input", (event) => {
+        this.state.updateField(
+          "otherDecorationDescription",
+          event.target.value,
+        );
+      });
+    }
+
+    this.attachSizedDecorationItemEvents("cakeTopper", "cakeTopperDetails");
+
+    this.attachSizedDecorationItemEvents("figurine", "figurineDetails");
   }
 
   attachFondantLayerDetailEvents(layer, index) {
@@ -2088,7 +2236,7 @@ ${this.createOtherTextField(
       [`fondantGanacheChocolateType-${index}`]: "ganacheChocolateType",
       [`fondantGanacheColor-${index}`]: "ganacheColor",
       [`fondantMarmaladeFlavor-${index}`]: "marmaladeFlavor",
-      [`fondantOtherMarmaladeFlavor-${index}`]: "otherMarmaladeFlavor"
+      [`fondantOtherMarmaladeFlavor-${index}`]: "otherMarmaladeFlavor",
     };
 
     Object.entries(fieldMap).forEach(([elementId, propertyName]) => {
@@ -2098,7 +2246,8 @@ ${this.createOtherTextField(
         return;
       }
 
-      const eventType = element.tagName.toLowerCase() === "select" ? "change" : "input";
+      const eventType =
+        element.tagName.toLowerCase() === "select" ? "change" : "input";
 
       element.addEventListener(eventType, (event) => {
         layer[propertyName] = event.target.value;
@@ -2122,7 +2271,22 @@ ${this.createOtherTextField(
   attachReferencesChapterEvents() {
     const request = this.state.getCakeRequest();
 
-    this.attachSelectChangeEvent("referenceMode", true);
+    const referenceModeSelect = document.getElementById("referenceMode");
+
+    if (referenceModeSelect) {
+      referenceModeSelect.addEventListener("change", (event) => {
+        const referenceMode = event.target.value;
+
+        this.state.updateField("referenceMode", referenceMode);
+
+        if (referenceMode === "no") {
+          request.referenceItems = [];
+          request.markUpdated();
+        }
+
+        this.render();
+      });
+    }
 
     const budgetModeSelect = document.getElementById("budgetMode");
 
@@ -2131,15 +2295,10 @@ ${this.createOtherTextField(
         const budgetMode = event.target.value;
 
         this.state.updateMultipleFields({
-          budgetMode: budgetMode,
-          budgetRange:
-            budgetMode === "enter_budget"
-              ? request.budgetRange
-              : "",
+          budgetMode,
+          budgetRange: budgetMode === "enter_budget" ? request.budgetRange : "",
           customBudget:
-            budgetMode === "enter_budget"
-              ? request.customBudget
-              : ""
+            budgetMode === "enter_budget" ? request.customBudget : "",
         });
 
         this.render();
@@ -2153,11 +2312,9 @@ ${this.createOtherTextField(
         const budgetRange = event.target.value;
 
         this.state.updateMultipleFields({
-          budgetRange: budgetRange,
+          budgetRange,
           customBudget:
-            budgetRange === "custom_budget"
-              ? request.customBudget
-              : ""
+            budgetRange === "custom_budget" ? request.customBudget : "",
         });
 
         this.render();
@@ -2165,6 +2322,7 @@ ${this.createOtherTextField(
     }
 
     const customBudget = document.getElementById("customBudget");
+
     if (customBudget) {
       customBudget.addEventListener("input", (event) => {
         this.state.updateField("customBudget", event.target.value);
@@ -2172,6 +2330,7 @@ ${this.createOtherTextField(
     }
 
     const additionalNotes = document.getElementById("additionalNotes");
+
     if (additionalNotes) {
       additionalNotes.addEventListener("input", (event) => {
         this.state.updateField("additionalNotes", event.target.value);
@@ -2182,7 +2341,10 @@ ${this.createOtherTextField(
 
     if (referenceImageInput) {
       referenceImageInput.addEventListener("change", () => {
-        if (!referenceImageInput.files || referenceImageInput.files.length === 0) {
+        if (
+          !referenceImageInput.files ||
+          referenceImageInput.files.length === 0
+        ) {
           return;
         }
 
@@ -2194,44 +2356,106 @@ ${this.createOtherTextField(
 
         request.referenceItems.push(referenceItem);
         request.markUpdated();
-
         this.render();
       });
     }
 
-    const addLinkReferenceButton = document.getElementById("addLinkReferenceButton");
+    const addLinkReferenceButton = document.getElementById(
+      "addLinkReferenceButton",
+    );
 
     if (addLinkReferenceButton) {
       addLinkReferenceButton.addEventListener("click", () => {
         const urlInput = document.getElementById("referenceUrl");
+        const errorElement = document.getElementById("referenceUrlError");
+        const url = urlInput?.value.trim() || "";
 
-        if (!urlInput || urlInput.value.trim() === "") {
-          alert("Please enter a link first.");
+        if (!this.isValidReferenceUrl(url)) {
+          if (errorElement) {
+            errorElement.textContent =
+              "Please enter a valid link beginning with http:// or https://.";
+          }
+
+          urlInput?.classList.add("field-error");
           return;
         }
 
+        if (errorElement) {
+          errorElement.textContent = "";
+        }
+
+        urlInput.classList.remove("field-error");
+
         const referenceItem = new ReferenceItem("link");
-        referenceItem.setUrl(urlInput.value.trim());
+        referenceItem.setUrl(url);
 
         request.referenceItems.push(referenceItem);
         request.markUpdated();
-
         this.render();
       });
     }
 
-    const removeReferenceButtons = document.querySelectorAll(".remove-reference-button");
+    request.referenceItems.forEach((referenceItem, index) => {
+      const likesInput = document.getElementById(`referenceLikes-${index}`);
+
+      if (likesInput) {
+        likesInput.addEventListener("input", (event) => {
+          referenceItem.likes = event.target.value;
+          request.markUpdated();
+        });
+      }
+
+      const dislikesInput = document.getElementById(
+        `referenceDislikes-${index}`,
+      );
+
+      if (dislikesInput) {
+        dislikesInput.addEventListener("input", (event) => {
+          referenceItem.dislikes = event.target.value;
+          request.markUpdated();
+        });
+      }
+
+      this.attachCheckboxGroupChange(
+        `referenceTags-${index}`,
+        (selectedValues) => {
+          referenceItem.tags = selectedValues;
+          request.markUpdated();
+        },
+      );
+    });
+
+    const removeReferenceButtons = document.querySelectorAll(
+      ".remove-reference-button",
+    );
 
     removeReferenceButtons.forEach((button) => {
       button.addEventListener("click", () => {
         const referenceIndex = Number(button.dataset.referenceIndex);
+        const referenceItem = request.referenceItems[referenceIndex];
+
+        if (referenceItem?.type === "image" && referenceItem.filePreviewUrl) {
+          URL.revokeObjectURL(referenceItem.filePreviewUrl);
+        }
 
         request.referenceItems.splice(referenceIndex, 1);
         request.markUpdated();
-
         this.render();
       });
     });
+  }
+
+  isValidReferenceUrl(value) {
+    if (typeof value !== "string" || !value.trim()) {
+      return false;
+    }
+
+    try {
+      const url = new URL(value.trim());
+      return url.protocol === "http:" || url.protocol === "https:";
+    } catch {
+      return false;
+    }
   }
 
   attachSelectChangeEvent(fieldName, shouldRerender = false) {
@@ -2270,7 +2494,7 @@ ${this.createOtherTextField(
     if (!request.textDetails) {
       request.textDetails = {
         text: "",
-        letteringStyle: ""
+        letteringStyle: "",
       };
     }
 
@@ -2284,7 +2508,7 @@ ${this.createOtherTextField(
     if (!request.numberAgeDetails) {
       request.numberAgeDetails = {
         numberOrAge: "",
-        displayType: ""
+        displayType: "",
       };
     }
 
@@ -2298,7 +2522,7 @@ ${this.createOtherTextField(
     if (!request.candleDetails) {
       request.candleDetails = {
         quantity: "",
-        colors: ""
+        colors: "",
       };
     }
 
@@ -2313,7 +2537,7 @@ ${this.createOtherTextField(
       request[detailsField] = {
         description: "",
         quantity: "",
-        items: []
+        items: [],
       };
     }
 
@@ -2328,7 +2552,7 @@ ${this.createOtherTextField(
       request[detailsField] = {
         description: "",
         quantity: "",
-        items: []
+        items: [],
       };
     }
 
@@ -2344,10 +2568,11 @@ ${this.createOtherTextField(
 
       request[detailsField].items = Array.from(
         { length: Number.isInteger(quantity) ? quantity : 0 },
-        (_, index) => existingItems[index] || {
-          description: "",
-          size: ""
-        }
+        (_, index) =>
+          existingItems[index] || {
+            description: "",
+            size: "",
+          },
       );
     }
 
@@ -2364,8 +2589,9 @@ ${this.createOtherTextField(
     }
 
     details.items.forEach((item, index) => {
-      const descriptionInput =
-        document.getElementById(`${fieldPrefix}Description-${index}`);
+      const descriptionInput = document.getElementById(
+        `${fieldPrefix}Description-${index}`,
+      );
 
       if (descriptionInput) {
         descriptionInput.addEventListener("input", (event) => {
@@ -2374,8 +2600,7 @@ ${this.createOtherTextField(
         });
       }
 
-      const sizeSelect =
-        document.getElementById(`${fieldPrefix}Size-${index}`);
+      const sizeSelect = document.getElementById(`${fieldPrefix}Size-${index}`);
 
       if (sizeSelect) {
         sizeSelect.addEventListener("change", (event) => {
@@ -2413,7 +2638,8 @@ ${this.createOtherTextField(
 
     const priceEstimateRequested = cakeRequest.budgetMode === "show_estimate";
 
-    const automaticPricingUnavailable = cakeRequest.shape === "sculpted_3d" || cakeRequest.shape === "other";
+    const automaticPricingUnavailable =
+      cakeRequest.shape === "sculpted_3d" || cakeRequest.shape === "other";
 
     if (priceEstimateRequested) {
       if (automaticPricingUnavailable) {
@@ -2421,8 +2647,7 @@ ${this.createOtherTextField(
       } else {
         this.summaryRenderer.renderPricingLoading();
 
-        PricingApiService
-          .estimatePrice(cakeRequest)
+        PricingApiService.estimatePrice(cakeRequest)
           .then((pricingResult) => {
             this.summaryRenderer.renderPricingResult(pricingResult);
           })
@@ -2437,12 +2662,12 @@ ${this.createOtherTextField(
 
     Promise.all([
       CakeRequestApiService.nutrientsCakeRequest(cakeRequest),
-      CakeRequestApiService.analyzeCakeRequest(cakeRequest)
+      CakeRequestApiService.analyzeCakeRequest(cakeRequest),
     ])
       .then(([allergensResult, nutrientsResult]) => {
         this.summaryRenderer.renderAnalysisResults(
           allergensResult.allergens,
-          nutrientsResult.analysis
+          nutrientsResult.analysis,
         );
       })
       .catch((error) => {
@@ -2466,7 +2691,6 @@ ${this.createOtherTextField(
       .replace(/([A-Z])/g, " $1")
       .replace(/^./, (firstLetter) => firstLetter.toUpperCase());
   }
-
 
   //Cake Size API Integration
   attachCakeSizeRelevantSelectEvent(fieldName, shouldClearKnownSize = false) {
@@ -2503,10 +2727,7 @@ ${this.createOtherTextField(
         If "I know the cake size" was selected before the user
         changed to a consultation-only combination, remove it.
       */
-      if (
-        sizeSelectionDisabled &&
-        request.sizeMode === "known_size"
-      ) {
+      if (sizeSelectionDisabled && request.sizeMode === "known_size") {
         this.state.updateMultipleFields({
           sizeMode: "",
           knownSize: "",
@@ -2516,7 +2737,7 @@ ${this.createOtherTextField(
           plannedServingsWithBuffer: "",
           sizeAdvice: "",
           sizeAdviceLevel: "",
-          consultationRequired: false
+          consultationRequired: false,
         });
       }
 
@@ -2540,14 +2761,16 @@ ${this.createOtherTextField(
     const servingSize = request.servingSize;
     const tiers = request.tiers;
 
-    const tiersRequired = shape !== "sculpted_3d";
+    if (shape === "sculpted_3d") {
+      request.sizeEstimateMessage =
+        "The bakery will determine a suitable size and structure based on the design and requested servings.";
+      request.consultationRequired = true;
+      request.markUpdated();
+      this.render();
+      return;
+    }
 
-    if (
-      !shape ||
-      !servingSize ||
-      !request.sizeMode ||
-      (tiersRequired && !tiers)
-    ) {
+    if (!shape || !servingSize || !request.sizeMode || !tiers) {
       request.markUpdated();
       this.render();
       return;
@@ -2562,13 +2785,12 @@ ${this.createOtherTextField(
           this.render();
           return;
         }
-        const tiersForApi = shape === "sculpted_3d" ? "unsure_advise" : tiers;
 
         result = await this.cakeSizeApiService.estimateSizeByServings({
           servings: request.knownServings,
           shape: shape,
           servingSize: servingSize,
-          tiers: tiersForApi
+          tiers,
         });
       }
 
@@ -2583,7 +2805,7 @@ ${this.createOtherTextField(
           sizeId: request.knownSize,
           shape: shape,
           servingSize: servingSize,
-          tiers: tiers
+          tiers: tiers,
         });
       }
 
@@ -2596,7 +2818,8 @@ ${this.createOtherTextField(
       request.recommendedSize = result.recommendedSize || "";
       request.estimatedServings = result.estimatedServings || "";
       request.sizeEstimateMessage = result.message || "";
-      request.plannedServingsWithBuffer = result.plannedServingsWithBuffer || "";
+      request.plannedServingsWithBuffer =
+        result.plannedServingsWithBuffer || "";
 
       request.sizeAdvice = result.sizeAdvice || "";
       request.sizeAdviceLevel = result.sizeAdviceLevel || "";
@@ -2627,6 +2850,34 @@ ${this.createOtherTextField(
       return "";
     }
 
+    if (request.shape === "sculpted_3d") {
+      return `
+      <div class="conditional-section">
+        <h4>3D / Sculpted Cake Size</h4>
+
+        <p class="field-hint">
+          A 3D or sculpted cake does not use standard cake-size or tier calculations.
+          The required dimensions and internal structure depend on the chosen design,
+          shape, level of detail and number of servings.
+        </p>
+
+        ${request.knownServings
+          ? `
+            <p>
+              <strong>Requested servings:</strong> ${request.knownServings}
+            </p>
+          `
+          : ""
+        }
+
+        <p class="field-hint">
+          The bakery will use the requested servings and design details to recommend
+          a suitable size and construction.
+        </p>
+      </div>
+    `;
+    }
+
     const adviceClass = request.sizeAdviceLevel
       ? `size-advice size-advice--${request.sizeAdviceLevel}`
       : "";
@@ -2635,7 +2886,9 @@ ${this.createOtherTextField(
     <div class="conditional-section">
       <h4>Cake Size Estimate</h4>
 
-      ${!request.recommendedSize && !request.estimatedServings && !request.sizeEstimateMessage
+      ${!request.recommendedSize &&
+        !request.estimatedServings &&
+        !request.sizeEstimateMessage
         ? `
             <p>
               Enter servings or choose a cake size to receive an automatic estimate.
@@ -2702,7 +2955,7 @@ ${this.createOtherTextField(
     try {
       const result = await this.cakeSizeApiService.getAvailableCakeSizes({
         shape: request.shape,
-        tiers: request.tiers
+        tiers: request.tiers,
       });
 
       selectElement.innerHTML = `<option value="">Please choose...</option>`;
@@ -2727,5 +2980,4 @@ ${this.createOtherTextField(
     `;
     }
   }
-
 }

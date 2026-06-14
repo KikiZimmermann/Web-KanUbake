@@ -124,9 +124,8 @@ const pricingRules = {
         number_age: 0,
 
         /*
-          These will later get detail fields with quantity and size.
-          Until then, we can either use rough fallback values or mark them
-          as consultation-related. For now we keep fallback values.
+        Cake toppers, candles and figurines use their own quantity-
+        and size-based pricing rules below.
         */
         cake_topper: 0,
         candles: 0,

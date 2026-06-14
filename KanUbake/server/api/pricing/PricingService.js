@@ -268,7 +268,7 @@ class PricingService {
             additionalCandles * rules.additionalPricePerCandle;
 
         return Math.min(price, rules.maximumAutomaticPrice);
-    };
+    }
 
     static calculateSizedItemsPrice(details, rules) {
         if (
