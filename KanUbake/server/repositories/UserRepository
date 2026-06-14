@@ -53,6 +53,28 @@ class UserRepository {
     );
     return result;
   }
+
+  async updateUser(email, fields) {
+    const sql = `
+      UPDATE users
+      SET firstName = ?, lastName = ?, dateOfBirth = ?, password = ?
+      WHERE email = ?
+    `;
+    const [result] = await this.db.promise().query(sql, [
+      fields.firstName,
+      fields.lastName,
+      fields.dateOfBirth,
+      fields.password,
+      email,
+    ]);
+    return result;
+  }
+
+  async deleteUser(email) {
+    const sql = `DELETE FROM users WHERE email = ?`;
+    const [result] = await this.db.promise().query(sql, [email]);
+    return result;
+  }
 }
 
 module.exports = UserRepository;

@@ -65,25 +65,31 @@
   }
 
   /* ── Sign-up page overrides ────────────────────────── */
-  body.page-signup {
+  body.page-signup,
+  body.page-edit {
     justify-content: flex-start;
     padding: 2rem;
     height: auto;
   }
 
-  body.page-signup header{
+  body.page-signup header,
+  body.page-edit header {
     margin: 3rem 0;
   }
 
-  body.page-signup .card {
+  body.page-signup .card,
+  body.page-edit .card {
     width: 30rem;
   }
 
-  body.page-signup .form_basic {
+  body.page-signup .form_basic,
+  body.page-edit .form_basic {
     gap: 2rem;
   }
 
-  #sign_up{
+  #sign_up,
+  #save_changes,
+  #delete_account {
     width: 40%;
   }
 }
