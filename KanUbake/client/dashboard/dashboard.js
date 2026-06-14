@@ -1,6 +1,6 @@
 async function loadCakes() {
     const token = localStorage.getItem("accessToken");
-    
+
     if (!token) {
         console.log("Not logged in");
         return;
@@ -11,8 +11,7 @@ async function loadCakes() {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`
-            },
-            credentials: "include"
+            }
         });
 
         if (!response.ok) {
@@ -20,6 +19,7 @@ async function loadCakes() {
         }
 
         const cakes = await response.json();
+
         renderCakes(cakes);
 
     } catch (err) {

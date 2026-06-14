@@ -87,7 +87,7 @@ app.post("/login", async function (req, res) {
   }
 
   // credentials are correct! create the user object to put in the token
-  const user = { email: email };
+  const user = { id: existingUser.id, email: email };
 
   // create a short-lived access token (expires in 1000 seconds)
   const accessToken = generateAccessToken(user);
