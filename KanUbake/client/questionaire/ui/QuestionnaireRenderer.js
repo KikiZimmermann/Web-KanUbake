@@ -2679,8 +2679,9 @@ ${this.createOtherTextField(
     this.backButton.disabled = this.state.isFirstChapter();
 
     if (this.state.isLastChapter()) {
-      this.nextButton.textContent = "Finish";
+      this.nextButton.hidden = true;
     } else {
+      this.nextButton.hidden = false;
       this.nextButton.textContent = "Next";
     }
   }
