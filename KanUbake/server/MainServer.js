@@ -40,6 +40,7 @@ registerCakeAnalysisApi(app);
 //app.use(authenticateToken); das wäre Ab hier braucht alles einen gültigen Token, um auf die Endpunkte zuzugreifen
 //aber ich habe es pro route selber in meinem file gemacht
 cakeService.insertCake(app);
+cakeService.getCake(app);
 
 //just rearranged
 app.listen(3010, () => {
