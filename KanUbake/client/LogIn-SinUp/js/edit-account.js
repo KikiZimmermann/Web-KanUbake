@@ -3,30 +3,34 @@ if (!localStorage.getItem("accessToken")) {
   window.location.href = "/LogIn-SinUp/html/LogIn.html";
 }
 
-const firstNameEl      = document.getElementById("first_name");
-const lastNameEl       = document.getElementById("last_name");
-const dateEl           = document.getElementById("date_of_birth");
-const currentPassEl    = document.getElementById("current_pass");
-const newPassEl        = document.getElementById("new_pass");
+const firstNameEl = document.getElementById("first_name");
+const lastNameEl = document.getElementById("last_name");
+const dateEl = document.getElementById("date_of_birth");
+const currentPassEl = document.getElementById("current_pass");
+const newPassEl = document.getElementById("new_pass");
 const newPassConfirmEl = document.getElementById("new_pass_confirm");
 
 // attach live validation listeners (validators come from validation.js)
-firstNameEl.addEventListener("input",      () => validateName(firstNameEl));
-lastNameEl.addEventListener("input",       () => validateName(lastNameEl));
-dateEl.addEventListener("input",           () => validateDate(dateEl));
-currentPassEl.addEventListener("input",    () => {
+firstNameEl.addEventListener("input", () => validateName(firstNameEl));
+lastNameEl.addEventListener("input", () => validateName(lastNameEl));
+dateEl.addEventListener("input", () => validateDate(dateEl));
+currentPassEl.addEventListener("input", () => {
   // only validate if the user has started typing
   if (currentPassEl.value) validatePassword(currentPassEl);
   else clearError(currentPassEl);
   // re-check confirm whenever current changes
-  if (newPassConfirmEl.value) validateConfirmPassword(newPassConfirmEl, newPassEl);
+  if (newPassConfirmEl.value)
+    validateConfirmPassword(newPassConfirmEl, newPassEl);
 });
-newPassEl.addEventListener("input",        () => {
+newPassEl.addEventListener("input", () => {
   if (newPassEl.value) validatePassword(newPassEl);
   else clearError(newPassEl);
-  if (newPassConfirmEl.value) validateConfirmPassword(newPassConfirmEl, newPassEl);
+  if (newPassConfirmEl.value)
+    validateConfirmPassword(newPassConfirmEl, newPassEl);
 });
-newPassConfirmEl.addEventListener("input", () => validateConfirmPassword(newPassConfirmEl, newPassEl));
+newPassConfirmEl.addEventListener("input", () =>
+  validateConfirmPassword(newPassConfirmEl, newPassEl)
+);
 
 // pre-fill the form with the user's current data
 window.addEventListener("load", async () => {
@@ -35,7 +39,7 @@ window.addEventListener("load", async () => {
 
   const user = await response.json();
   firstNameEl.value = user.firstName || "";
-  lastNameEl.value  = user.lastName  || "";
+  lastNameEl.value = user.lastName || "";
   if (user.dateOfBirth) {
     dateEl.value = user.dateOfBirth.split("T")[0];
   }
@@ -50,21 +54,22 @@ document.getElementById("save_changes").addEventListener("click", async () => {
   const changingPassword = currentPassEl.value.length > 0;
   let passOk = true;
   if (changingPassword) {
-    passOk = validatePassword(currentPassEl)
-           & validatePassword(newPassEl)
-           & validateConfirmPassword(newPassConfirmEl, newPassEl);
+    passOk =
+      validatePassword(currentPassEl) &
+      validatePassword(newPassEl) &
+      validateConfirmPassword(newPassConfirmEl, newPassEl);
   }
 
   if (!nameOk || !dateOk || !passOk) return;
 
   const body = {
-    firstName:   firstNameEl.value.trim(),
-    lastName:    lastNameEl.value.trim(),
+    firstName: firstNameEl.value.trim(),
+    lastName: lastNameEl.value.trim(),
     dateOfBirth: dateEl.value,
   };
   if (changingPassword) {
     body.currentPassword = currentPassEl.value;
-    body.newPassword     = newPassEl.value;
+    body.newPassword = newPassEl.value;
   }
 
   const response = await fetch("http://localhost:3010/user", {

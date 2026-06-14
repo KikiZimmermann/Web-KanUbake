@@ -1,7 +1,7 @@
 /*
   Email API
 
-  Sends the cake questionnaire draft to a customer email address via Resend.
+  Sends the cake questionnaire draft to a customer email address via    .
 */
 
 const nodemailer = require("nodemailer");
