@@ -15,6 +15,7 @@ import { QuestionnaireValidator } from "./validation/QuestionnaireValidator.js";
 import { DraftStorageService } from "./services/DraftStorageService.js";
 import { EmailApiService } from "./services/api/EmailApiService.js";
 import { SummaryBuilder } from "./services/SummaryBuilder.js";
+import { CakeRequestApiService } from "./services/api/CakeRequestApiService.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const startScreen = document.getElementById("startScreen");
@@ -160,8 +161,18 @@ document.addEventListener("DOMContentLoaded", () => {
         statusEl.className = "email-draft-status";
 
         try {
-            const summary = summaryBuilder.buildSummary(state.getCakeRequest());
-            await emailApiService.sendDraft({ customerEmail: email, summary });
+            const cakeRequest = state.getCakeRequest();
+            const summary = summaryBuilder.buildSummary(cakeRequest);
+
+            const [allergensResult, nutrientsResult] = await Promise.allSettled([
+                CakeRequestApiService.nutrientsCakeRequest(cakeRequest),
+                CakeRequestApiService.analyzeCakeRequest(cakeRequest)
+            ]);
+
+            const allergens = allergensResult.status === "fulfilled" ? allergensResult.value.allergens : null;
+            const analysis = nutrientsResult.status === "fulfilled" ? nutrientsResult.value.analysis : null;
+
+            await emailApiService.sendDraft({ customerEmail: email, summary, allergens, analysis });
             statusEl.textContent = "Draft sent! Check your inbox.";
             statusEl.className = "email-draft-status email-draft-status--success";
         } catch {
