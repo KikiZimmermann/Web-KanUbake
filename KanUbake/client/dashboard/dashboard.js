@@ -1,7 +1,7 @@
 import { questionnaireOptions } from "../questionaire/data/questionnaireOptions.js";
 
-function getLabel(options, value) {
-    return options.find(wert => wert.value === value)?.label || value;
+function label(list, value) {
+    return list.find(item => item.value === value)?.label ?? value;
 }
 
 async function loadCakes() {
@@ -39,21 +39,28 @@ function renderCakes(cakes) {
     container.innerHTML = "";
 
     cakes.forEach(cake => {
+
+        const occasion = label(questionnaireOptions.occasions, cake.data.occasion);
+        const cakeType = label(questionnaireOptions.cakeTypes, cake.data.cakeType);
+        const shape = label(questionnaireOptions.shapes, cake.data.requestData.shape);
+        const tiers = label(questionnaireOptions.tiers, cake.data.requestData.tiers);
+
         const article = document.createElement("article");
         article.className = "showcase";
+
         article.innerHTML = `
             <div class="introduction">
                 <h3>${cake.data.displayName}</h3>
 
-                <p>
-                Occasion: ${cake.data.occasion}
-                <br>
-                Cake Type: ${cake.data.cakeType}
-                <br>
-                Shape: S${cake.data.requestData.shape}
-                <br>
-                Tiers: ${cake.data.requestData.tiers}
-                </p>
+               <p>
+    <strong>Occasion:</strong> ${occasion}
+    <br>
+    <strong>Cake Type:</strong> ${cakeType}
+    <br>
+    <strong>Shape:</strong> ${shape}
+    <br>
+    <strong>Tiers:</strong> ${tiers}
+</p>
 
                 <p>Last Updated: ${cake.updated_at || "unknown"}</p>
               
