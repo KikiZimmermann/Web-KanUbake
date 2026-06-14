@@ -1469,10 +1469,7 @@ ${this.createOtherTextField(
     const automaticEstimateUnavailable =
       request.shape === "sculpted_3d" || request.shape === "other";
 
-    if (
-      request.budgetMode === "show_estimate" &&
-      automaticEstimateUnavailable
-    ) {
+    if (request.budgetMode === "show_estimate" && automaticEstimateUnavailable) {
       return `
             <div class="conditional-section">
                 <p class="field-hint">

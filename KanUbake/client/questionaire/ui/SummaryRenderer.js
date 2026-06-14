@@ -397,11 +397,18 @@ export class SummaryRenderer {
         const row = document.createElement("div");
         row.classList.add("email-draft-row");
 
+        const inputWrapper = document.createElement("div");
+        inputWrapper.classList.add("email-draft-input-wrapper");
+
         const input = document.createElement("input");
         input.type = "email";
         input.placeholder = "your@email.com";
         input.id = "draftEmailInput";
         input.classList.add("email-draft-input");
+
+        const status = document.createElement("p");
+        status.id = "emailDraftStatus";
+        status.classList.add("email-draft-status");
 
         const button = document.createElement("button");
         button.type = "button";
@@ -409,12 +416,9 @@ export class SummaryRenderer {
         button.id = "sendDraftEmailButton";
         button.classList.add("email-draft-button");
 
-        const status = document.createElement("p");
-        status.id = "emailDraftStatus";
-        status.classList.add("email-draft-status");
-
-        row.append(input, button);
-        section.append(heading, row, status);
+        inputWrapper.append(input, status);
+        row.append(inputWrapper, button);
+        section.append(heading, row);
 
         return section;
     }

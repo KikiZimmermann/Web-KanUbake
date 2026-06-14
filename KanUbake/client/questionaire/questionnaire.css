@@ -86,11 +86,15 @@ main {
 /* ── General Form fields ── */
 
 .form-field {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  grid-template-rows: auto 14px;
 
-  gap: 12px;
-  margin-bottom: 20px;
+  align-items: start;
+  column-gap: 12px;
+  row-gap: 0px;
+
+  margin-bottom: 12px;
 }
 
 label,
@@ -246,11 +250,26 @@ textarea:focus {
 }
 
 .field-error-message {
-  margin-top: 4px;
+  grid-column: 2;
+
+  margin: 0;
+  padding: 0;
+  position: relative;
+  left: 8px;
+  top: -5px;
 
   color: #c62828;
 
-  font-size: 0.9rem;
+  font-family: Arial, sans-serif;
+  font-size: 0.8rem;
+  line-height: 1;
+  text-align: left;
+}
+
+.form-field > .field-hint {
+  grid-column: 2;
+
+  margin-left: 0;
 }
 
 /* ── Cake Size Advice ── */
@@ -401,14 +420,20 @@ textarea:focus {
 }
 
 .email-draft-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+
   gap: 10px;
-  flex-wrap: wrap;
+}
+
+.email-draft-input-wrapper {
+  min-width: 0;
 }
 
 .email-draft-input {
-  flex: 1;
-  min-width: 200px;
+  width: 100%;
+  min-width: 0;
 }
 
 .email-draft-button {
@@ -438,8 +463,25 @@ textarea:focus {
 }
 
 .email-draft-status {
-  margin: 10px 0 0;
-  font-size: 0.9rem;
+  min-height: 14px;
+
+  margin: 0;
+  padding: 0;
+
+  position: relative;
+  left: 8px;
+  top: 3px;
+
+  background: transparent;
+
+  font-family: Arial, sans-serif;
+  font-size: 0.8rem;
+  line-height: 1;
+  text-align: left;
+}
+
+.email-draft-status:empty {
+  visibility: hidden;
 }
 
 .email-draft-status--success {

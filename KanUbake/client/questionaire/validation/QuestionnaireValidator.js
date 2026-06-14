@@ -8,6 +8,15 @@
   file upload rules, and special warnings such as fondant compatibility.
 */
 
+const ERROR_MESSAGES = {
+    selection: "Please make a selection.",
+    option: "Please select at least one option.",
+    link: "Please enter a valid link beginning with http:// or https://.",
+    number: "Please enter a number greater than 0.",
+    description: "Please add a description.",
+    size: "Please select a size."
+};
+
 export class QuestionnaireValidator {
     constructor(state) {
         this.state = state;
@@ -29,13 +38,6 @@ export class QuestionnaireValidator {
             case "references":
                 return this.validateReferencesChapter();
 
-            case "summary":
-                return {
-                    isValid: true,
-                    messages: [],
-                    fields: []
-                };
-
             default:
                 return {
                     isValid: true,
@@ -51,37 +53,41 @@ export class QuestionnaireValidator {
         const fields = [];
 
         if (!request.cakeType) {
-            messages.push("Please choose a cake type.");
+            messages.push(ERROR_MESSAGES.selection);
             fields.push("cakeType");
         }
 
         if (!request.servingSize) {
-            messages.push("Please choose a serving size.");
+            messages.push(ERROR_MESSAGES.selection);
             fields.push("servingSize");
         }
 
         if (!request.shape) {
-            messages.push("Please choose a cake shape.");
+            messages.push(ERROR_MESSAGES.selection);
             fields.push("shape");
         }
 
         if (request.shape !== "sculpted_3d" && !request.tiers) {
-            messages.push("Please choose the number of tiers.");
+            messages.push(ERROR_MESSAGES.selection);
             fields.push("tiers");
         }
 
         if (!request.sizeMode) {
-            messages.push("Please choose what you already know about the size.");
+            messages.push(ERROR_MESSAGES.selection);
             fields.push("sizeMode");
         }
 
-        if (request.sizeMode === "known_servings" && !request.knownServings) {
-            messages.push("Please enter the number of guests or servings.");
-            fields.push("knownServings");
+        if (request.sizeMode === "known_servings") {
+            const servings = Number(request.knownServings);
+
+            if (!Number.isFinite(servings) || servings <= 0) {
+                messages.push(ERROR_MESSAGES.number);
+                fields.push("knownServings");
+            }
         }
 
         if (request.sizeMode === "known_size" && !request.knownSize) {
-            messages.push("Please enter the desired cake size.");
+            messages.push(ERROR_MESSAGES.selection);
             fields.push("knownSize");
         }
 
@@ -98,15 +104,15 @@ export class QuestionnaireValidator {
         const fields = [];
 
         if (Number(request.tiers) > 1 && !request.tierFlavorMode) {
-            messages.push("Please choose whether all tiers should be the same or individual.");
+            messages.push(ERROR_MESSAGES.selection);
             fields.push("tierFlavorMode");
         }
 
-        if (!request.tierFlavors || request.tierFlavors.length === 0) {
-            messages.push("Please choose a cake flavor.");
+        if (!Array.isArray(request.tierFlavors) || request.tierFlavors.length === 0) {
+            messages.push(ERROR_MESSAGES.selection);
             fields.push("cakeFlavor-0");
 
-            messages.push("Please choose a filling.");
+            messages.push(ERROR_MESSAGES.selection);
             fields.push("filling-0");
 
             return {
@@ -118,84 +124,72 @@ export class QuestionnaireValidator {
 
         request.tierFlavors.forEach((tierFlavor, index) => {
             if (!tierFlavor.cakeFlavor) {
-                messages.push("Please choose a cake flavor.");
+                messages.push(ERROR_MESSAGES.selection);
                 fields.push(`cakeFlavor-${index}`);
             }
 
-            if (tierFlavor.cakeFlavor === "other" && !tierFlavor.otherCakeFlavor) {
-                messages.push("Please describe the other cake flavor.");
+            if (tierFlavor.cakeFlavor === "other" && !tierFlavor.otherCakeFlavor?.trim()) {
+                messages.push(ERROR_MESSAGES.description);
                 fields.push(`otherCakeFlavor-${index}`);
             }
 
+            if (tierFlavor.cakeFlavor === "nut" && !tierFlavor.cakeNutType) {
+                messages.push(ERROR_MESSAGES.selection);
+                fields.push(`cakeNutType-${index}`);
+            }
+
+            if (tierFlavor.cakeNutType === "other" && !tierFlavor.otherCakeNut?.trim()) {
+                messages.push(ERROR_MESSAGES.description);
+                fields.push(`otherCakeNut-${index}`);
+            }
+
             if (!tierFlavor.filling) {
-                messages.push("Please choose a filling.");
+                messages.push(ERROR_MESSAGES.selection);
                 fields.push(`filling-${index}`);
             }
 
-            if (tierFlavor.filling === "other" && !tierFlavor.otherFilling) {
-                messages.push("Please describe the other filling.");
+            if (tierFlavor.filling === "other" && !tierFlavor.otherFilling?.trim()) {
+                messages.push(ERROR_MESSAGES.description);
                 fields.push(`otherFilling-${index}`);
             }
 
             if (tierFlavor.filling === "fruit_filling" && !tierFlavor.fruitFilling) {
-                messages.push("Please choose a fruit filling.");
+                messages.push(ERROR_MESSAGES.selection);
                 fields.push(`fruitFilling-${index}`);
             }
 
-            if (tierFlavor.fruitFilling === "other" && !tierFlavor.otherFruitFilling) {
-                messages.push("Please describe the other fruit filling.");
+            if (tierFlavor.fruitFilling === "other" && !tierFlavor.otherFruitFilling?.trim()) {
+                messages.push(ERROR_MESSAGES.description);
                 fields.push(`otherFruitFilling-${index}`);
             }
 
             if (tierFlavor.filling === "buttercream_filling" && !tierFlavor.buttercreamType) {
-                messages.push("Please choose a buttercream type.");
+                messages.push(ERROR_MESSAGES.selection);
                 fields.push(`buttercreamType-${index}`);
             }
 
             if (tierFlavor.filling === "ganache" && !tierFlavor.ganacheChocolateType) {
-                messages.push("Please choose a ganache chocolate type.");
+                messages.push(ERROR_MESSAGES.selection);
                 fields.push(`ganacheChocolateType-${index}`);
             }
 
-            if (tierFlavor.cakeFlavor === "nut" && !tierFlavor.cakeNutType) {
-                messages.push("Please choose a nut for the cake.");
-                fields.push(`cakeNutType-${index}`);
-            }
-
-            if (
-                tierFlavor.cakeNutType === "other" &&
-                !tierFlavor.otherCakeNut
-            ) {
-                messages.push("Please enter the other nut.");
-                fields.push(`otherCakeNut-${index}`);
-            }
-
-            if (
-                tierFlavor.filling === "nut_cream" &&
-                !tierFlavor.fillingNutType
-            ) {
-                messages.push("Please choose a nut cream.");
+            if (tierFlavor.filling === "nut_cream" && !tierFlavor.fillingNutType) {
+                messages.push(ERROR_MESSAGES.selection);
                 fields.push(`fillingNutType-${index}`);
             }
 
-            if (
-                tierFlavor.fillingNutType === "other" &&
-                !tierFlavor.otherFillingNut
-            ) {
-                messages.push("Please enter the other nut.");
+            if (tierFlavor.fillingNutType === "other" && !tierFlavor.otherFillingNut?.trim()) {
+                messages.push(ERROR_MESSAGES.description);
                 fields.push(`otherFillingNut-${index}`);
             }
 
             if (tierFlavor.filling === "jam" && !tierFlavor.jamFlavor) {
-                messages.push("Please choose a fruit preserve.");
+                messages.push(ERROR_MESSAGES.selection);
                 fields.push(`jamFlavor-${index}`);
             }
 
-            if (
-                tierFlavor.jamFlavor === "other" &&
-                !tierFlavor.otherJamFlavor
-            ) {
-                messages.push("Please enter the other fruit preserve.");
+            if (tierFlavor.jamFlavor === "other" && !tierFlavor.otherJamFlavor?.trim()) {
+                messages.push(ERROR_MESSAGES.description);
                 fields.push(`otherJamFlavor-${index}`);
             }
         });
@@ -213,119 +207,31 @@ export class QuestionnaireValidator {
         const fields = [];
 
         if (!request.covering) {
-            messages.push("Please choose a covering or outer frosting.");
+            messages.push(ERROR_MESSAGES.selection);
             fields.push("covering");
         }
 
-        if (request.covering === "other" && !request.coveringOther) {
-            messages.push("Please describe the other covering option.");
+        if (request.covering === "other" && !request.coveringOther?.trim()) {
+            messages.push(ERROR_MESSAGES.description);
             fields.push("coveringOther");
         }
 
         if (request.covering === "buttercream" && !request.coveringButtercreamType) {
-            messages.push("Please choose a buttercream type.");
+            messages.push(ERROR_MESSAGES.selection);
             fields.push("coveringButtercreamType");
         }
 
         if (request.covering === "ganache" && !request.coveringGanacheChocolateType) {
-            messages.push("Please choose a ganache chocolate type.");
+            messages.push(ERROR_MESSAGES.selection);
             fields.push("coveringGanacheChocolateType");
         }
 
         if (request.covering === "fondant") {
-            if (this.usesIndividualFondantLayers(request)) {
-                request.fondantLayerDetails.forEach((layer, index) => {
-                    if (!layer.layerType) {
-                        messages.push(`Please choose a fondant layer for tier ${layer.tierNumber}.`);
-                        fields.push(`fondantLayer-${index}`);
-                    }
-
-                    if (layer.layerType === "buttercream" && !layer.buttercreamType) {
-                        messages.push(`Please choose a buttercream type for tier ${layer.tierNumber}.`);
-                        fields.push(`fondantButtercreamType-${index}`);
-                    }
-
-                    if (layer.layerType === "ganache" && !layer.ganacheChocolateType) {
-                        messages.push(`Please choose a ganache chocolate type for tier ${layer.tierNumber}.`);
-                        fields.push(`fondantGanacheChocolateType-${index}`);
-                    }
-
-                    if (
-                        layer.layerType === "marmalade" && !layer.marmaladeFlavor
-                    ) {
-                        messages.push(`Please choose a fruit preserve for tier ${layer.tierNumber}.`);
-                        fields.push(`fondantMarmaladeFlavor-${index}`);
-                    }
-
-                    if (
-                        layer.layerType === "marmalade" && layer.marmaladeFlavor === "other" && !layer.otherMarmaladeFlavor
-                    ) {
-                        messages.push(`Please enter the other fruit preserve for tier ${layer.tierNumber}.`);
-                        fields.push(`fondantOtherMarmaladeFlavor-${index}`);
-                    }
-                });
-            } else {
-                if (!request.fondantLayer) {
-                    messages.push("Please choose a layer underneath the fondant.");
-                    fields.push("fondantLayer");
-                }
-
-                if (request.fondantLayer === "buttercream" && !request.fondantButtercreamType) {
-                    messages.push("Please choose a buttercream type for the fondant layer.");
-                    fields.push("fondantButtercreamType");
-                }
-
-                if (request.fondantLayer === "ganache" && !request.fondantGanacheChocolateType) {
-                    messages.push("Please choose a ganache chocolate type for the fondant layer.");
-                    fields.push("fondantGanacheChocolateType");
-                }
-
-                if (request.fondantLayer === "marmalade" && !request.fondantMarmaladeFlavor
-                ) {
-                    messages.push("Please choose a fruit preserve for the fondant layer.");
-                    fields.push("fondantMarmaladeFlavor");
-                }
-
-                if (request.fondantLayer === "marmalade" && request.fondantMarmaladeFlavor === "other" && !request.fondantOtherMarmaladeFlavor
-                ) {
-                    messages.push("Please enter the other fruit preserve for the fondant layer.");
-                    fields.push("fondantOtherMarmaladeFlavor");
-                }
-            }
+            this.validateFondantDetails(request, messages, fields);
         }
 
-        if (!request.designStyle) {
-            messages.push("Please choose a design style.");
-            fields.push("designStyle");
-        }
-
-        if (!request.colorMode) {
-            messages.push("Please choose a color option.");
-            fields.push("colorMode");
-        }
-
-        if (request.colorMode === "choose_colors" && !request.colors[0]) {
-            messages.push("Please enter at least a main color.");
-            fields.push("mainColor");
-        }
-
-        if (request.colorMode === "suggest_palette" && !request.paletteBaseColor) {
-            messages.push("Please enter a starting color for the palette suggestion.");
-            fields.push("paletteBaseColor");
-        }
-
-        if (request.colorMode === "choose_color_theme" && !request.colorTheme) {
-            messages.push("Please choose a color theme.");
-            fields.push("colorTheme");
-        }
-
-        if (
-            request.covering === "chocolate_glaze" &&
-            !request.chocolateGlazePreserveChoice
-        ) {
-            messages.push(
-                "Please choose whether you would like fruit preserve underneath the chocolate glaze."
-            );
+        if (request.covering === "chocolate_glaze" && !request.chocolateGlazePreserveChoice) {
+            messages.push(ERROR_MESSAGES.selection);
             fields.push("chocolateGlazePreserveChoice");
         }
 
@@ -334,7 +240,7 @@ export class QuestionnaireValidator {
             request.chocolateGlazePreserveChoice === "yes" &&
             !request.chocolateGlazePreserveFlavor
         ) {
-            messages.push("Please choose a fruit preserve.");
+            messages.push(ERROR_MESSAGES.selection);
             fields.push("chocolateGlazePreserveFlavor");
         }
 
@@ -342,10 +248,40 @@ export class QuestionnaireValidator {
             request.covering === "chocolate_glaze" &&
             request.chocolateGlazePreserveChoice === "yes" &&
             request.chocolateGlazePreserveFlavor === "other" &&
-            !request.chocolateGlazeOtherPreserveFlavor
+            !request.chocolateGlazeOtherPreserveFlavor?.trim()
         ) {
-            messages.push("Please enter the other fruit preserve.");
+            messages.push(ERROR_MESSAGES.description);
             fields.push("chocolateGlazeOtherPreserveFlavor");
+        }
+
+        if (!request.designStyle) {
+            messages.push(ERROR_MESSAGES.selection);
+            fields.push("designStyle");
+        }
+
+        if (request.designStyle === "themed" && !request.themeDescription?.trim()) {
+            messages.push(ERROR_MESSAGES.description);
+            fields.push("themeDescription");
+        }
+
+        if (!request.colorMode) {
+            messages.push(ERROR_MESSAGES.selection);
+            fields.push("colorMode");
+        }
+
+        if (request.colorMode === "choose_colors" && !request.colors?.[0]) {
+            messages.push(ERROR_MESSAGES.selection);
+            fields.push("mainColor");
+        }
+
+        if (request.colorMode === "suggest_palette" && !request.paletteBaseColor) {
+            messages.push(ERROR_MESSAGES.selection);
+            fields.push("paletteBaseColor");
+        }
+
+        if (request.colorMode === "choose_color_theme" && !request.colorTheme) {
+            messages.push(ERROR_MESSAGES.selection);
+            fields.push("colorTheme");
         }
 
         this.validateDecorationDetails(request, messages, fields);
@@ -357,6 +293,72 @@ export class QuestionnaireValidator {
         };
     }
 
+    validateFondantDetails(request, messages, fields) {
+        if (this.usesIndividualFondantLayers(request)) {
+            request.fondantLayerDetails.forEach((layer, index) => {
+                if (!layer.layerType) {
+                    messages.push(ERROR_MESSAGES.selection);
+                    fields.push(`fondantLayer-${index}`);
+                }
+
+                if (layer.layerType === "buttercream" && !layer.buttercreamType) {
+                    messages.push(ERROR_MESSAGES.selection);
+                    fields.push(`fondantButtercreamType-${index}`);
+                }
+
+                if (layer.layerType === "ganache" && !layer.ganacheChocolateType) {
+                    messages.push(ERROR_MESSAGES.selection);
+                    fields.push(`fondantGanacheChocolateType-${index}`);
+                }
+
+                if (layer.layerType === "marmalade" && !layer.marmaladeFlavor) {
+                    messages.push(ERROR_MESSAGES.selection);
+                    fields.push(`fondantMarmaladeFlavor-${index}`);
+                }
+
+                if (
+                    layer.layerType === "marmalade" &&
+                    layer.marmaladeFlavor === "other" &&
+                    !layer.otherMarmaladeFlavor?.trim()
+                ) {
+                    messages.push(ERROR_MESSAGES.description);
+                    fields.push(`fondantOtherMarmaladeFlavor-${index}`);
+                }
+            });
+
+            return;
+        }
+
+        if (!request.fondantLayer) {
+            messages.push(ERROR_MESSAGES.selection);
+            fields.push("fondantLayer");
+        }
+
+        if (request.fondantLayer === "buttercream" && !request.fondantButtercreamType) {
+            messages.push(ERROR_MESSAGES.selection);
+            fields.push("fondantButtercreamType");
+        }
+
+        if (request.fondantLayer === "ganache" && !request.fondantGanacheChocolateType) {
+            messages.push(ERROR_MESSAGES.selection);
+            fields.push("fondantGanacheChocolateType");
+        }
+
+        if (request.fondantLayer === "marmalade" && !request.fondantMarmaladeFlavor) {
+            messages.push(ERROR_MESSAGES.selection);
+            fields.push("fondantMarmaladeFlavor");
+        }
+
+        if (
+            request.fondantLayer === "marmalade" &&
+            request.fondantMarmaladeFlavor === "other" &&
+            !request.fondantOtherMarmaladeFlavor?.trim()
+        ) {
+            messages.push(ERROR_MESSAGES.description);
+            fields.push("fondantOtherMarmaladeFlavor");
+        }
+    }
+
     validateDecorationDetails(request, messages, fields) {
         if (!Array.isArray(request.decorations)) {
             return;
@@ -364,24 +366,24 @@ export class QuestionnaireValidator {
 
         if (request.decorations.includes("text_lettering")) {
             if (!request.textDetails?.text?.trim()) {
-                messages.push("Please enter the text that should appear on the cake.");
+                messages.push(ERROR_MESSAGES.description);
                 fields.push("cakeText");
             }
 
             if (!request.textDetails?.letteringStyle) {
-                messages.push("Please choose a lettering style.");
+                messages.push(ERROR_MESSAGES.selection);
                 fields.push("letteringStyle");
             }
         }
 
         if (request.decorations.includes("number_age")) {
             if (!request.numberAgeDetails?.numberOrAge?.trim()) {
-                messages.push("Please enter the number or age that should be displayed.");
+                messages.push(ERROR_MESSAGES.description);
                 fields.push("numberOrAge");
             }
 
             if (!request.numberAgeDetails?.displayType) {
-                messages.push("Please choose how the number or age should be displayed.");
+                messages.push(ERROR_MESSAGES.selection);
                 fields.push("numberDisplayType");
             }
         }
@@ -390,7 +392,7 @@ export class QuestionnaireValidator {
             const quantity = Number(request.candleDetails?.quantity);
 
             if (!Number.isInteger(quantity) || quantity <= 0) {
-                messages.push("Please enter a valid number of candles.");
+                messages.push(ERROR_MESSAGES.number);
                 fields.push("candleQuantity");
             }
         }
@@ -398,7 +400,6 @@ export class QuestionnaireValidator {
         if (request.decorations.includes("cake_topper")) {
             this.validateSizedDecoration(
                 request.cakeTopperDetails,
-                "cake topper",
                 "cakeTopper",
                 messages,
                 fields
@@ -409,39 +410,38 @@ export class QuestionnaireValidator {
             this.validateSizedDecoration(
                 request.figurineDetails,
                 "figurine",
-                "figurine",
                 messages,
                 fields
             );
         }
 
-        if (request.decorations.includes("edible_print") && !request.ediblePrintDescription?.trim()) {
-            messages.push("Please describe the edible print or image you would like.");
+        if (
+            request.decorations.includes("edible_print") &&
+            !request.ediblePrintDescription?.trim()
+        ) {
+            messages.push(ERROR_MESSAGES.description);
             fields.push("ediblePrintDescription");
         }
 
-        if (request.decorations.includes("other") && !request.otherDecorationDescription?.trim()) {
-            messages.push("Please describe the other decoration you would like.");
+        if (
+            request.decorations.includes("other") &&
+            !request.otherDecorationDescription?.trim()
+        ) {
+            messages.push(ERROR_MESSAGES.description);
             fields.push("otherDecorationDescription");
         }
     }
 
-    validateSizedDecoration(details, label, fieldPrefix, messages, fields) {
-        if (!details) {
-            messages.push(`Please choose how many ${label}s you would like.`);
-            fields.push(`${fieldPrefix}Quantity`);
-            return;
-        }
-
-        if (!details.quantity) {
-            messages.push(`Please choose how many ${label}s you would like.`);
+    validateSizedDecoration(details, fieldPrefix, messages, fields) {
+        if (!details?.quantity) {
+            messages.push(ERROR_MESSAGES.selection);
             fields.push(`${fieldPrefix}Quantity`);
             return;
         }
 
         if (details.quantity === "4_plus") {
             if (!details.description?.trim()) {
-                messages.push(`Please describe the ${label}s you would like.`);
+                messages.push(ERROR_MESSAGES.description);
                 fields.push(`${fieldPrefix}GeneralDescription`);
             }
 
@@ -451,25 +451,25 @@ export class QuestionnaireValidator {
         const quantity = Number(details.quantity);
 
         if (!Number.isInteger(quantity) || quantity < 1 || quantity > 3) {
-            messages.push(`Please choose a valid number of ${label}s.`);
+            messages.push(ERROR_MESSAGES.selection);
             fields.push(`${fieldPrefix}Quantity`);
             return;
         }
 
         if (!Array.isArray(details.items) || details.items.length !== quantity) {
-            messages.push(`Please complete the details for every ${label}.`);
+            messages.push(ERROR_MESSAGES.selection);
             fields.push(`${fieldPrefix}Quantity`);
             return;
         }
 
         details.items.forEach((item, index) => {
             if (!item.description?.trim()) {
-                messages.push(`Please describe ${label} ${index + 1}.`);
+                messages.push(ERROR_MESSAGES.description);
                 fields.push(`${fieldPrefix}Description-${index}`);
             }
 
             if (!["small", "medium", "large"].includes(item.size)) {
-                messages.push(`Please choose a size for ${label} ${index + 1}.`);
+                messages.push(ERROR_MESSAGES.size);
                 fields.push(`${fieldPrefix}Size-${index}`);
             }
         });
@@ -481,40 +481,45 @@ export class QuestionnaireValidator {
         const fields = [];
 
         if (!request.referenceMode) {
-            messages.push("Please choose whether you would like to add references.");
+            messages.push(ERROR_MESSAGES.selection);
             fields.push("referenceMode");
         }
 
-        if (request.referenceMode === "add_references") {
-            if (!Array.isArray(request.referenceItems) || request.referenceItems.length === 0) {
-                messages.push("Please add at least one reference image or link.");
-                fields.push("referenceImage");
-                fields.push("referenceUrl");
-            }
+        if (
+            request.referenceMode === "add_references" &&
+            (!Array.isArray(request.referenceItems) || request.referenceItems.length === 0)
+        ) {
+            messages.push(ERROR_MESSAGES.option);
+            fields.push("referenceImage");
+        }
 
-            request.referenceItems.forEach((item, index) => {
+        if (Array.isArray(request.referenceItems)) {
+            request.referenceItems.forEach((item) => {
                 if (item.type === "link" && !this.isValidReferenceUrl(item.url)) {
-                    messages.push(`Reference link ${index + 1} is not a valid URL.`);
+                    messages.push(ERROR_MESSAGES.link);
                     fields.push("referenceUrl");
                 }
             });
         }
 
         if (!request.budgetMode) {
-            messages.push("Please choose a budget option.");
+            messages.push(ERROR_MESSAGES.selection);
             fields.push("budgetMode");
         }
 
         if (request.budgetMode === "enter_budget" && !request.budgetRange) {
-            messages.push("Please choose a budget range.");
+            messages.push(ERROR_MESSAGES.selection);
             fields.push("budgetRange");
         }
 
-        if (request.budgetMode === "enter_budget" && request.budgetRange === "custom_budget") {
+        if (
+            request.budgetMode === "enter_budget" &&
+            request.budgetRange === "custom_budget"
+        ) {
             const customBudget = Number(request.customBudget);
 
             if (!Number.isFinite(customBudget) || customBudget <= 0) {
-                messages.push("Please enter a valid custom budget.");
+                messages.push(ERROR_MESSAGES.number);
                 fields.push("customBudget");
             }
         }

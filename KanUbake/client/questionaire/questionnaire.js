@@ -34,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const state = new QuestionnaireState();
 
     const renderer = new QuestionnaireRenderer(state);
-    renderer.setValidationRefreshCallback(refreshCurrentValidationErrors);
 
     const validator = new QuestionnaireValidator(state);
     const draftStorageService = new DraftStorageService();
@@ -83,16 +82,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             parentField.appendChild(errorMessage);
         });
-    }
-
-    function refreshCurrentValidationErrors() {
-        const result = validator.validateCurrentChapter();
-
-        clearValidationErrors();
-
-        if (!result.isValid) {
-            showValidationErrors(result.fields, result.messages);
-        }
     }
 
     function clearSingleValidationError(fieldName) {
