@@ -7,145 +7,220 @@
   It only prepares the data structure.
 */
 
+import { CakeRequest } from "../models/CakeRequest.js";
+import { TierFlavor } from "../models/TierFlavor.js";
+import { ReferenceItem } from "../models/ReferenceItem.js";
+
 export class CakeRequestMapper {
+  // fields in both functions - redundancy
+  static simpleFields = [
+    "occasion",
+    "cakeType",
+    "servingSize",
+    "shape",
+    "tiers",
+
+    "sizeMode",
+    "knownServings",
+    "knownSize",
+
+    "recommendedSize",
+    "estimatedServings",
+    "sizeEstimateMessage",
+    "plannedServingsWithBuffer",
+
+    "sizeAdvice",
+    "sizeAdviceLevel",
+    "consultationRequired",
+
+    "restrictionNotes",
+
+    "tierFlavorMode",
+
+    "covering",
+    "coveringOther",
+
+    "coveringButtercreamType",
+    "coveringButtercreamColor",
+    "coveringButtercreamFlavor",
+
+    "coveringGanacheChocolateType",
+    "coveringGanacheColor",
+
+    "chocolateGlazePreserveChoice",
+    "chocolateGlazePreserveFlavor",
+    "chocolateGlazeOtherPreserveFlavor",
+
+    "fondantLayer",
+
+    "fondantButtercreamType",
+    "fondantButtercreamColor",
+    "fondantButtercreamFlavor",
+
+    "fondantGanacheChocolateType",
+    "fondantGanacheColor",
+
+    "fondantMarmaladeFlavor",
+    "fondantOtherMarmaladeFlavor",
+
+    "designStyle",
+    "themeDescription",
+
+    "colorMode",
+    "colorTheme",
+
+    "paletteBaseColor",
+    "paletteSchemeMode",
+
+    "ediblePrintDescription",
+    "otherDecorationDescription",
+
+    "referenceMode",
+
+    "budgetMode",
+    "budgetRange",
+    "customBudget",
+
+    "additionalNotes"
+  ];
+
+  static copySimpleFields(source, target) {
+    this.simpleFields.forEach((fieldName) => {
+      if (source[fieldName] !== undefined) {
+        target[fieldName] = source[fieldName];
+      }
+    });
+  }
+
+  static detailFields = [
+    "textDetails",
+    "numberAgeDetails",
+    "candleDetails",
+    "cakeTopperDetails",
+    "figurineDetails"
+  ];
+
+  static copyDetailFields(source, target) {
+    this.detailFields.forEach((fieldName) => {
+      const value = source[fieldName];
+
+      target[fieldName] =
+        value === null || value === undefined
+          ? null
+          : { ...value };
+    });
+  }
+
+  static arrayFields = [
+    "restrictions",
+    "fondantLayerDetails",
+    "colors",
+    "paletteColors",
+    "decorations"
+  ];
+
+  static copyArrayFields(source, target) {
+    this.arrayFields.forEach((fieldName) => {
+      target[fieldName] = Array.isArray(source[fieldName])
+        ? source[fieldName].map((entry) => {
+          if (
+            entry !== null &&
+            typeof entry === "object"
+          ) {
+            return { ...entry };
+          }
+
+          return entry;
+        })
+        : [];
+    });
+  }
+
   static toApiPayload(cakeRequest) {
-    if (!cakeRequest) {
-      throw new TypeError(
-        "CakeRequestMapper requires a valid CakeRequest object.",
-      );
-    }
+
+    const requestData = {};
+
+    this.copySimpleFields(cakeRequest, requestData);
+    this.copyArrayFields(cakeRequest, requestData);
+    this.copyDetailFields(cakeRequest, requestData);
+
+    requestData.tierFlavors = cakeRequest.tierFlavors.map((tier) => ({
+      ...tier
+    }));
+
+    requestData.referenceItems = cakeRequest.referenceItems.map((item) => ({
+      ...item
+    }));
 
     return {
       id: cakeRequest.id,
       displayName: cakeRequest.displayName,
       status: cakeRequest.status,
-
-      occasion: cakeRequest.occasion,
-      cakeType: cakeRequest.cakeType,
-
-      requestData: {
-        occasion: cakeRequest.occasion,
-        cakeType: cakeRequest.cakeType,
-        servingSize: cakeRequest.servingSize,
-        shape: cakeRequest.shape,
-        tiers: cakeRequest.tiers,
-
-        sizeMode: cakeRequest.sizeMode,
-        knownServings: cakeRequest.knownServings,
-        knownSize: cakeRequest.knownSize,
-
-        recommendedSize: cakeRequest.recommendedSize,
-        estimatedServings: cakeRequest.estimatedServings,
-        sizeEstimateMessage: cakeRequest.sizeEstimateMessage,
-        plannedServingsWithBuffer: cakeRequest.plannedServingsWithBuffer,
-
-        sizeAdvice: cakeRequest.sizeAdvice,
-        sizeAdviceLevel: cakeRequest.sizeAdviceLevel,
-        consultationRequired: cakeRequest.consultationRequired,
-
-        restrictions: [...cakeRequest.restrictions],
-        restrictionNotes: cakeRequest.restrictionNotes,
-
-        tierFlavorMode: cakeRequest.tierFlavorMode,
-        tierFlavors: cakeRequest.tierFlavors.map((tierFlavor) => ({
-          ...tierFlavor,
-        })),
-
-        covering: cakeRequest.covering,
-        coveringOther: cakeRequest.coveringOther,
-
-        coveringButtercreamType: cakeRequest.coveringButtercreamType,
-        coveringButtercreamColor: cakeRequest.coveringButtercreamColor,
-        coveringButtercreamFlavor: cakeRequest.coveringButtercreamFlavor,
-
-        coveringGanacheChocolateType: cakeRequest.coveringGanacheChocolateType,
-        coveringGanacheColor: cakeRequest.coveringGanacheColor,
-
-        chocolateGlazePreserveChoice: cakeRequest.chocolateGlazePreserveChoice,
-        chocolateGlazePreserveFlavor: cakeRequest.chocolateGlazePreserveFlavor,
-        chocolateGlazeOtherPreserveFlavor:
-          cakeRequest.chocolateGlazeOtherPreserveFlavor,
-
-        fondantLayer: cakeRequest.fondantLayer,
-        fondantLayerDetails: cakeRequest.fondantLayerDetails.map((detail) => ({
-          ...detail,
-        })),
-
-        fondantButtercreamType: cakeRequest.fondantButtercreamType,
-        fondantButtercreamColor: cakeRequest.fondantButtercreamColor,
-        fondantButtercreamFlavor: cakeRequest.fondantButtercreamFlavor,
-
-        fondantGanacheChocolateType: cakeRequest.fondantGanacheChocolateType,
-        fondantGanacheColor: cakeRequest.fondantGanacheColor,
-
-        fondantMarmaladeFlavor: cakeRequest.fondantMarmaladeFlavor,
-        fondantOtherMarmaladeFlavor: cakeRequest.fondantOtherMarmaladeFlavor,
-
-        designStyle: cakeRequest.designStyle,
-        themeDescription: cakeRequest.themeDescription,
-
-        colorMode: cakeRequest.colorMode,
-        colorTheme: cakeRequest.colorTheme,
-
-        colors: cakeRequest.colors.map((color) => ({ ...color })),
-
-        paletteBaseColor: cakeRequest.paletteBaseColor
-          ? { ...cakeRequest.paletteBaseColor }
-          : null,
-
-        paletteSchemeMode: cakeRequest.paletteSchemeMode,
-
-        paletteColors: cakeRequest.paletteColors.map((color) => ({ ...color })),
-
-        decorations: [...cakeRequest.decorations],
-
-        textDetails: cakeRequest.textDetails
-          ? { ...cakeRequest.textDetails }
-          : null,
-
-        numberAgeDetails: cakeRequest.numberAgeDetails
-          ? { ...cakeRequest.numberAgeDetails }
-          : null,
-
-        candleDetails: cakeRequest.candleDetails
-          ? { ...cakeRequest.candleDetails }
-          : null,
-
-        cakeTopperDetails: cakeRequest.cakeTopperDetails
-          ? {
-            ...cakeRequest.cakeTopperDetails,
-            items: Array.isArray(cakeRequest.cakeTopperDetails.items)
-              ? cakeRequest.cakeTopperDetails.items.map((item) => ({
-                ...item,
-              }))
-              : [],
-          }
-          : null,
-
-        figurineDetails: cakeRequest.figurineDetails
-          ? {
-            ...cakeRequest.figurineDetails,
-            items: Array.isArray(cakeRequest.figurineDetails.items)
-              ? cakeRequest.figurineDetails.items.map((item) => ({ ...item }))
-              : [],
-          }
-          : null,
-
-        ediblePrintDescription: cakeRequest.ediblePrintDescription,
-        otherDecorationDescription: cakeRequest.otherDecorationDescription,
-
-        referenceMode: cakeRequest.referenceMode,
-        referenceItems: CakeRequestMapper.mapReferenceItems(
-          cakeRequest.referenceItems,
-        ),
-
-        budgetMode: cakeRequest.budgetMode,
-        budgetRange: cakeRequest.budgetRange,
-        customBudget: cakeRequest.customBudget,
-
-        additionalNotes: cakeRequest.additionalNotes,
-      },
+      createdAt: cakeRequest.createdAt,
+      updatedAt: cakeRequest.updatedAt,
+      requestData
     };
+  }
+
+  static fromApiPayload(apiData) {
+    const storedData = apiData.requestData ?? apiData;
+
+    const cakeRequest = new CakeRequest();
+
+    this.copySimpleFields(storedData, cakeRequest);
+    this.copyArrayFields(storedData, cakeRequest);
+    this.copyDetailFields(storedData, cakeRequest);
+
+    cakeRequest.id =
+      apiData.id ??
+      storedData.id ??
+      cakeRequest.id;
+
+    cakeRequest.displayName =
+      apiData.displayName ??
+      storedData.displayName ??
+      cakeRequest.displayName;
+
+    cakeRequest.status =
+      apiData.status ??
+      storedData.status ??
+      "draft_incomplete";
+
+    cakeRequest.createdAt =
+      apiData.createdAt ??
+      storedData.createdAt ??
+      cakeRequest.createdAt;
+
+    cakeRequest.updatedAt =
+      apiData.updatedAt ??
+      storedData.updatedAt ??
+      cakeRequest.updatedAt;
+
+    cakeRequest.tierFlavors = Array.isArray(storedData.tierFlavors)
+      ? storedData.tierFlavors.map((tierData, index) => {
+        const tierFlavor = new TierFlavor(
+          tierData.tierNumber ?? index + 1
+        );
+
+        Object.assign(tierFlavor, tierData);
+
+        return tierFlavor;
+      })
+      : [];
+
+    cakeRequest.referenceItems = Array.isArray(storedData.referenceItems)
+      ? storedData.referenceItems.map((itemData) => {
+        const referenceItem = new ReferenceItem(
+          itemData.type ?? "image"
+        );
+
+        Object.assign(referenceItem, itemData);
+
+        return referenceItem;
+      })
+      : [];
+
+    return cakeRequest;
   }
 
   static mapReferenceItems(referenceItems) {

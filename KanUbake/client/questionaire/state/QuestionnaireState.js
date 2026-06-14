@@ -34,6 +34,14 @@ export class QuestionnaireState {
         return this.cakeRequest;
     }
 
+    setCakeRequest(cakeRequest) {
+        if (!(cakeRequest instanceof CakeRequest)) {
+            throw new Error("The loaded request must be a CakeRequest instance.");
+        }
+
+        this.cakeRequest = cakeRequest;
+    }
+
     isFirstChapter() {
         return this.currentChapterIndex === 0;
     }

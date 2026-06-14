@@ -17,7 +17,7 @@ import { EmailApiService } from "./services/api/EmailApiService.js";
 import { SummaryBuilder } from "./services/SummaryBuilder.js";
 import { CakeRequestApiService } from "./services/api/CakeRequestApiService.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const startScreen = document.getElementById("startScreen");
     const wizardScreen = document.getElementById("wizardScreen");
     const startQuestionnaireButton = document.getElementById(
@@ -41,6 +41,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const summaryBuilder = new SummaryBuilder();
     let validationErrorsActive = false;
+
+    async function loadSavedCakeRequestIfPresent() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const cakeRequestId = urlParams.get("cakeRequestId");
+
+        if (!cakeRequestId) {
+            return false;
+        }
+
+        try {
+            const loadedCakeRequest =
+                await CakeRequestApiService.loadCakeRequest(cakeRequestId);
+
+            state.setCakeRequest(loadedCakeRequest);
+
+            state.goToChapter(0);
+
+            startScreen.classList.add("hidden");
+            wizardScreen.classList.remove("hidden");
+
+            renderer.render();
+
+            return true;
+        } catch (error) {
+            console.error("Could not load saved cake request:", error);
+
+            alert("The saved cake request could not be loaded.");
+
+            return false;
+        }
+    }
 
     function clearValidationErrors() {
         document.querySelectorAll(".field-error").forEach((element) => {
@@ -293,4 +324,6 @@ document.addEventListener("DOMContentLoaded", () => {
             renderer.render();
         });
     });
+
+    await loadSavedCakeRequestIfPresent();
 });
