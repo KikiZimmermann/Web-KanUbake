@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "../client")));
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/index/index.html"));
+    res.sendFile(path.join(__dirname, "../client/index/index.html"));
 });
 
 //grants permissions for browser-requests from different origins
@@ -44,6 +44,9 @@ registerCakeAnalysisApi(app);
 //aber ich habe es pro route selber in meinem file gemacht
 cakeService.insertCake(app);
 cakeService.getCake(app);
+cakeService.deleteCake(app);
+cakeService.updateCake(app);
+
 
 userService.getUser(app);
 userService.updateUser(app);

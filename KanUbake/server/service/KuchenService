@@ -51,8 +51,9 @@ function getCake(app) {
 
 
 function deleteCake(app) {
-    app.delete("/delete/kuchen", authenticateToken, async (req, res) => {
+    app.delete("/delete/cake", authenticateToken, async (req, res) => {
         try {
+            
             const { id } = req.body;
             await kuchenRepository.deleteKuchen(id, req.user);
             res.json({ success: true });
@@ -66,7 +67,7 @@ function deleteCake(app) {
 }
 
 function updateCake(app) {
-    app.put("/update/kuchen", authenticateToken, async (req, res) => {
+    app.put("/update/cake", authenticateToken, async (req, res) => {
         try {
         const { id, kuchen } = req.body;
 
