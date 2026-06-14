@@ -240,23 +240,27 @@ class PricingValidator {
             return;
         }
 
-        const consultationDecorations = [
-            "fresh_flowers",
-            "sugar_flowers",
-            "ruffles",
-            "other"
-        ];
+        const consultationMessages = {
+            fresh_flowers:
+                "Fresh flowers require confirmation regarding availability, food safety, preparation and final price.",
 
-        if (
-            decorations.some((decoration) =>
-                consultationDecorations.includes(decoration)
-            )
-        ) {
+            sugar_flowers:
+                "Sugar flowers require confirmation regarding quantity, size, level of detail and final price.",
+
+            ruffles:
+                "Ruffles require confirmation regarding material, coverage, number of layers and final price.",
+        };
+
+        decorations.forEach((decoration) => {
+            const message = consultationMessages[decoration];
+
+            if (!message) {
+                return;
+            }
+
             markConsultationRequired();
-            messages.push(
-                "One or more selected decorations require confirmation by the bakery."
-            );
-        }
+            messages.push(message);
+        });
     }
 
     static checkDecorationDetails(requestData, errors, messages, markConsultationRequired) {
@@ -324,6 +328,11 @@ class PricingValidator {
             ) {
                 errors.push(
                     "A description is required when another decoration is selected."
+                );
+            } else {
+                markConsultationRequired();
+                messages.push(
+                    `Other decoration "${requestData.otherDecorationDescription.trim()}" requires confirmation regarding feasibility, materials, placement and final price.`
                 );
             }
         }

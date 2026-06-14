@@ -1378,10 +1378,7 @@ ${this.createOtherTextField(
   }
 
   createReferenceList(request) {
-    if (
-      !Array.isArray(request.referenceItems) ||
-      request.referenceItems.length === 0
-    ) {
+    if (!Array.isArray(request.referenceItems) || request.referenceItems.length === 0) {
       return `
       <p class="field-hint">
         No reference items added yet.
@@ -1389,88 +1386,90 @@ ${this.createOtherTextField(
     `;
     }
 
-    return request.referenceItems
-      .map((referenceItem, index) => {
-        return `
+    return request.referenceItems.map((referenceItem, index) => {
+      return `
       <section class="reference-card">
         <h4>Reference ${index + 1}</h4>
 
-        ${referenceItem.type === "image"
-            ? `
-            <img
-              class="reference-preview"
-              src="${referenceItem.filePreviewUrl}"
-              alt="Uploaded reference image"
+        <div class="reference-card-content">
+          <div class="reference-visual">
+            ${referenceItem.type === "image"
+          ? `
+                <img
+                  class="reference-preview"
+                  src="${referenceItem.filePreviewUrl}"
+                  alt="Uploaded reference image"
+                >
+              `
+          : `
+                <div class="reference-link-box">
+                  <strong>Link:</strong>
+                  <a
+                    href="${referenceItem.url}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="reference-link"
+                  >
+                    ${referenceItem.url}
+                  </a>
+                </div>
+              `
+        }
+          </div>
+
+          <div class="reference-details">
+            <div class="form-field">
+              <label for="referenceLikes-${index}">
+                What do you like about this reference?
+              </label>
+
+              <textarea
+                id="referenceLikes-${index}"
+                data-field="referenceLikes-${index}"
+                rows="3"
+                placeholder="For example: the colors, floral arrangement or overall style."
+              >${referenceItem.likes || ""}</textarea>
+            </div>
+
+            <div class="form-field">
+              <label for="referenceDislikes-${index}">
+                What do you dislike or want changed?
+              </label>
+
+              <textarea
+                id="referenceDislikes-${index}"
+                data-field="referenceDislikes-${index}"
+                rows="3"
+                placeholder="For example: not the gold details, fewer flowers or a lighter color."
+              >${referenceItem.dislikes || ""}</textarea>
+            </div>
+
+            ${this.createCheckboxGroup(
+          `referenceTags-${index}`,
+          "Which parts of this reference are relevant?",
+          questionnaireOptions.referenceTags,
+          Array.isArray(referenceItem.tags) ? referenceItem.tags : []
+        )}
+
+            <button
+              class="remove-reference-button"
+              type="button"
+              data-reference-index="${index}"
             >
-
-            <p class="field-hint">
-              ${referenceItem.fileName || "Uploaded image"}
-            </p>
-          `
-            : `
-            <p>
-              <strong>Link:</strong>
-              <a href="${referenceItem.url}" target="_blank" rel="noopener noreferrer">
-                ${referenceItem.url}
-              </a>
-            </p>
-          `
-          }
-
-        <div class="form-field">
-          <label for="referenceLikes-${index}">
-            What do you like about this reference?
-          </label>
-
-          <textarea
-            id="referenceLikes-${index}"
-            data-field="referenceLikes-${index}"
-            rows="3"
-            placeholder="For example: the colors, floral arrangement or overall style."
-          >${referenceItem.likes || ""}</textarea>
+              Remove reference
+            </button>
+          </div>
         </div>
-
-        <div class="form-field">
-          <label for="referenceDislikes-${index}">
-            What do you dislike or want changed?
-          </label>
-
-          <textarea
-            id="referenceDislikes-${index}"
-            data-field="referenceDislikes-${index}"
-            rows="3"
-            placeholder="For example: not the gold details, fewer flowers or a lighter color."
-          >${referenceItem.dislikes || ""}</textarea>
-        </div>
-
-        ${this.createCheckboxGroup(
-            `referenceTags-${index}`,
-            "Which parts of this reference are relevant?",
-            questionnaireOptions.referenceTags,
-            Array.isArray(referenceItem.tags) ? referenceItem.tags : [],
-          )}
-
-        <button
-          class="remove-reference-button"
-          type="button"
-          data-reference-index="${index}"
-        >
-          Remove reference
-        </button>
       </section>
     `;
-      })
-      .join("");
+    }).join("");
   }
 
   createBudgetDetailsField(request) {
     const automaticEstimateUnavailable =
       request.shape === "sculpted_3d" || request.shape === "other";
 
-    if (
-      request.budgetMode === "show_estimate" &&
-      automaticEstimateUnavailable
-    ) {
+    if (request.budgetMode === "show_estimate" && automaticEstimateUnavailable) {
       return `
             <div class="conditional-section">
                 <p class="field-hint">
