@@ -1,5 +1,11 @@
 import { CakeRequestApiService } from "../questionaire/services/api/CakeRequestApiService.js";
 
+import { questionnaireOptions } from "../questionaire/data/questionnaireOptions.js";
+
+function getLabel(options, value) {
+    return options.find(wert => wert.value === value)?.label || value;
+}
+
 async function loadCakes() {
     const token = localStorage.getItem("accessToken");
 
@@ -40,9 +46,28 @@ function renderCakes(cakes) {
         article.innerHTML = `
             <div class="introduction">
                 <h3>${cake.data.displayName}</h3>
-                <p>Last Updated: ${cake.updated_at || "noch nicht angegeben"}</p>
-                <button class="edit-btn" data-cake-id="${cake.id}">View / Edit</button>
-                <button class="delete-btn" data-cake-id="${cake.id}">Delete</button>
+
+                <p>
+                Occasion: ${cake.data.occasion}
+                <br>
+                Cake Type: ${cake.data.cakeType}
+                <br>
+                Shape: S${cake.data.requestData.shape}
+                <br>
+                Tiers: ${cake.data.requestData.tiers}
+                </p>
+
+                <p>Last Updated: ${cake.updated_at || "unknown"}</p>
+              
+                <div class="button-container">
+            <button class="edit-btn" data-cake-id="${cake.id}">
+                View / Edit
+            </button>
+            <button class="delete-btn" data-cake-id="${cake.id}">
+                Delete
+            </button>
+        </div>
+
             </div>
         `;
 
