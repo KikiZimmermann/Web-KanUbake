@@ -169,6 +169,131 @@ textarea:focus {
   min-width: auto;
 }
 
+/* ── Compatibility States ── */
+
+select option:disabled {
+  color: #8f7a7a;
+  background-color: #eeeeee;
+}
+
+.checkbox-option {
+  position: relative;
+}
+
+.checkbox-option--disabled {
+  opacity: 0.5;
+  background-color: #eeeeee;
+  cursor: not-allowed;
+}
+
+.checkbox-option--disabled input {
+  cursor: not-allowed;
+}
+
+.checkbox-option--warning {
+  background-color: #fff3cd;
+  border: 1px solid #d6aa20;
+  cursor: help;
+}
+
+.checkbox-option--selected-conflict {
+  opacity: 1;
+  background-color: #ffe5e5;
+  border: 1.5px solid #c62828;
+  cursor: pointer;
+}
+
+.checkbox-option--selected-conflict input {
+  cursor: pointer;
+}
+
+.checkbox-option-label {
+  flex: 1;
+}
+
+.compatibility-warning-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+.compatibility-tooltip {
+  display: none;
+
+  width: max-content;
+  max-width: 280px;
+
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  z-index: 20;
+
+  transform: translateX(-50%);
+
+  padding: 9px 12px;
+
+  background-color: #5f3526;
+  color: white;
+
+  border-radius: 8px;
+
+  font-size: 0.8rem;
+  font-weight: normal;
+  line-height: 1.4;
+  text-align: left;
+
+  pointer-events: none;
+}
+
+.compatibility-tooltip::after {
+  content: "";
+
+  position: absolute;
+  top: 100%;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  border-width: 6px;
+  border-style: solid;
+  border-color: #5f3526 transparent transparent transparent;
+}
+
+.checkbox-option:hover .compatibility-tooltip,
+.checkbox-option:focus-within .compatibility-tooltip {
+  display: block;
+}
+
+.compatibility-warning-list {
+  margin: 12px 0 20px 192px;
+}
+
+.compatibility-warning,
+.compatibility-conflict {
+  grid-column: 2;
+
+  margin: 4px 0 0;
+  padding: 10px 14px;
+
+  border-radius: 10px;
+
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.compatibility-warning {
+  background-color: #fff3cd;
+  color: #765700;
+
+  border: 1px solid #d6aa20;
+}
+
+.compatibility-conflict {
+  background-color: #ffe5e5;
+  color: #9b1c1c;
+
+  border: 1px solid #c62828;
+}
+
 /* ── Form Navigation ── */
 
 .form-navigation {

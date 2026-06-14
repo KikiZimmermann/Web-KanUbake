@@ -17,6 +17,7 @@ import { CakeSizeApiService } from "../services/api/CakeSizeApiService.js";
 import { PricingApiService } from "../services/api/PricingApiService.js";
 import { ColorSelector } from "./ColorSelector.js";
 import { CakeRequestApiService } from "../services/api/CakeRequestApiService.js";
+import { QuestionnaireCompatibilityService } from "../services/QuestionnaireCompatibilityService.js";
 
 export class QuestionnaireRenderer {
   constructor(state) {
@@ -307,6 +308,8 @@ export class QuestionnaireRenderer {
       request.decorations,
       "If you do not select anything, no extras will be added. Multiple selections are possible.",
     )}
+
+        ${this.createCompatibilityWarnings(request)}
 
         ${this.createTextDetailsField(request)}
 
@@ -1521,44 +1524,246 @@ ${this.createOtherTextField(
     `;
   }
 
+  getCompatibilityFieldName(fieldName) {
+    const fieldMappings = [
+      {
+        pattern: /^cakeFlavor-\d+$/,
+        compatibilityField: "cakeFlavor"
+      },
+      {
+        pattern: /^filling-\d+$/,
+        compatibilityField: "filling"
+      },
+      {
+        pattern: /^cakeNutType-\d+$/,
+        compatibilityField: "cakeNutType"
+      },
+      {
+        pattern: /^fillingNutType-\d+$/,
+        compatibilityField: "fillingNutType"
+      },
+      {
+        pattern: /^buttercreamType-\d+$/,
+        compatibilityField: "buttercreamType"
+      },
+      {
+        pattern: /^fondantLayer-\d+$/,
+        compatibilityField: "fondantLayer"
+      },
+      {
+        pattern: /^fondantButtercreamType-\d+$/,
+        compatibilityField: "fondantButtercreamType"
+      }
+    ];
+
+    const mapping = fieldMappings.find((entry) =>
+      entry.pattern.test(fieldName)
+    );
+
+    return mapping
+      ? mapping.compatibilityField
+      : fieldName;
+  }
+
+  getCompatibilityContext(fieldName) {
+    const tierSpecificFields = [
+      "cakeFlavor",
+      "filling",
+      "cakeNutType",
+      "fillingNutType",
+      "buttercreamType",
+      "ganacheChocolateType",
+      "fondantLayer",
+      "fondantButtercreamType",
+      "fondantGanacheChocolateType",
+      "fondantMarmaladeFlavor"
+    ];
+
+    const match = fieldName.match(/-(\d+)$/);
+
+    if (!match) {
+      return {};
+    }
+
+    const baseFieldName = fieldName.replace(/-\d+$/, "");
+
+    if (!tierSpecificFields.includes(baseFieldName)) {
+      return {};
+    }
+
+    return {
+      tierIndex: Number(match[1])
+    };
+  }
+
+  getOptionCompatibilityState(fieldName, optionValue) {
+    const request = this.state.getCakeRequest();
+
+    const compatibilityField =
+      this.getCompatibilityFieldName(fieldName);
+
+    const context =
+      this.getCompatibilityContext(fieldName);
+
+    return QuestionnaireCompatibilityService.getOptionState(
+      request,
+      compatibilityField,
+      optionValue,
+      context
+    );
+  }
+
+  escapeHtmlAttribute(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
+  }
+
+  createCompatibilityWarnings(request) {
+    const warnings =
+      QuestionnaireCompatibilityService.getRequestWarnings(request);
+
+    if (warnings.length === 0) {
+      return "";
+    }
+
+    return `
+    <div class="compatibility-warning-list">
+      ${warnings
+        .map(
+          (warning) => `
+            <p class="compatibility-warning">
+              ${warning.message}
+            </p>
+          `
+        )
+        .join("")}
+    </div>
+  `;
+  }
+
   createSelectField(
     fieldName,
     labelText,
     options,
     selectedValue,
-    { disabled = false, disabledValues = [] } = {},
+    {
+      disabled = false,
+      disabledValues = [],
+      useCompatibility = true
+    } = {}
   ) {
+    let selectedCompatibilityState = null;
+
+    const optionHtml = options
+      .map((option) => {
+        const selected =
+          option.value === selectedValue
+            ? "selected"
+            : "";
+
+        const manuallyDisabled =
+          disabledValues.includes(option.value);
+
+        const compatibilityState = useCompatibility
+          ? this.getOptionCompatibilityState(
+            fieldName,
+            option.value
+          )
+          : {
+            disabled: false,
+            warning: false,
+            message: ""
+          };
+
+        const optionIsDisabled =
+          manuallyDisabled ||
+          compatibilityState.disabled;
+
+        if (
+          option.value === selectedValue &&
+          (
+            compatibilityState.disabled ||
+            compatibilityState.warning
+          )
+        ) {
+          selectedCompatibilityState =
+            compatibilityState;
+        }
+
+        const disabledAttribute =
+          optionIsDisabled
+            ? "disabled"
+            : "";
+
+        const titleAttribute =
+          compatibilityState.message
+            ? `title="${this.escapeHtmlAttribute(
+              compatibilityState.message
+            )}"`
+            : "";
+
+        let optionLabel = option.label;
+
+        if (compatibilityState.disabled) {
+          optionLabel += " — Unavailable";
+        } else if (compatibilityState.warning) {
+          optionLabel += " ⚠";
+        }
+
+        return `
+        <option
+          value="${option.value}"
+          ${selected}
+          ${disabledAttribute}
+          ${titleAttribute}
+          data-compatibility-disabled="${compatibilityState.disabled}"
+          data-compatibility-warning="${compatibilityState.warning}"
+          data-compatibility-message="${this.escapeHtmlAttribute(
+          compatibilityState.message
+        )}"
+        >
+          ${optionLabel}
+        </option>
+      `;
+      })
+      .join("");
+
+    const selectedMessage =
+      selectedCompatibilityState?.message
+        ? `
+        <p
+          class="${selectedCompatibilityState.disabled
+          ? "compatibility-conflict"
+          : "compatibility-warning"
+        }"
+        >
+          ${selectedCompatibilityState.message}
+        </p>
+      `
+        : "";
+
     return `
     <div class="form-field">
-      <label for="${fieldName}">${labelText}</label>
+      <label for="${fieldName}">
+        ${labelText}
+      </label>
 
       <select
         id="${fieldName}"
         data-field="${fieldName}"
         ${disabled ? "disabled" : ""}
       >
-        <option value="">Please choose...</option>
+        <option value="">
+          Please choose...
+        </option>
 
-        ${options
-        .map((option) => {
-          const selected = option.value === selectedValue ? "selected" : "";
-
-          const optionDisabled = disabledValues.includes(option.value)
-            ? "disabled"
-            : "";
-
-          return `
-              <option
-                value="${option.value}"
-                ${selected}
-                ${optionDisabled}
-              >
-                ${option.label}
-              </option>
-            `;
-        })
-        .join("")}
+        ${optionHtml}
       </select>
+
+      ${selectedMessage}
     </div>
   `;
   }
@@ -1588,36 +1793,140 @@ ${this.createOtherTextField(
     options,
     selectedValues,
     hintText = "",
+    {
+      useCompatibility = true
+    } = {}
   ) {
-    return `
-      <div class="form-field checkbox-field">
-        <p class="field-label">${labelText}</p>
+    const safeSelectedValues =
+      Array.isArray(selectedValues)
+        ? selectedValues
+        : [];
 
-        <div class="checkbox-group" data-field="${fieldName}">
-          ${options
+    return `
+    <div class="form-field checkbox-field">
+      <p class="field-label">
+        ${labelText}
+      </p>
+
+      <div
+        class="checkbox-group"
+        data-field="${fieldName}"
+      >
+        ${options
         .map((option) => {
-          const checked = selectedValues.includes(option.value)
-            ? "checked"
-            : "";
+          const checked =
+            safeSelectedValues.includes(option.value);
+
+          const compatibilityState =
+            useCompatibility
+              ? this.getOptionCompatibilityState(
+                fieldName,
+                option.value
+              )
+              : {
+                disabled: false,
+                warning: false,
+                message: ""
+              };
+
+          /*
+            A previously selected incompatible checkbox stays
+            enabled so the user can remove the selection.
+          */
+          const shouldDisable =
+            compatibilityState.disabled &&
+            !checked;
+
+          const checkedAttribute =
+            checked
+              ? "checked"
+              : "";
+
+          const disabledAttribute =
+            shouldDisable
+              ? "disabled"
+              : "";
+
+          const titleAttribute =
+            compatibilityState.message
+              ? `title="${this.escapeHtmlAttribute(
+                compatibilityState.message
+              )}"`
+              : "";
+
+          const compatibilityClass =
+            compatibilityState.disabled
+              ? "checkbox-option--disabled"
+              : compatibilityState.warning
+                ? "checkbox-option--warning"
+                : "";
+
+          const selectedConflictClass =
+            checked && compatibilityState.disabled
+              ? "checkbox-option--selected-conflict"
+              : "";
+
+          const messageHtml =
+            compatibilityState.message
+              ? `
+                  <span class="compatibility-tooltip">
+                    ${compatibilityState.message}
+                  </span>
+                `
+              : "";
 
           return `
-                <label class="checkbox-option">
-                  <input
-                    type="checkbox"
-                    name="${fieldName}"
-                    value="${option.value}"
-                    ${checked}
-                  >
+              <label
+                class="
+                  checkbox-option
+                  ${compatibilityClass}
+                  ${selectedConflictClass}
+                "
+                ${titleAttribute}
+              >
+                <input
+                  type="checkbox"
+                  name="${fieldName}"
+                  value="${option.value}"
+                  ${checkedAttribute}
+                  ${disabledAttribute}
+                  data-compatibility-disabled="${compatibilityState.disabled}"
+                  data-compatibility-warning="${compatibilityState.warning}"
+                >
+
+                <span class="checkbox-option-label">
                   ${option.label}
-                </label>
-              `;
+                </span>
+
+                ${compatibilityState.warning
+              ? `
+                    <span
+                      class="compatibility-warning-icon"
+                      aria-hidden="true"
+                    >
+                      ⚠
+                    </span>
+                  `
+              : ""
+            }
+
+                ${messageHtml}
+              </label>
+            `;
         })
         .join("")}
-        </div>
-
-        ${hintText ? `<p class="field-hint">${hintText}</p>` : ""}
       </div>
-    `;
+
+      ${hintText
+        ? `
+          <p class="field-hint">
+            ${hintText}
+          </p>
+        `
+        : ""
+      }
+    </div>
+  `;
   }
 
   createSizeDetailsField(request) {
@@ -1670,7 +1979,7 @@ ${this.createOtherTextField(
     }
 
     this.attachSelectChangeEvent("occasion");
-    this.attachSelectChangeEvent("cakeType");
+    this.attachSelectChangeEvent("cakeType", true);
 
     this.attachCakeSizeRelevantSelectEvent("servingSize");
     this.attachCakeSizeRelevantSelectEvent("shape", true);
@@ -1729,7 +2038,12 @@ ${this.createOtherTextField(
     }
 
     this.attachCheckboxGroupChange("restrictions", (selectedValues) => {
-      this.state.updateField("restrictions", selectedValues);
+      this.state.updateField(
+        "restrictions",
+        selectedValues
+      );
+
+      this.render();
     });
   }
 
