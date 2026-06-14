@@ -159,6 +159,116 @@ export class SummaryRenderer {
         }
     }
 
+    renderPricingLoading() {
+        const container =
+            this.containerElement.querySelector(".summary-content");
+
+        if (!container) {
+            return;
+        }
+
+        const section = document.createElement("section");
+        section.id = "pricingSection";
+        section.classList.add("summary-section");
+
+        section.innerHTML = `
+        <h4>Estimated Price</h4>
+        <p class="summary-warning">
+            Calculating estimated price...
+        </p>
+    `;
+
+        container.append(section);
+    }
+
+    renderPricingResult(pricingResult) {
+        const section = document.getElementById("pricingSection");
+
+        if (!section) {
+            return;
+        }
+
+        const minimum = pricingResult.estimatedMinimum;
+        const maximum = pricingResult.estimatedMaximum;
+        const currencySymbol =
+            pricingResult.currency === "EUR" ? "€" : pricingResult.currency;
+
+        const messages = Array.isArray(pricingResult.messages)
+            ? pricingResult.messages
+            : [];
+
+        const messagesHtml = messages.length > 0
+            ? `
+            <ul>
+                ${messages
+                .map((message) => `<li>${message}</li>`)
+                .join("")}
+            </ul>
+        `
+            : "";
+
+        section.innerHTML = `
+        <h4>Estimated Price</h4>
+
+        <p>
+            <strong>
+                ${currencySymbol}${minimum}–${currencySymbol}${maximum}
+            </strong>
+        </p>
+
+        <p class="summary-warning">
+            This is a rough and non-binding estimate.
+            The final price must be confirmed by the confectionist.
+        </p>
+
+        ${messagesHtml}
+    `;
+    }
+
+    renderPricingError() {
+        const section = document.getElementById("pricingSection");
+
+        if (!section) {
+            return;
+        }
+
+        section.innerHTML = `
+        <h4>Estimated Price</h4>
+
+        <p class="summary-warning">
+            A price estimate could not be calculated.
+            Please confirm the price directly with the confectionist.
+        </p>
+    `;
+    }
+
+    renderPricingUnavailable() {
+        const container =
+            this.containerElement.querySelector(".summary-content");
+
+        if (!container) {
+            return;
+        }
+
+        const section = document.createElement("section");
+        section.id = "pricingSection";
+        section.classList.add("summary-section");
+
+        section.innerHTML = `
+        <h4>Estimated Price</h4>
+
+        <p class="summary-warning">
+            A reliable automatic price estimate cannot be provided for
+            3D, sculpted or custom-shaped cakes because the required work,
+            stability, materials and level of detail can vary significantly.
+            The price must be discussed and confirmed directly with the
+            confectionist.
+        </p>
+    `;
+
+        container.append(section);
+    }
+
     createEmailSection() {
         const section = document.createElement("div");
         section.classList.add("email-draft-section");

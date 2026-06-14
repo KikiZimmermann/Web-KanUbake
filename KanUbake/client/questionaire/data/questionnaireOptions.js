@@ -219,16 +219,16 @@ export const questionnaireOptions = {
         { value: "modern_clean", label: "Modern / Clean" },
         { value: "comic_cartoon", label: "Comic / Cartoon" },
         { value: "themed", label: "Themed" },
-        { value: "unsure_advise", label: "I’m Not Sure Yet – Please Advise" },
-        { value: "other", label: "Other Style" }
+        { value: "other", label: "Other Style" },
+        { value: "unsure_advise", label: "I’m Not Sure Yet – Please Advise" }
     ],
 
     colorModes: [
+        { value: "no_specific_color", label: "No Specific Color" },
         { value: "choose_colors", label: "I Want To Choose Colors Myself" },
         { value: "suggest_palette", label: "I Want A Suggested Color Palette" },
         { value: "choose_color_theme", label: "I Want To Choose A Color Theme" },
-        { value: "unsure_advise", label: "I’m Not Sure Yet – Please Advise" },
-        { value: "no_specific_color", label: "No Specific Color" }
+        { value: "unsure_advise", label: "I’m Not Sure Yet – Please Advise" }
     ],
 
     colorThemes: [
@@ -285,8 +285,7 @@ export const questionnaireOptions = {
         { value: "no", label: "No" },
         { value: "upload_images", label: "Upload Images" },
         { value: "add_links", label: "Add Links" },
-        { value: "upload_images_and_links", label: "Upload Images And Add Links" },
-        { value: "unsure_advise", label: "I’m Not Sure Yet – Please Advise" }
+        { value: "upload_images_and_links", label: "Upload Images And Add Links" }
     ],
 
     referenceTags: [
@@ -300,9 +299,7 @@ export const questionnaireOptions = {
     budgetModes: [
         { value: "skip", label: "No, Skip This" },
         { value: "enter_budget", label: "I Want To Enter A Budget" },
-        { value: "show_estimate", label: "I Want To See A Rough Price Estimate" },
-        { value: "both", label: "Both" },
-        { value: "unsure_advise", label: "I’m Not Sure Yet – Please Advise" }
+        { value: "show_estimate", label: "I Want To See A Rough Price Estimate" }
     ],
 
     budgetRanges: [
@@ -312,7 +309,6 @@ export const questionnaireOptions = {
         { value: "100_200", label: "€100–200" },
         { value: "200_400", label: "€200–400" },
         { value: "over_400", label: "Over €400" },
-        { value: "custom_budget", label: "I Want To Enter My Own Amount" },
-        { value: "unsure_advise", label: "I’m Not Sure Yet – Please Advise" }
+        { value: "custom_budget", label: "I Want To Enter My Own Amount" }
     ]
 };

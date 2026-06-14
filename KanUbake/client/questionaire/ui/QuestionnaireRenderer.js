@@ -14,6 +14,7 @@ import { SummaryRenderer } from "../ui/SummaryRenderer.js";
 import { TierFlavor } from "../models/TierFlavor.js";
 import { ReferenceItem } from "../models/ReferenceItem.js";
 import { CakeSizeApiService } from "../services/api/CakeSizeApiService.js";
+import { PricingApiService } from "../services/api/PricingApiService.js";
 import { ColorSelector } from "./ColorSelector.js";
 import { CakeRequestApiService } from "../services/api/CakeRequestApiService.js";
 
@@ -1180,109 +1181,95 @@ ${this.createOtherTextField(
   }
 
   createBudgetDetailsField(request) {
-    if (
-      !request.budgetMode ||
-      request.budgetMode === "skip" ||
-      request.budgetMode === "unsure_advise"
-    ) {
+    const automaticEstimateUnavailable = request.shape === "sculpted_3d" || request.shape === "other";
+
+    if (request.budgetMode === "show_estimate" && automaticEstimateUnavailable) {
+      return `
+            <div class="conditional-section">
+                <p class="field-hint">
+                    A reliable automatic price estimate cannot be provided for
+                    3D, sculpted or custom-shaped cakes because the required work,
+                    stability, materials and level of detail can vary significantly.
+                    The price must be discussed and confirmed directly with the
+                    confectionist.
+                </p>
+            </div>
+        `;
+    }
+
+    if (request.budgetMode !== "enter_budget") {
       return "";
     }
 
-    let estimateText = "";
-
-    if (request.budgetMode === "show_estimate" || request.budgetMode === "both") {
-      if (request.shape === "sculpted_3d") {
-        estimateText = `
-          <p class="field-hint">
-            For 3D / sculpted cakes, no reliable automatic price estimate can be provided
-            because the amount of work, stability requirements, level of detail and
-            materials can vary significantly. The price must be discussed and confirmed
-            directly with the bakery.
-          </p>
-        `;
-      } else {
-        estimateText = `
-          <p class="field-hint">
-            A rough price estimate can be added later. This is not a final or binding price.
-            The final price must be confirmed directly with the bakery.
-          </p>
-        `;
-      }
-    }
-
-    const budgetRangeField =
-      request.budgetMode === "enter_budget" || request.budgetMode === "both"
-        ? this.createSelectField(
-          "budgetRange",
-          "Do you have an approximate budget?",
-          questionnaireOptions.budgetRanges,
-          request.budgetRange
-        )
-        : "";
+    const budgetRangeField = this.createSelectField(
+      "budgetRange",
+      "Do you have an approximate budget?",
+      questionnaireOptions.budgetRanges,
+      request.budgetRange
+    );
 
     const customBudgetField =
       request.budgetRange === "custom_budget"
         ? `
-          <div class="form-field">
-            <label for="customBudget">
-              Desired budget
-            </label>
-            <input
-              type="number"
-              id="customBudget"
-              data-field="customBudget"
-              min="0"
-              value="${request.customBudget}"
-              placeholder="For example: 150"
-            >
-          </div>
-        `
+                <div class="form-field">
+                    <label for="customBudget">
+                        Desired budget
+                    </label>
+
+                    <input
+                        type="number"
+                        id="customBudget"
+                        data-field="customBudget"
+                        min="0"
+                        value="${request.customBudget}"
+                        placeholder="For example: 150"
+                    >
+                </div>
+            `
         : "";
 
     return `
-      <div class="conditional-section">
-        ${budgetRangeField}
-        ${customBudgetField}
-        ${estimateText}
-      </div>
+        <div class="conditional-section">
+            ${budgetRangeField}
+            ${customBudgetField}
+        </div>
     `;
   }
 
-  createSelectField(
-    fieldName,
-    labelText,
-    options,
-    selectedValue,
-    {
-      disabled = false,
-      disabledValues = []
-    } = {}) {
-
-
+  createSelectField(fieldName, labelText, options, selectedValue,
+    { disabled = false, disabledValues = [] } = {}) {
 
     return `
-      <div class="form-field">
-        <label for="${fieldName}">${labelText}</label>
+    <div class="form-field">
+      <label for="${fieldName}">${labelText}</label>
 
-        <select id="${fieldName}" data-field="${fieldName}" ${disabled ? "disabled" : ""}>
-          <option value="">Please choose...</option>
+      <select
+        id="${fieldName}"
+        data-field="${fieldName}"
+        ${disabled ? "disabled" : ""}
+      >
+        <option value="">Please choose...</option>
 
-          ${options
+        ${options
         .map((option) => {
           const selected = option.value === selectedValue ? "selected" : "";
 
           const optionDisabled = disabledValues.includes(option.value) ? "disabled" : "";
 
           return `
-                <option value="${option.value}" ${selected} ${optionDisabled}>
-                  ${option.label}
-                </option>
-              `;
+              <option
+                value="${option.value}"
+                ${selected}
+                ${optionDisabled}
+              >
+                ${option.label}
+              </option>
+            `;
         })
         .join("")}
-        </select>
-      </div>
-    `;
+      </select>
+    </div>
+  `;
   }
 
   createOtherTextField(fieldName, labelText, value, shouldShow) {
@@ -1864,11 +1851,49 @@ ${this.createOtherTextField(
   }
 
   attachReferencesChapterEvents() {
-    this.attachSelectChangeEvent("referenceMode", true);
-    this.attachSelectChangeEvent("budgetMode", true);
-    this.attachSelectChangeEvent("budgetRange", true);
-
     const request = this.state.getCakeRequest();
+
+    this.attachSelectChangeEvent("referenceMode", true);
+
+    const budgetModeSelect = document.getElementById("budgetMode");
+
+    if (budgetModeSelect) {
+      budgetModeSelect.addEventListener("change", (event) => {
+        const budgetMode = event.target.value;
+
+        this.state.updateMultipleFields({
+          budgetMode: budgetMode,
+          budgetRange:
+            budgetMode === "enter_budget"
+              ? request.budgetRange
+              : "",
+          customBudget:
+            budgetMode === "enter_budget"
+              ? request.customBudget
+              : ""
+        });
+
+        this.render();
+      });
+    }
+
+    const budgetRangeSelect = document.getElementById("budgetRange");
+
+    if (budgetRangeSelect) {
+      budgetRangeSelect.addEventListener("change", (event) => {
+        const budgetRange = event.target.value;
+
+        this.state.updateMultipleFields({
+          budgetRange: budgetRange,
+          customBudget:
+            budgetRange === "custom_budget"
+              ? request.customBudget
+              : ""
+        });
+
+        this.render();
+      });
+    }
 
     const customBudget = document.getElementById("customBudget");
     if (customBudget) {
@@ -2023,21 +2048,44 @@ ${this.createOtherTextField(
     const summarySections = this.summaryBuilder.buildSummary(cakeRequest);
     this.summaryRenderer.render(summarySections);
 
+    const priceEstimateRequested = cakeRequest.budgetMode === "show_estimate";
+
+    const automaticPricingUnavailable = cakeRequest.shape === "sculpted_3d" || cakeRequest.shape === "other";
+
+    if (priceEstimateRequested) {
+      if (automaticPricingUnavailable) {
+        this.summaryRenderer.renderPricingUnavailable();
+      } else {
+        this.summaryRenderer.renderPricingLoading();
+
+        PricingApiService
+          .estimatePrice(cakeRequest)
+          .then((pricingResult) => {
+            this.summaryRenderer.renderPricingResult(pricingResult);
+          })
+          .catch((error) => {
+            console.error("Pricing estimate failed:", error);
+            this.summaryRenderer.renderPricingError();
+          });
+      }
+    }
+
     this.summaryRenderer.renderAnalysisLoading();
 
-    try {
-      const [allergensResult, nutrientsResult] = await Promise.all([
-        CakeRequestApiService.nutrientsCakeRequest(cakeRequest),
-        CakeRequestApiService.analyzeCakeRequest(cakeRequest)
-      ]);
-
-      this.summaryRenderer.renderAnalysisResults(
-        allergensResult.allergens,
-        nutrientsResult.analysis
-      );
-    } catch (err) {
-      this.summaryRenderer.renderAnalysisError();
-    }
+    Promise.all([
+      CakeRequestApiService.nutrientsCakeRequest(cakeRequest),
+      CakeRequestApiService.analyzeCakeRequest(cakeRequest)
+    ])
+      .then(([allergensResult, nutrientsResult]) => {
+        this.summaryRenderer.renderAnalysisResults(
+          allergensResult.allergens,
+          nutrientsResult.analysis
+        );
+      })
+      .catch((error) => {
+        console.error("Cake analysis failed:", error);
+        this.summaryRenderer.renderAnalysisError();
+      });
   }
 
   renderNavigationButtons() {
