@@ -1,0 +1,58 @@
+const express = require("express");
+require("dotenv").config({ path: __dirname + "/.env" });
+
+const app = express();
+
+class UserRepository {
+  constructor(db) {
+    this.db = db;
+  }
+
+
+  async createUser(user) {
+    const sql = `
+      INSERT INTO users
+      (firstName, lastName, email, dateOfBirth, password)
+      VALUES (?, ?, ?, ?, ?)
+    `;
+
+    const [result] = await this.db.promise().query(
+      sql,
+      [
+        user.firstName,
+        user.lastName,
+        user.email,
+        user.dateOfBirth,
+        user.password
+      ],   
+    );
+    return result;
+  }
+
+
+  async findUserbyEmail(email) {
+    const sql = `
+      SELECT * FROM users WHERE email = ?
+    `;
+
+    const [result] = await this.db.promise().query(
+      sql,
+      [email]
+    );
+    return result[0];
+  }
+
+
+  async findUser() {
+    const sql = `
+      SELECT * FROM users
+    `;
+
+    const [result] = await this.db.promise().query(
+      sql,
+    );
+    return result;
+  }
+}
+
+module.exports = UserRepository;
