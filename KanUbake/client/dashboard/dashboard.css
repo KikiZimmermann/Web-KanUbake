@@ -42,6 +42,10 @@ article.showcase {
     border: #e07a5f dashed;
 }
 
+.showcase:hover {
+    background: rgb(255, 255, 255);
+}
+
 p a {
     color: rgb(3, 58, 74);
 }
