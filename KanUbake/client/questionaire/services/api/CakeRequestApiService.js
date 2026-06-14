@@ -50,8 +50,10 @@ export class CakeRequestApiService {
                 `Loading failed with status ${response.status}: ${errorText}`
             );
         }
-
-        const apiData = await response.json().data.find(cake => cake.id === cakeRequestId);
+        
+        const jsonData = await response.json();
+        console.log("Received cake data from API:", jsonData[0].data);
+        const apiData = jsonData[0].data;
 
         return CakeRequestMapper.fromApiPayload(apiData);
     }
