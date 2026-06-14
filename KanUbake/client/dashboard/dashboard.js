@@ -1,5 +1,3 @@
-import { CakeRequestApiService } from "../questionaire/services/api/CakeRequestApiService.js";
-
 import { questionnaireOptions } from "../questionaire/data/questionnaireOptions.js";
 
 function getLabel(options, value) {
