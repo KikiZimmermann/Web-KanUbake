@@ -37,8 +37,9 @@ function insertCake(app) {
 function getCake(app) {
     app.get("/get/cake", authenticateToken, async (req, res) => {
         try {
-            const data = await kuchenRepository.findAllKuchen(req.user);
+            const data = await kuchenRepository.findallKuchen(req.user);
             res.json(data);
+            
         } catch (err) {
             console.error(err);
             res.status(500).json({

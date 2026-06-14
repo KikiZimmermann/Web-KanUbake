@@ -19,6 +19,7 @@ async function loadCakes() {
         }
 
         const cakes = await response.json();
+
         renderCakes(cakes);
 
     } catch (err) {
