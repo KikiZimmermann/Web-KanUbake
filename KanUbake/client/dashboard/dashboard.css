@@ -40,8 +40,14 @@ article.showcase {
     background: rgb(247, 196, 154);
 }
 
-p a {
-    color: rgb(3, 58, 74);
+p {
+    margin: 0;
+    padding: 6px 10px;
+    font-size: 14px;
+    line-height: 1.4;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 8px;
+    margin: 5px;
 }
 
 .core {
