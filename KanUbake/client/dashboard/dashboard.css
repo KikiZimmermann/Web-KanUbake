@@ -53,3 +53,27 @@ p a {
 .core {
     margin-bottom: 10px;
 }
+
+.button-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+button {
+    background-color: #fde5e5;
+    padding: 10px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #5f3526;
+    font-weight: bold;
+    border: #5f3526 solid 1.5px;
+}
+
+button:hover {
+    background: #f27f72;
+    color: white;
+    border: none;
+}
