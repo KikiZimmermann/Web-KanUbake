@@ -94,16 +94,12 @@ class PricingService {
     }
 
     static calculateFillingSurcharge(requestData, servings) {
-        if (
-            !Array.isArray(requestData.tierFlavors) ||
-            requestData.tierFlavors.length === 0
-        ) {
+        if (!Array.isArray(requestData.tierFlavors) || requestData.tierFlavors.length === 0) {
             return 0;
         }
 
         const surcharges = requestData.tierFlavors.map((tierFlavor) => {
-            const surcharge =
-                pricingRules.fillingSurchargesPerServing[tierFlavor.filling];
+            const surcharge = pricingRules.fillingSurchargesPerServing[tierFlavor.filling];
 
             return typeof surcharge === "number" ? surcharge : 0;
         });
@@ -114,8 +110,7 @@ class PricingService {
     }
 
     static calculateCoveringSurcharge(requestData, servings) {
-        const surchargePerServing =
-            pricingRules.coveringSurchargesPerServing[requestData.covering];
+        const surchargePerServing = pricingRules.coveringSurchargesPerServing[requestData.covering];
 
         if (typeof surchargePerServing !== "number") {
             return 0;
@@ -134,8 +129,7 @@ class PricingService {
             requestData.fondantLayerDetails.length > 0
         ) {
             const surcharges = requestData.fondantLayerDetails.map((layer) => {
-                const surcharge =
-                    pricingRules.fondantLayerSurchargesPerServing[layer.layerType];
+                const surcharge = pricingRules.fondantLayerSurchargesPerServing[layer.layerType];
 
                 return typeof surcharge === "number" ? surcharge : 0;
             });
@@ -143,10 +137,7 @@ class PricingService {
             return servings * Math.max(...surcharges, 0);
         }
 
-        const surchargePerServing =
-            pricingRules.fondantLayerSurchargesPerServing[
-            requestData.fondantLayer
-            ];
+        const surchargePerServing = pricingRules.fondantLayerSurchargesPerServing[requestData.fondantLayer];
 
         if (typeof surchargePerServing !== "number") {
             return 0;
@@ -163,12 +154,9 @@ class PricingService {
         const restrictions = [...requestData.restrictions];
 
         if (restrictions.includes("vegan")) {
-            const veganPrice =
-                pricingRules.restrictionSurchargesPerServing.vegan;
+            const veganPrice = pricingRules.restrictionSurchargesPerServing.vegan;
 
-            const glutenFreePrice = restrictions.includes("gluten_free")
-                ? pricingRules.restrictionSurchargesPerServing.gluten_free
-                : 0;
+            const glutenFreePrice = restrictions.includes("gluten_free") ? pricingRules.restrictionSurchargesPerServing.gluten_free : 0;
 
             return servings * (veganPrice + glutenFreePrice);
         }
@@ -179,9 +167,7 @@ class PricingService {
                     pricingRules.restrictionSurchargesPerServing[restriction];
 
                 return total + (
-                    typeof surcharge === "number"
-                        ? surcharge
-                        : 0
+                    typeof surcharge === "number" ? surcharge : 0
                 );
             },
             0
@@ -208,9 +194,7 @@ class PricingService {
                     pricingRules.decorationSurchargesFixed[decoration];
 
                 return sum + (
-                    typeof surcharge === "number"
-                        ? surcharge
-                        : 0
+                    typeof surcharge === "number" ? surcharge : 0
                 );
             },
             0
@@ -231,9 +215,91 @@ class PricingService {
             }
         }
 
+        if (
+            requestData.decorations.includes("candles") &&
+            requestData.candleDetails
+        ) {
+            total += PricingService.calculateCandlePrice(
+                requestData.candleDetails
+            );
+        }
+
+        if (
+            requestData.decorations.includes("cake_topper") &&
+            requestData.cakeTopperDetails
+        ) {
+            total += PricingService.calculateSizedItemsPrice(
+                requestData.cakeTopperDetails,
+                pricingRules.topperPricing
+            );
+        }
+
+        if (
+            requestData.decorations.includes("figurines") &&
+            requestData.figurineDetails
+        ) {
+            total += PricingService.calculateSizedItemsPrice(
+                requestData.figurineDetails,
+                pricingRules.figurinePricing
+            );
+        }
+
         return total;
     }
-}
+
+    static calculateCandlePrice(candleDetails) {
+        const quantity = Number(candleDetails.quantity);
+
+        if (!Number.isFinite(quantity) || quantity <= 0) {
+            return 0;
+        }
+
+        const rules = pricingRules.candlePricing;
+
+        if (quantity <= rules.baseQuantity) {
+            return rules.basePrice;
+        }
+
+        const additionalCandles =
+            quantity - rules.baseQuantity;
+
+        const price =
+            rules.basePrice +
+            additionalCandles * rules.additionalPricePerCandle;
+
+        return Math.min(price, rules.maximumAutomaticPrice);
+    };
+
+    static calculateSizedItemsPrice(details, rules) {
+        if (
+            !details ||
+            !Array.isArray(details.items)
+        ) {
+            return 0;
+        }
+
+        const quantity = Number(details.quantity);
+
+        if (
+            !Number.isFinite(quantity) ||
+            quantity <= 0 ||
+            quantity > rules.maximumAutomaticQuantity
+        ) {
+            return 0;
+        }
+
+        return details.items
+            .slice(0, quantity)
+            .reduce((total, item) => {
+                const price =
+                    rules.pricesBySize[item.size];
+
+                return total + (
+                    typeof price === "number" ? price : 0
+                );
+            }, 0);
+    }
+};
 
 module.exports = {
     PricingService

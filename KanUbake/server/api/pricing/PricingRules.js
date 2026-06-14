@@ -128,13 +128,12 @@ const pricingRules = {
           Until then, we can either use rough fallback values or mark them
           as consultation-related. For now we keep fallback values.
         */
-        cake_topper: 8,
-        candles: 2,
-        figurines: null,
+        cake_topper: 0,
+        candles: 0,
+        figurines: 0,
 
         fresh_flowers: null,
         sugar_flowers: null,
-
         drip: 5,
         fruits: 8,
         macarons: 10,
@@ -147,7 +146,6 @@ const pricingRules = {
         glitter_metallic: 4,
         gold_silver_details: 6,
         edible_print: 8,
-
         other: null
     },
 
@@ -160,21 +158,30 @@ const pricingRules = {
     },
 
     candlePricing: {
-        pricePerCandle: 0.5,
-        minimumPrice: 2,
-        maximumAutomaticPrice: 10
+        baseQuantity: 5,
+        basePrice: 1,
+        additionalPricePerCandle: 0.1,
+        maximumAutomaticPrice: 5
     },
 
-    topperPricingBySize: {
-        small: 5,
-        medium: 8,
-        large: 12
+    topperPricing: {
+        maximumAutomaticQuantity: 3,
+
+        pricesBySize: {
+            small: 5,
+            medium: 8,
+            large: 12
+        }
     },
 
-    figurinePricingBySize: {
-        small: 15,
-        medium: 25,
-        large: 40
+    figurinePricing: {
+        maximumAutomaticQuantity: 3,
+
+        pricesBySize: {
+            small: 15,
+            medium: 25,
+            large: 40
+        }
     }
 };
 

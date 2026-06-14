@@ -113,6 +113,10 @@ class PricingValidator {
             }
         );
 
+        PricingValidator.checkDecorationDetails(requestData, errors, messages, () => {
+            consultationRequired = true;
+        });
+
         return {
             isValid: errors.length === 0,
             errors,
@@ -235,7 +239,6 @@ class PricingValidator {
         const consultationDecorations = [
             "fresh_flowers",
             "sugar_flowers",
-            "figurines",
             "ruffles",
             "other"
         ];
@@ -250,6 +253,89 @@ class PricingValidator {
                 "One or more selected decorations require confirmation by the confectionist."
             );
         }
+    }
+
+    static checkDecorationDetails(requestData, errors, messages, markConsultationRequired) {
+        const decorations = requestData.decorations;
+
+        if (!Array.isArray(decorations)) {
+            return;
+        }
+
+        if (decorations.includes("text_lettering")) {
+            if (!requestData.textDetails?.text || !requestData.textDetails?.letteringStyle) {
+                errors.push("Text and lettering style are required when text lettering is selected.");
+            }
+        }
+
+        if (decorations.includes("number_age")) {
+            if (!requestData.numberAgeDetails?.numberOrAge || !requestData.numberAgeDetails?.displayType) {
+                errors.push("Number or age and display type are required when number or age is selected.");
+            }
+        }
+
+        if (decorations.includes("candles")) {
+            const quantity = Number(requestData.candleDetails?.quantity);
+
+            if (!Number.isInteger(quantity) || quantity <= 0) {
+                errors.push("A valid candle quantity is required when candles are selected.");
+            }
+        }
+
+        if (decorations.includes("cake_topper")) {
+            PricingValidator.checkSizedDecoration(
+                requestData.cakeTopperDetails,
+                "cake topper",
+                errors,
+                messages,
+                markConsultationRequired
+            );
+        }
+
+        if (decorations.includes("figurines")) {
+            PricingValidator.checkSizedDecoration(
+                requestData.figurineDetails,
+                "figurine",
+                errors,
+                messages,
+                markConsultationRequired
+            );
+        }
+    }
+
+    static checkSizedDecoration(details, label, errors, messages, markConsultationRequired) {
+        if (!details) {
+            errors.push(`${label} details are required.`);
+            return;
+        }
+
+        if (details.quantity === "4_plus") {
+            markConsultationRequired();
+            messages.push(`Four or more ${label}s must be discussed with the confectionist.`);
+            return;
+        }
+
+        const quantity = Number(details.quantity);
+
+        if (!Number.isInteger(quantity) || quantity < 1 || quantity > 3) {
+            errors.push(`A valid ${label} quantity between 1 and 3 is required.`);
+            return;
+        }
+
+        if (!Array.isArray(details.items) || details.items.length !== quantity) {
+            errors.push(`Details for every selected ${label} are required.`);
+            return;
+        }
+
+        details.items.forEach((item, index) => {
+            if (typeof item.description !== "string" || !item.description.trim()) {
+                errors.push(`Description for ${label} ${index + 1} is required.`);
+            }
+
+            if (!["small", "medium", "large"].includes(item.size)) {
+                errors.push(`A valid size for ${label} ${index + 1} is required.`);
+            }
+        });
     }
 }
 
