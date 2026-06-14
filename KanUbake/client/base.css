@@ -108,6 +108,10 @@ li {
   padding: 20px;
 }
 
+#dashboard {
+  display: flex;
+}
+
 article {
   background-color: #eeafaf;
   border-radius: 18px;
@@ -276,6 +280,12 @@ footer {
   }
 
   .nav-buttons {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  #dashboard {
     flex-direction: column;
     align-items: center;
     width: 100%;
