@@ -33,7 +33,7 @@ article.showcase {
     padding: 20px;
     margin: 0;
     background: rgb(255, 247, 230);
-    border: #e07a5f dashed;
+    border: #e07a5f dashed 1.5px;
 }
 
 .showcase:hover {

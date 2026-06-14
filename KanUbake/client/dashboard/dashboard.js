@@ -40,8 +40,8 @@ function renderCakes(cakes) {
 
     cakes.forEach(cake => {
 
-        const occasion = label(questionnaireOptions.occasions, cake.data.occasion);
-        const cakeType = label(questionnaireOptions.cakeTypes, cake.data.cakeType);
+        const occasion = label(questionnaireOptions.occasions, cake.data.requestData.occasion);
+        const cakeType = label(questionnaireOptions.cakeTypes, cake.data.requestData.cakeType);
         const shape = label(questionnaireOptions.shapes, cake.data.requestData.shape);
         const tiers = label(questionnaireOptions.tiers, cake.data.requestData.tiers);
 
@@ -62,7 +62,7 @@ function renderCakes(cakes) {
     <strong>Tiers:</strong> ${tiers}
 </p>
 
-                <p>Last Updated: ${cake.updated_at || "unknown"}</p>
+                <p><strong>Last Updated:</strong> ${cake.updated_at || "unknown"}</p>
               
                 <div class="button-container">
             <button class="edit-btn" data-cake-id="${cake.id}">
