@@ -293,12 +293,8 @@ const tieredCakeSizes = {
 const estimateMessage =
     "The calculated servings are estimates and depend on how the cake is cut.";
 
-const customPlanningMessage =
-    "This cake requires custom planning. The final size and servings must be confirmed with the confectionist.";
-
 module.exports = {
     singleTierCakeSizes,
     tieredCakeSizes,
     estimateMessage,
-    customPlanningMessage
 };

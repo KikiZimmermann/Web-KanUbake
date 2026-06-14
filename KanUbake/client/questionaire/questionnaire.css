@@ -253,6 +253,48 @@ textarea:focus {
   font-size: 0.9rem;
 }
 
+/* ── Cake Size Advice ── */
+
+.size-advice {
+  max-width: 850px;
+
+  margin: 12px 0 20px 192px;
+  padding: 14px 16px;
+
+  border-radius: 12px;
+
+  line-height: 1.5;
+  font-weight: bold;
+}
+
+.size-advice--soft {
+  background-color: #fff8d9;
+  color: #7a5a00;
+
+  border: 1.5px solid #d9b93e;
+}
+
+.size-advice--hard {
+  background-color: #ffe5e5;
+  color: #9b1c1c;
+
+  border: 1.5px solid #c62828;
+}
+
+.size-advice--oversized {
+  background-color: #fff0dc;
+  color: #8a4b08;
+
+  border: 1.5px solid #e09a42;
+}
+
+.size-advice--consultation {
+  background-color: #e9f1ff;
+  color: #244b78;
+
+  border: 1.5px solid #6f9ed6;
+}
+
 /* ── Summary ── */
 
 .summary-section {
@@ -682,6 +724,10 @@ textarea:focus {
 
   .form-navigation button {
     width: 100%;
+  }
+
+  .size-advice {
+    margin-left: 0;
   }
 }
 

@@ -2053,6 +2053,10 @@ ${this.createOtherTextField(
     request.sizeEstimateMessage = "";
     request.plannedServingsWithBuffer = "";
 
+    request.sizeAdvice = "";
+    request.sizeAdviceLevel = "";
+    request.consultationRequired = false;
+
     const shape = request.shape;
     const servingSize = request.servingSize;
     const tiers = request.tiers;
@@ -2107,6 +2111,10 @@ ${this.createOtherTextField(
       request.sizeEstimateMessage = result.message || "";
       request.plannedServingsWithBuffer = result.plannedServingsWithBuffer || "";
 
+      request.sizeAdvice = result.sizeAdvice || "";
+      request.sizeAdviceLevel = result.sizeAdviceLevel || "";
+      request.consultationRequired = result.consultationRequired === true;
+
       request.markUpdated();
       this.render();
     } catch (error) {
@@ -2118,6 +2126,10 @@ ${this.createOtherTextField(
         "The automatic cake size estimate is currently unavailable.";
       request.plannedServingsWithBuffer = "";
 
+      request.sizeAdvice = "";
+      request.sizeAdviceLevel = "";
+      request.consultationRequired = false;
+
       request.markUpdated();
       this.render();
     }
@@ -2128,11 +2140,15 @@ ${this.createOtherTextField(
       return "";
     }
 
+    const adviceClass = request.sizeAdviceLevel
+      ? `size-advice size-advice--${request.sizeAdviceLevel}`
+      : "";
+
     return `
     <div class="conditional-section">
       <h4>Cake Size Estimate</h4>
 
-      ${!request.recommendedSize && !request.estimatedServings
+      ${!request.recommendedSize && !request.estimatedServings && !request.sizeEstimateMessage
         ? `
             <p>
               Enter servings or choose a cake size to receive an automatic estimate.
@@ -2170,10 +2186,19 @@ ${this.createOtherTextField(
 
       ${request.sizeEstimateMessage
         ? `
-            <p class="field-hint">
-              ${request.sizeEstimateMessage}
+            <p 
+              class="field-hint"> ${request.sizeEstimateMessage}
             </p>
           `
+        : ""
+      }
+
+      ${request.sizeAdvice
+        ? `
+              <p 
+                class="${adviceClass}"> ${request.sizeAdvice}
+              </p>
+            `
         : ""
       }
     </div>
