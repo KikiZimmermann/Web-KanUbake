@@ -8,6 +8,7 @@ const fs = require("fs");
 const cors = require("cors");
 
 const { registerCakeSizeApi } = require("./api/cakeSize/cakeSizeApi");
+const { registerPricingApi } = require("./api/pricing/pricing.routes");
 const { registerEmailApi } = require("./api/emailApi");
 const { registerCakeAnalysisApi } = require("./api/cakeAnalysisApi");
 
@@ -16,7 +17,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "../client")));
 
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "../client/index/index.html"));
+  res.sendFile(path.join(__dirname, "../client/index/index.html"));
 });
 
 //grants permissions for browser-requests from different origins
@@ -32,6 +33,7 @@ app.use(
 
 //starts API
 registerCakeSizeApi(app);
+registerPricingApi(app);
 registerEmailApi(app);
 registerCakeAnalysisApi(app);
 
