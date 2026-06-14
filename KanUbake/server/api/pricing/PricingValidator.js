@@ -310,6 +310,10 @@ class PricingValidator {
         }
 
         if (details.quantity === "4_plus") {
+            if (typeof details.description !== "string" || !details.description.trim()) {
+                errors.push(`A general description for the ${label}s is required.`);
+            }
+
             markConsultationRequired();
             messages.push(`Four or more ${label}s must be discussed with the bakery.`);
             return;

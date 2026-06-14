@@ -50,11 +50,6 @@ export class QuestionnaireValidator {
         const messages = [];
         const fields = [];
 
-        if (!request.occasion) {
-            messages.push("Please choose an occasion.");
-            fields.push("occasion");
-        }
-
         if (!request.cakeType) {
             messages.push("Please choose a cake type.");
             fields.push("cakeType");
@@ -423,14 +418,9 @@ export class QuestionnaireValidator {
 
     validateSizedDecoration(details, label, fieldPrefix, messages, fields) {
         if (!details) {
-            messages.push(`Please enter the ${label} details.`);
+            messages.push(`Please choose how many ${label}s you would like.`);
             fields.push(`${fieldPrefix}Quantity`);
             return;
-        }
-
-        if (!details.description?.trim()) {
-            messages.push(`Please provide a general description for the ${label}s.`);
-            fields.push(`${fieldPrefix}GeneralDescription`);
         }
 
         if (!details.quantity) {
@@ -440,6 +430,11 @@ export class QuestionnaireValidator {
         }
 
         if (details.quantity === "4_plus") {
+            if (!details.description?.trim()) {
+                messages.push(`Please describe the ${label}s you would like.`);
+                fields.push(`${fieldPrefix}GeneralDescription`);
+            }
+
             return;
         }
 

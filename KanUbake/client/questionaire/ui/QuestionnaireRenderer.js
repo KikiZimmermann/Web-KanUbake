@@ -1162,9 +1162,18 @@ ${this.createOtherTextField(
     <div class="conditional-section">
       <h3>${heading}</h3>
 
+      ${this.createSelectField(
+      `${fieldPrefix}Quantity`,
+      `How many ${itemLabel}s would you like?`,
+      quantityOptions,
+      currentDetails.quantity
+    )}
+
+      ${currentDetails.quantity === "4_plus"
+        ? `
       <div class="form-field">
         <label for="${fieldPrefix}GeneralDescription">
-          General description
+          Please describe the ${itemLabel}s you would like
         </label>
 
         <textarea
@@ -1175,15 +1184,6 @@ ${this.createOtherTextField(
         >${currentDetails.description || ""}</textarea>
       </div>
 
-      ${this.createSelectField(
-      `${fieldPrefix}Quantity`,
-      `How many ${itemLabel}s would you like?`,
-      quantityOptions,
-      currentDetails.quantity
-    )}
-
-      ${currentDetails.quantity === "4_plus"
-        ? `
           <p class="field-hint">
             Four or more ${itemLabel}s must be discussed directly with the bakery.
             The price cannot be calculated automatically.
@@ -2337,6 +2337,8 @@ ${this.createOtherTextField(
     if (value === "4_plus") {
       request[detailsField].items = [];
     } else {
+      request[detailsField].description = "";
+
       const quantity = Number(value);
       const existingItems = request[detailsField].items || [];
 

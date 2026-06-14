@@ -19,7 +19,7 @@ export class SummaryBuilder {
                 title: "Basic Information & Size",
                 items: [
                     this.createOptionalPlainSummaryItem("Project Name", cakeRequest.displayName),
-                    this.createSummaryItem("Occasion", cakeRequest.occasion, questionnaireOptions.occasions),
+                    cakeRequest.occasion ? this.createSummaryItem("Occasion", cakeRequest.occasion, questionnaireOptions.occasions) : null,
                     this.createSummaryItem("Cake Type", cakeRequest.cakeType, questionnaireOptions.cakeTypes),
                     this.createSummaryItem("Serving Size", cakeRequest.servingSize, questionnaireOptions.servingSizes),
                     this.createSummaryItem("Shape", cakeRequest.shape, questionnaireOptions.shapes),
@@ -428,7 +428,7 @@ export class SummaryBuilder {
 
         return {
             label: "Decorations",
-            value: labels.join(", ")
+            value: labels.join("\n")
         };
     }
 
@@ -443,8 +443,10 @@ export class SummaryBuilder {
         );
 
         return {
-            label: "Text Details",
-            value: `${textDetails.text} – ${style}`
+            label: "Text / Lettering Details",
+            value:
+                `Text: ${textDetails.text}\n` +
+                `Lettering style: ${style}`
         };
     }
 
@@ -460,7 +462,9 @@ export class SummaryBuilder {
 
         return {
             label: "Number / Age Details",
-            value: `${numberAgeDetails.numberOrAge} – ${displayType}`
+            value:
+                `Number or age: ${numberAgeDetails.numberOrAge}\n` +
+                `Display type: ${displayType}`
         };
     }
 
@@ -486,35 +490,35 @@ export class SummaryBuilder {
             return null;
         }
 
-        const values = [];
-
-        if (details.description) {
-            values.push(`General description: ${details.description}`);
+        if (details.quantity === "4_plus") {
+            return {
+                label,
+                value:
+                    `Quantity: 4 or more\n` +
+                    `Description: ${details.description}\n` +
+                    `Please discuss the details and final price with the bakery.`
+            };
         }
 
-        if (details.quantity === "4_plus") {
-            values.push(
-                "Quantity: 4 or more (please discuss the details and final price with the bakery)"
-            );
-        } else {
-            values.push(`Quantity: ${details.quantity}`);
+        const values = [`Quantity: ${details.quantity}`];
 
-            if (Array.isArray(details.items)) {
-                details.items.forEach((item, index) => {
-                    const size = item.size
-                        ? item.size.charAt(0).toUpperCase() + item.size.slice(1)
-                        : "Not specified";
+        if (Array.isArray(details.items)) {
+            details.items.forEach((item, index) => {
+                const size = item.size
+                    ? item.size.charAt(0).toUpperCase() + item.size.slice(1)
+                    : "Not specified";
 
-                    values.push(
-                        `${itemLabel} ${index + 1}: ${item.description}, ${size}`
-                    );
-                });
-            }
+                values.push(
+                    `${itemLabel} ${index + 1}\n` +
+                    `Description: ${item.description}\n` +
+                    `Size: ${size}`
+                );
+            });
         }
 
         return {
             label,
-            value: values.join("\n")
+            value: values.join("\n\n")
         };
     }
 
@@ -594,7 +598,7 @@ export class SummaryBuilder {
 
         const entries = Object.entries(objectValue)
             .filter(([, value]) => value !== "" && value !== null && value !== undefined)
-            .map(([key, value]) => `${this.formatKey(key)}: ${value}`);
+            .map(([key, value]) => `${this.formatKey(key)}: ${value} `);
 
         return {
             label: label,
@@ -633,7 +637,7 @@ export class SummaryBuilder {
                             questionnaireOptions.nutTypes
                         );
 
-                details.push(`Cake nut: ${nut}`);
+                details.push(`Cake nut: ${nut} `);
             }
 
             details.push(
@@ -656,7 +660,7 @@ export class SummaryBuilder {
                             questionnaireOptions.fruitFillings
                         );
 
-                details.push(`Fruit: ${fruit}`);
+                details.push(`Fruit: ${fruit} `);
             }
 
             if (tierFlavor.filling === "nut_cream") {
@@ -668,7 +672,7 @@ export class SummaryBuilder {
                             questionnaireOptions.nutTypes
                         );
 
-                details.push(`Nut cream: ${nut}`);
+                details.push(`Nut cream: ${nut} `);
             }
 
             if (tierFlavor.filling === "jam") {
@@ -680,10 +684,10 @@ export class SummaryBuilder {
                             questionnaireOptions.fruitPreserves
                         );
 
-                details.push(`Fruit preserve: ${preserve}`);
+                details.push(`Fruit preserve: ${preserve} `);
             }
 
-            return `Tier ${tierFlavor.tierNumber}: ${details.join(", ")}`;
+            return `Tier ${tierFlavor.tierNumber}: ${details.join(", ")} `;
         });
 
         return {
