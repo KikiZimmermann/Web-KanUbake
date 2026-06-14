@@ -8,14 +8,27 @@ export class CakeRequestApiService {
     static async saveCakeRequest(cakeRequest) {
         const payload = CakeRequestMapper.toApiPayload(cakeRequest);
 
-        const response = await fetch("http://localhost:3010/insert/cake", {
-            method: "POST",
+        // Prüfe ob CakeRequest bereits eine rowId (Primary Key) hat → UPDATE, sonst → INSERT
+        const isUpdate = cakeRequest.rowId && cakeRequest.rowId !== null;
+        
+        const endpoint = isUpdate 
+            ? `http://localhost:3010/update/cake` 
+            : "http://localhost:3010/insert/cake";
+        const method = isUpdate ? "PUT" : "POST";
+
+        // Für UPDATE: Primary Key rowId und kuchen mitschicken
+        const body = isUpdate 
+            ? JSON.stringify({ id: cakeRequest.rowId, kuchen: payload })
+            : JSON.stringify(payload);
+
+        const response = await fetch(endpoint, {
+            method: method,
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${this.getAccessToken()}`
             },
             credentials: "include",
-            body: JSON.stringify(payload)
+            body: body
         }
         );
 
@@ -54,8 +67,11 @@ export class CakeRequestApiService {
         const jsonData = await response.json();
         console.log("Received cake data from API:", jsonData[0].data);
         const apiData = jsonData[0].data;
+        const primaryKeyId = jsonData[0].id; // Die Primary Key aus der Datenbank
 
-        return CakeRequestMapper.fromApiPayload(apiData);
+        const cakeRequest = CakeRequestMapper.fromApiPayload(apiData);
+        cakeRequest.rowId = primaryKeyId; // Speichere die Primary Key für UPDATE
+        return cakeRequest;
     }
 
     static async nutrientsCakeRequest(cakeRequest) {

@@ -17,6 +17,9 @@ import { EmailApiService } from "./services/api/EmailApiService.js";
 import { SummaryBuilder } from "./services/SummaryBuilder.js";
 import { CakeRequestApiService } from "./services/api/CakeRequestApiService.js";
 
+
+const token = localStorage.getItem("accessToken");
+
 document.addEventListener("DOMContentLoaded", async () => {
     const startScreen = document.getElementById("startScreen");
     const wizardScreen = document.getElementById("wizardScreen");
@@ -248,7 +251,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         console.log("Draft saved:", savedDraft);
 
-        if (savedDraft.status === "draft_complete") {
+        if(!token) {
+            alert("Log in to save it to your account.");
+        }
+        else if (savedDraft.status === "draft_complete") {
             alert("Draft saved as complete.");
         } else {
             alert("Draft saved as incomplete. You can continue editing it later.");
