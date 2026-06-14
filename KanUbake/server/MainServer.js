@@ -11,6 +11,7 @@ const { registerCakeSizeApi } = require("./api/cakeSize/cakeSizeApi");
 const { registerEmailApi } = require("./api/emailApi");
 const { registerCakeAnalysisApi } = require("./api/cakeAnalysisApi");
 const cakeService = require("./service/KuchenService");
+const userService = require("./service/UserService");
 const authenticateToken = require("./middleware/authenticateToken");
 
 app.use(express.json());
@@ -41,6 +42,10 @@ registerCakeAnalysisApi(app);
 //aber ich habe es pro route selber in meinem file gemacht
 cakeService.insertCake(app);
 cakeService.getCake(app);
+
+userService.getUser(app);
+userService.updateUser(app);
+userService.deleteUser(app);
 
 //just rearranged
 app.listen(3010, () => {

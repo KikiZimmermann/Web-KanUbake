@@ -108,17 +108,6 @@ function generateAccessToken(user) {
   return jwt.sign(user, process.env.ACCESS_TOKEN, { expiresIn: "1000s" });
 }
 
-// middleware — checks that the request has a valid access token
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-  if (!token) return res.sendStatus(401);
-  jwt.verify(token, process.env.ACCESS_TOKEN, (err, user) => {
-    if (err) return res.sendStatus(401);
-    req.user = user; // attach decoded user (contains email) to request
-    next();
-  });
-}
 
 // endpoint to sign up — creates a new user account
 app.post("/signup", async function (req, res) {
@@ -154,61 +143,3 @@ app.post("/signup", async function (req, res) {
   res.sendStatus(201);
 });
 
-// endpoint to get the logged-in user's own data (for pre-filling the edit form)
-app.get("/user", authenticateToken, async function (req, res) {
-  const user = await userRepository.findUserbyEmail(req.user.email);
-  if (!user) return res.sendStatus(404);
-  // never send the password back to the browser
-  res.json({
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    dateOfBirth: user.dateOfBirth,
-  });
-});
-
-// endpoint to update the logged-in user's own account
-app.put("/user", authenticateToken, async function (req, res) {
-  const { firstName, lastName, dateOfBirth, currentPassword, newPassword } = req.body;
-
-  const existing = await userRepository.findUserbyEmail(req.user.email);
-  if (!existing) return res.sendStatus(404);
-
-  let hashedPassword = existing.password;
-
-  if (currentPassword) {
-    // verify the current password before allowing a change
-    const match = await bcrypt.compare(currentPassword, existing.password);
-    if (!match) return res.sendStatus(403); // 403 = wrong current password
-    hashedPassword = await bcrypt.hash(newPassword, 10);
-  }
-
-  await userRepository.updateUser(req.user.email, {
-    firstName,
-    lastName,
-    dateOfBirth,
-    password: hashedPassword,
-  });
-
-  res.sendStatus(200);
-});
-
-// endpoint to delete the logged-in user's own account
-app.delete("/user", authenticateToken, async function (req, res) {
-  const { password, refreshToken } = req.body;
-
-  const existing = await userRepository.findUserbyEmail(req.user.email);
-  if (!existing) return res.sendStatus(404);
-
-  // verify password before allowing deletion
-  const match = await bcrypt.compare(password, existing.password);
-  if (!match) return res.sendStatus(403);
-
-  await userRepository.deleteUser(req.user.email);
-
-  if (refreshToken) {
-    refreshTokens = refreshTokens.filter((t) => t !== refreshToken);
-  }
-
-  res.sendStatus(204);
-});

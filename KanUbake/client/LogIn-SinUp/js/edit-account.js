@@ -30,7 +30,7 @@ newPassConfirmEl.addEventListener("input", () => validateConfirmPassword(newPass
 
 // pre-fill the form with the user's current data
 window.addEventListener("load", async () => {
-  const response = await fetchWithAuth("http://localhost:4010/user");
+  const response = await fetchWithAuth("http://localhost:3010/user");
   if (!response.ok) return;
 
   const user = await response.json();
@@ -67,7 +67,7 @@ document.getElementById("save_changes").addEventListener("click", async () => {
     body.newPassword     = newPassEl.value;
   }
 
-  const response = await fetchWithAuth("http://localhost:4010/user", {
+  const response = await fetchWithAuth("http://localhost:3010/user", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -102,7 +102,7 @@ document.getElementById("confirmDelete").addEventListener("click", async () => {
 
   const refreshToken = localStorage.getItem("refreshToken");
 
-  const response = await fetchWithAuth("http://localhost:4010/user", {
+  const response = await fetchWithAuth("http://localhost:3010/user", {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ refreshToken, password }),
