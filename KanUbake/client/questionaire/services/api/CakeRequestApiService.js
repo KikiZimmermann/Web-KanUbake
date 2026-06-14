@@ -32,7 +32,7 @@ export class CakeRequestApiService {
 
     static async loadCakeRequest(cakeRequestId) {
         const response = await fetch(
-            `http://localhost:3010/cake/${encodeURIComponent(cakeRequestId)}`,
+            "http://localhost:3010/get/cake",
             {
                 method: "GET",
                 headers: {
@@ -51,7 +51,7 @@ export class CakeRequestApiService {
             );
         }
 
-        const apiData = await response.json();
+        const apiData = await response.json().data.find(cake => cake.id === cakeRequestId);
 
         return CakeRequestMapper.fromApiPayload(apiData);
     }

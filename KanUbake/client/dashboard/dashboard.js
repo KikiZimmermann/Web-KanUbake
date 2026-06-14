@@ -1,3 +1,5 @@
+import { CakeRequestApiService } from "../questionaire/services/api/CakeRequestApiService.js";
+
 async function loadCakes() {
     const token = localStorage.getItem("accessToken");
 
@@ -56,8 +58,8 @@ function renderCakes(cakes) {
 }
 
 async function editCake(cakeId) {
-    // Navigate to the questionnaire page to edit the cake
-    window.location.href = `../questionaire/questionnaire.html?edit=${cakeId}`;
+    const token = localStorage.getItem("accessToken");
+    const savedRequest = await CakeRequestApiService.loadCakeRequest(cakeId);
 }
 
 async function deleteCake(cakeId) {
