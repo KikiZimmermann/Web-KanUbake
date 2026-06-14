@@ -31,6 +31,9 @@ window.onload = function () {
   const editAccountBtn = document.getElementById("editAccountBtn");
   const logoutDialog = document.getElementById("logoutDialog");
 
+  // header is loaded dynamically on this page — initAuthBtn() handles it instead
+  if (!authBtn || !logoutDialog) return;
+
   // check if an accessToken exists in the browser's localStorage
   // if it exists → user is logged in
   const token = localStorage.getItem("accessToken");
