@@ -1,7 +1,10 @@
 import { CakeRequestMapper } from "../../mapper/CakeRequestMapper.js";
-const token = localStorage.getItem("accessToken");
 
 export class CakeRequestApiService {
+    static getAccessToken() {
+        return localStorage.getItem("accessToken");
+    }
+
     static async saveCakeRequest(cakeRequest) {
         const payload = CakeRequestMapper.toApiPayload(cakeRequest);
 
@@ -9,7 +12,7 @@ export class CakeRequestApiService {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
+                "Authorization": `Bearer ${this.getAccessToken()}`
             },
             credentials: "include",
             body: JSON.stringify(payload)
@@ -20,11 +23,37 @@ export class CakeRequestApiService {
             const errorText = await response.text();
 
             throw new Error(
-                `Saving failed with status ${response.status}.`
+                `Saving failed with status ${response.status}: ${errorText}`
             );
         }
 
         return response.json();
+    }
+
+    static async loadCakeRequest(cakeRequestId) {
+        const response = await fetch(
+            `http://localhost:3010/cake/${encodeURIComponent(cakeRequestId)}`,
+            {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${this.getAccessToken()}`
+                },
+                credentials: "include"
+            }
+        );
+
+        if (!response.ok) {
+            const errorText = await response.text();
+
+            throw new Error(
+                `Loading failed with status ${response.status}: ${errorText}`
+            );
+        }
+
+        const apiData = await response.json();
+
+        return CakeRequestMapper.fromApiPayload(apiData);
     }
 
     static async nutrientsCakeRequest(cakeRequest) {
@@ -42,7 +71,7 @@ export class CakeRequestApiService {
             const errorText = await response.text();
 
             throw new Error(
-                `Saving failed with status ${response.status}.`
+                `Saving failed with status ${response.status}: ${errorText}`
             );
         }
 
@@ -64,7 +93,7 @@ export class CakeRequestApiService {
             const errorText = await response.text();
 
             throw new Error(
-                `Saving failed with status ${response.status}.`
+                `Saving failed with status ${response.status}: ${errorText}`
             );
         }
 
