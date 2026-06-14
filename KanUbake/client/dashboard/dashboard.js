@@ -45,24 +45,28 @@ function renderCakes(cakes) {
         const shape = label(questionnaireOptions.shapes, cake.data.requestData.shape);
         const tiers = label(questionnaireOptions.tiers, cake.data.requestData.tiers);
 
+        const updatedAt = cake.updated_at ?? cake.updatedAt ?? cake.data.updated_at ?? cake.data.updatedAt;
+
+        const formattedUpdatedAt = updatedAt ? new Date(updatedAt).toLocaleString("de-AT") : "unknown";
+
         const article = document.createElement("article");
         article.className = "showcase";
 
         article.innerHTML = `
             <div class="introduction">
-                <h3>${cake.data.displayName}</h3>
+                <h3>${cake.data.displayName ?? "Unnamed Cake"}</h3>
 
                <p>
-    <strong>Occasion:</strong> ${occasion}
-    <br>
-    <strong>Cake Type:</strong> ${cakeType}
-    <br>
-    <strong>Shape:</strong> ${shape}
-    <br>
-    <strong>Tiers:</strong> ${tiers}
-</p>
+                    <strong>Occasion:</strong> ${occasion}
+                    <br>
+                    <strong>Cake Type:</strong> ${cakeType}
+                    <br>
+                    <strong>Shape:</strong> ${shape}
+                    <br>
+                    <strong>Tiers:</strong> ${tiers}
+                </p>
 
-                <p><strong>Last Updated:</strong> ${cake.updated_at || "unknown"}</p>
+                <p><strong>Last Updated: ${formattedUpdatedAt}</p>
               
                 <div class="button-container">
             <button class="edit-btn" data-cake-id="${cake.id}">
