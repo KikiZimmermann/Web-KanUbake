@@ -97,6 +97,26 @@ export class CakeRequestMapper {
 
                 numberAgeDetails: cakeRequest.numberAgeDetails ? { ...cakeRequest.numberAgeDetails } : null,
 
+                candleDetails: cakeRequest.candleDetails ? { ...cakeRequest.candleDetails } : null,
+
+                cakeTopperDetails: cakeRequest.cakeTopperDetails
+                    ? {
+                        ...cakeRequest.cakeTopperDetails,
+                        items: Array.isArray(cakeRequest.cakeTopperDetails.items)
+                            ? cakeRequest.cakeTopperDetails.items.map((item) => ({ ...item }))
+                            : []
+                    }
+                    : null,
+
+                figurineDetails: cakeRequest.figurineDetails
+                    ? {
+                        ...cakeRequest.figurineDetails,
+                        items: Array.isArray(cakeRequest.figurineDetails.items)
+                            ? cakeRequest.figurineDetails.items.map((item) => ({ ...item }))
+                            : []
+                    }
+                    : null,
+
                 referenceItems: CakeRequestMapper.mapReferenceItems(cakeRequest.referenceItems),
 
                 budgetMode: cakeRequest.budgetMode,

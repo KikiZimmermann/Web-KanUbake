@@ -93,6 +93,8 @@ export class SummaryRenderer {
         const value = document.createElement("dd");
         value.textContent = item.value;
 
+        value.style.whiteSpace = "pre-line";
+
         row.append(label, value);
 
         return row;
@@ -218,7 +220,7 @@ export class SummaryRenderer {
 
         <p class="summary-warning">
             This is a rough and non-binding estimate.
-            The final price must be confirmed by the confectionist.
+            The final price must be confirmed by the bakery.
         </p>
 
         ${messagesHtml}
@@ -237,7 +239,7 @@ export class SummaryRenderer {
 
         <p class="summary-warning">
             A price estimate could not be calculated.
-            Please confirm the price directly with the confectionist.
+            Please confirm the price directly with the bakery.
         </p>
     `;
     }
@@ -262,7 +264,7 @@ export class SummaryRenderer {
             3D, sculpted or custom-shaped cakes because the required work,
             stability, materials and level of detail can vary significantly.
             The price must be discussed and confirmed directly with the
-            confectionist.
+            bakery.
         </p>
     `;
 

@@ -353,11 +353,121 @@ export class QuestionnaireValidator {
             fields.push("chocolateGlazeOtherPreserveFlavor");
         }
 
+        this.validateDecorationDetails(request, messages, fields);
+
         return {
             isValid: messages.length === 0,
             messages,
             fields
         };
+    }
+
+    validateDecorationDetails(request, messages, fields) {
+        if (!Array.isArray(request.decorations)) {
+            return;
+        }
+
+        if (request.decorations.includes("text_lettering")) {
+            if (!request.textDetails?.text?.trim()) {
+                messages.push("Please enter the text that should appear on the cake.");
+                fields.push("cakeText");
+            }
+
+            if (!request.textDetails?.letteringStyle) {
+                messages.push("Please choose a lettering style.");
+                fields.push("letteringStyle");
+            }
+        }
+
+        if (request.decorations.includes("number_age")) {
+            if (!request.numberAgeDetails?.numberOrAge?.trim()) {
+                messages.push("Please enter the number or age that should be displayed.");
+                fields.push("numberOrAge");
+            }
+
+            if (!request.numberAgeDetails?.displayType) {
+                messages.push("Please choose how the number or age should be displayed.");
+                fields.push("numberDisplayType");
+            }
+        }
+
+        if (request.decorations.includes("candles")) {
+            const quantity = Number(request.candleDetails?.quantity);
+
+            if (!Number.isInteger(quantity) || quantity <= 0) {
+                messages.push("Please enter a valid number of candles.");
+                fields.push("candleQuantity");
+            }
+        }
+
+        if (request.decorations.includes("cake_topper")) {
+            this.validateSizedDecoration(
+                request.cakeTopperDetails,
+                "cake topper",
+                "cakeTopper",
+                messages,
+                fields
+            );
+        }
+
+        if (request.decorations.includes("figurines")) {
+            this.validateSizedDecoration(
+                request.figurineDetails,
+                "figurine",
+                "figurine",
+                messages,
+                fields
+            );
+        }
+    }
+
+    validateSizedDecoration(details, label, fieldPrefix, messages, fields) {
+        if (!details) {
+            messages.push(`Please enter the ${label} details.`);
+            fields.push(`${fieldPrefix}Quantity`);
+            return;
+        }
+
+        if (!details.description?.trim()) {
+            messages.push(`Please provide a general description for the ${label}s.`);
+            fields.push(`${fieldPrefix}GeneralDescription`);
+        }
+
+        if (!details.quantity) {
+            messages.push(`Please choose how many ${label}s you would like.`);
+            fields.push(`${fieldPrefix}Quantity`);
+            return;
+        }
+
+        if (details.quantity === "4_plus") {
+            return;
+        }
+
+        const quantity = Number(details.quantity);
+
+        if (!Number.isInteger(quantity) || quantity < 1 || quantity > 3) {
+            messages.push(`Please choose a valid number of ${label}s.`);
+            fields.push(`${fieldPrefix}Quantity`);
+            return;
+        }
+
+        if (!Array.isArray(details.items) || details.items.length !== quantity) {
+            messages.push(`Please complete the details for every ${label}.`);
+            fields.push(`${fieldPrefix}Quantity`);
+            return;
+        }
+
+        details.items.forEach((item, index) => {
+            if (!item.description?.trim()) {
+                messages.push(`Please describe ${label} ${index + 1}.`);
+                fields.push(`${fieldPrefix}Description-${index}`);
+            }
+
+            if (!["small", "medium", "large"].includes(item.size)) {
+                messages.push(`Please choose a size for ${label} ${index + 1}.`);
+                fields.push(`${fieldPrefix}Size-${index}`);
+            }
+        });
     }
 
     validateReferencesChapter() {

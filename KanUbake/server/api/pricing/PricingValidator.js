@@ -5,7 +5,7 @@
   required for a price estimate.
 
   It separates invalid requests from requests that can still be estimated
-  but require confirmation by the confectionist.
+  but require confirmation by the bakery.
 */
 
 class PricingValidator {
@@ -64,28 +64,28 @@ class PricingValidator {
         ) {
             consultationRequired = true;
             messages.push(
-                "The selected cake shape requires confirmation by the confectionist."
+                "The selected cake shape requires confirmation by the bakery."
             );
         }
 
         if (requestData.designStyle === "luxury") {
             consultationRequired = true;
             messages.push(
-                "Luxury designs require confirmation by the confectionist."
+                "Luxury designs require confirmation by the bakery."
             );
         }
 
         if (requestData.designStyle === "comic_cartoon") {
             consultationRequired = true;
             messages.push(
-                "Comic or cartoon designs require confirmation by the confectionist."
+                "Comic or cartoon designs require confirmation by the bakery."
             );
         }
 
         if (requestData.designStyle === "other") {
             consultationRequired = true;
             messages.push(
-                "The selected design style requires confirmation by the confectionist."
+                "The selected design style requires confirmation by the bakery."
             );
         }
 
@@ -162,21 +162,21 @@ class PricingValidator {
             if (tierFlavor.cakeFlavor === "other") {
                 markConsultationRequired();
                 messages.push(
-                    "The selected cake flavor requires confirmation by the confectionist."
+                    "The selected cake flavor requires confirmation by the bakery."
                 );
             }
 
             if (tierFlavor.filling === "other") {
                 markConsultationRequired();
                 messages.push(
-                    "The selected filling requires confirmation by the confectionist."
+                    "The selected filling requires confirmation by the bakery."
                 );
             }
 
             if (tierFlavor.fruitFilling === "other") {
                 markConsultationRequired();
                 messages.push(
-                    "The selected fruit filling requires confirmation by the confectionist."
+                    "The selected fruit filling requires confirmation by the bakery."
                 );
             }
 
@@ -186,14 +186,14 @@ class PricingValidator {
             ) {
                 markConsultationRequired();
                 messages.push(
-                    "The selected nut option requires confirmation by the confectionist."
+                    "The selected nut option requires confirmation by the bakery."
                 );
             }
 
             if (tierFlavor.jamFlavor === "other") {
                 markConsultationRequired();
                 messages.push(
-                    "The selected fruit preserve requires confirmation by the confectionist."
+                    "The selected fruit preserve requires confirmation by the bakery."
                 );
             }
         });
@@ -207,7 +207,7 @@ class PricingValidator {
         if (restrictions.includes("other")) {
             markConsultationRequired();
             messages.push(
-                "Additional allergies or dietary notes require confirmation by the confectionist."
+                "Additional allergies or dietary notes require confirmation by the bakery."
             );
         }
 
@@ -250,7 +250,7 @@ class PricingValidator {
         ) {
             markConsultationRequired();
             messages.push(
-                "One or more selected decorations require confirmation by the confectionist."
+                "One or more selected decorations require confirmation by the bakery."
             );
         }
     }
@@ -311,7 +311,7 @@ class PricingValidator {
 
         if (details.quantity === "4_plus") {
             markConsultationRequired();
-            messages.push(`Four or more ${label}s must be discussed with the confectionist.`);
+            messages.push(`Four or more ${label}s must be discussed with the bakery.`);
             return;
         }
 

@@ -307,6 +307,12 @@ export class QuestionnaireRenderer {
 
         ${this.createNumberAgeDetailsField(request)}
 
+        ${this.createCandleDetailsField(request)}
+
+        ${this.createCakeTopperDetailsField(request)}
+
+        ${this.createFigurineDetailsField(request)}
+
       </div>
     `;
 
@@ -1064,6 +1070,183 @@ ${this.createOtherTextField(
     `;
   }
 
+  createCandleDetailsField(request) {
+    if (!request.decorations.includes("candles")) {
+      return "";
+    }
+
+    const candleDetails = request.candleDetails || {
+      quantity: "",
+      colors: ""
+    };
+
+    return `
+    <div class="conditional-section">
+      <h3>Candle Details</h3>
+
+      <div class="form-field">
+        <label for="candleQuantity">
+          Number of candles
+        </label>
+
+        <input
+          type="number"
+          id="candleQuantity"
+          data-field="candleQuantity"
+          min="1"
+          value="${candleDetails.quantity}"
+          placeholder="For example: 10"
+        >
+      </div>
+
+      <div class="form-field">
+        <label for="candleColors">
+          Candle colors <span class="optional-note">(optional)</span>
+        </label>
+
+        <input
+          type="text"
+          id="candleColors"
+          data-field="candleColors"
+          value="${candleDetails.colors}"
+          placeholder="For example: pink, white and gold"
+        >
+      </div>
+    </div>
+  `;
+  }
+
+  createCakeTopperDetailsField(request) {
+    if (!request.decorations.includes("cake_topper")) {
+      return "";
+    }
+
+    return this.createSizedDecorationDetailsField(
+      request.cakeTopperDetails,
+      "cakeTopper",
+      "Cake Topper Details",
+      "topper",
+      "For example: wooden Happy Birthday topper, gold acrylic name topper"
+    );
+  }
+
+  createFigurineDetailsField(request) {
+    if (!request.decorations.includes("figurines")) {
+      return "";
+    }
+
+    return this.createSizedDecorationDetailsField(
+      request.figurineDetails,
+      "figurine",
+      "Figurines / Modelling Details",
+      "figurine",
+      "For example: simple fondant dog, person based on a photo, small teddy bear"
+    );
+  }
+
+  createSizedDecorationDetailsField(details, fieldPrefix, heading, itemLabel, descriptionPlaceholder) {
+    const currentDetails = details || {
+      description: "",
+      quantity: "",
+      items: []
+    };
+
+    const quantityOptions = [
+      { value: "1", label: "1" },
+      { value: "2", label: "2" },
+      { value: "3", label: "3" },
+      { value: "4_plus", label: "4 Or More – Please Discuss With The Bakery" }
+    ];
+
+    return `
+    <div class="conditional-section">
+      <h3>${heading}</h3>
+
+      <div class="form-field">
+        <label for="${fieldPrefix}GeneralDescription">
+          General description
+        </label>
+
+        <textarea
+          id="${fieldPrefix}GeneralDescription"
+          data-field="${fieldPrefix}GeneralDescription"
+          rows="3"
+          placeholder="${descriptionPlaceholder}"
+        >${currentDetails.description || ""}</textarea>
+      </div>
+
+      ${this.createSelectField(
+      `${fieldPrefix}Quantity`,
+      `How many ${itemLabel}s would you like?`,
+      quantityOptions,
+      currentDetails.quantity
+    )}
+
+      ${currentDetails.quantity === "4_plus"
+        ? `
+          <p class="field-hint">
+            Four or more ${itemLabel}s must be discussed directly with the bakery.
+            The price cannot be calculated automatically.
+          </p>
+        `
+        : this.createSizedDecorationItems(
+          currentDetails,
+          fieldPrefix,
+          itemLabel
+        )
+      }
+    </div>
+  `;
+  }
+
+  createSizedDecorationItems(details, fieldPrefix, itemLabel) {
+    const quantity = Number(details.quantity);
+
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 3) {
+      return "";
+    }
+
+    const sizeOptions = [
+      { value: "small", label: "Small" },
+      { value: "medium", label: "Medium" },
+      { value: "large", label: "Large" }
+    ];
+
+    return Array.from({ length: quantity }, (_, index) => {
+      const item = details.items?.[index] || {
+        description: "",
+        size: ""
+      };
+
+      return `
+      <section class="tier-flavor-card">
+        <h4>${itemLabel.charAt(0).toUpperCase() + itemLabel.slice(1)} ${index + 1}</h4>
+
+        <div class="form-field">
+          <label for="${fieldPrefix}Description-${index}">
+            Description
+          </label>
+
+          <input
+            type="text"
+            id="${fieldPrefix}Description-${index}"
+            data-field="${fieldPrefix}Description-${index}"
+            value="${item.description || ""}"
+            placeholder="Please describe this ${itemLabel}."
+          >
+        </div>
+
+        ${this.createSelectField(
+        `${fieldPrefix}Size-${index}`,
+        "Size",
+        sizeOptions,
+        item.size
+      )}
+      </section>
+    `;
+    }).join("");
+  }
+
   createReferenceDetailsSection(request) {
     if (
       !request.referenceMode ||
@@ -1759,6 +1942,18 @@ ${this.createOtherTextField(
         request.numberAgeDetails = null;
       }
 
+      if (!selectedValues.includes("candles")) {
+        request.candleDetails = null;
+      }
+
+      if (!selectedValues.includes("cake_topper")) {
+        request.cakeTopperDetails = null;
+      }
+
+      if (!selectedValues.includes("figurines")) {
+        request.figurineDetails = null;
+      }
+
       request.markUpdated();
       this.render();
     });
@@ -1790,6 +1985,80 @@ ${this.createOtherTextField(
         this.updateNumberAgeDetails("displayType", event.target.value);
       });
     }
+
+    const candleQuantity = document.getElementById("candleQuantity");
+
+    if (candleQuantity) {
+      candleQuantity.addEventListener("input", (event) => {
+        this.updateCandleDetails("quantity", event.target.value);
+      });
+    }
+
+    const candleColors = document.getElementById("candleColors");
+
+    if (candleColors) {
+      candleColors.addEventListener("input", (event) => {
+        this.updateCandleDetails("colors", event.target.value);
+      });
+    }
+
+    const cakeTopperGeneralDescription =
+      document.getElementById("cakeTopperGeneralDescription");
+
+    if (cakeTopperGeneralDescription) {
+      cakeTopperGeneralDescription.addEventListener("input", (event) => {
+        this.updateSizedDecorationDescription(
+          "cakeTopperDetails",
+          event.target.value
+        );
+      });
+    }
+
+    const cakeTopperQuantity =
+      document.getElementById("cakeTopperQuantity");
+
+    if (cakeTopperQuantity) {
+      cakeTopperQuantity.addEventListener("change", (event) => {
+        this.updateSizedDecorationQuantity(
+          "cakeTopperDetails",
+          event.target.value
+        );
+      });
+    }
+
+    const figurineGeneralDescription =
+      document.getElementById("figurineGeneralDescription");
+
+    if (figurineGeneralDescription) {
+      figurineGeneralDescription.addEventListener("input", (event) => {
+        this.updateSizedDecorationDescription(
+          "figurineDetails",
+          event.target.value
+        );
+      });
+    }
+
+    const figurineQuantity =
+      document.getElementById("figurineQuantity");
+
+    if (figurineQuantity) {
+      figurineQuantity.addEventListener("change", (event) => {
+        this.updateSizedDecorationQuantity(
+          "figurineDetails",
+          event.target.value
+        );
+      });
+    }
+
+    this.attachSizedDecorationItemEvents(
+      "cakeTopper",
+      "cakeTopperDetails"
+    );
+
+    this.attachSizedDecorationItemEvents(
+      "figurine",
+      "figurineDetails"
+    );
   }
 
   attachFondantLayerDetailEvents(layer, index) {
@@ -2021,6 +2290,98 @@ ${this.createOtherTextField(
 
     request.numberAgeDetails[fieldName] = value;
     request.markUpdated();
+  }
+
+  updateCandleDetails(fieldName, value) {
+    const request = this.state.getCakeRequest();
+
+    if (!request.candleDetails) {
+      request.candleDetails = {
+        quantity: "",
+        colors: ""
+      };
+    }
+
+    request.candleDetails[fieldName] = value;
+    request.markUpdated();
+  }
+
+  updateSizedDecorationDescription(detailsField, value) {
+    const request = this.state.getCakeRequest();
+
+    if (!request[detailsField]) {
+      request[detailsField] = {
+        description: "",
+        quantity: "",
+        items: []
+      };
+    }
+
+    request[detailsField].description = value;
+    request.markUpdated();
+  }
+
+  updateSizedDecorationQuantity(detailsField, value) {
+    const request = this.state.getCakeRequest();
+
+    if (!request[detailsField]) {
+      request[detailsField] = {
+        description: "",
+        quantity: "",
+        items: []
+      };
+    }
+
+    request[detailsField].quantity = value;
+
+    if (value === "4_plus") {
+      request[detailsField].items = [];
+    } else {
+      const quantity = Number(value);
+      const existingItems = request[detailsField].items || [];
+
+      request[detailsField].items = Array.from(
+        { length: Number.isInteger(quantity) ? quantity : 0 },
+        (_, index) => existingItems[index] || {
+          description: "",
+          size: ""
+        }
+      );
+    }
+
+    request.markUpdated();
+    this.render();
+  }
+
+  attachSizedDecorationItemEvents(fieldPrefix, detailsField) {
+    const request = this.state.getCakeRequest();
+    const details = request[detailsField];
+
+    if (!details || !Array.isArray(details.items)) {
+      return;
+    }
+
+    details.items.forEach((item, index) => {
+      const descriptionInput =
+        document.getElementById(`${fieldPrefix}Description-${index}`);
+
+      if (descriptionInput) {
+        descriptionInput.addEventListener("input", (event) => {
+          item.description = event.target.value;
+          request.markUpdated();
+        });
+      }
+
+      const sizeSelect =
+        document.getElementById(`${fieldPrefix}Size-${index}`);
+
+      if (sizeSelect) {
+        sizeSelect.addEventListener("change", (event) => {
+          item.size = event.target.value;
+          request.markUpdated();
+        });
+      }
+    });
   }
 
   renderPlaceholderChapter() {
