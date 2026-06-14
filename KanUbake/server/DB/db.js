@@ -6,14 +6,14 @@ const db = mysql.createConnection({
   user: "root",
   password: process.env.DB_PASSWORT,
   database: "web_projekt",
-  port: 3307
+  port: process.env.DB_Port
 });
 
 db.connect((err) => {
   if (err) {
     console.log("DB Fehler:", err);
   } else {
-    console.log("Mit MySQL verbunden (Port 3307)");
+    console.log("Mit MySQL verbunden (Port " + process.env.DB_Port + ")");
   }
 });
 
