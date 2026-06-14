@@ -40,6 +40,10 @@ export class CakeRequestMapper {
                 sizeEstimateMessage: cakeRequest.sizeEstimateMessage,
                 plannedServingsWithBuffer: cakeRequest.plannedServingsWithBuffer,
 
+                sizeAdvice: cakeRequest.sizeAdvice,
+                sizeAdviceLevel: cakeRequest.sizeAdviceLevel,
+                consultationRequired: cakeRequest.consultationRequired,
+
                 restrictions: [...cakeRequest.restrictions],
                 restrictionNotes: cakeRequest.restrictionNotes,
 
@@ -96,6 +100,7 @@ export class CakeRequestMapper {
                 referenceItems: CakeRequestMapper.mapReferenceItems(cakeRequest.referenceItems),
 
                 budgetMode: cakeRequest.budgetMode,
+                budgetRange: cakeRequest.budgetRange,
                 customBudget: cakeRequest.customBudget,
 
                 additionalNotes: cakeRequest.additionalNotes,

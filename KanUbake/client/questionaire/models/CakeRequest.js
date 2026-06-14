@@ -30,6 +30,10 @@ export class CakeRequest {
         this.sizeEstimateMessage = "";
         this.plannedServingsWithBuffer = "";
 
+        this.sizeAdvice = "";
+        this.sizeAdviceLevel = "";
+        this.consultationRequired = false;
+
         this.restrictions = [];
         this.restrictionNotes = "";
 

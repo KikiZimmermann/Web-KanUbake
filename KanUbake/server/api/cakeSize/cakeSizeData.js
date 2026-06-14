@@ -77,6 +77,12 @@ const singleTierCakeSizes = {
 
     rectangle: [
         {
+            sizeId: "rectangle_18_28",
+            label: "18 × 28 cm sheet cake",
+            partyServings: 24,
+            eventServings: 32
+        },
+        {
             sizeId: "rectangle_23_33",
             label: "23 × 33 cm rectangular cake",
             partyServings: 36,
@@ -93,6 +99,39 @@ const singleTierCakeSizes = {
             label: "41 × 61 cm rectangular cake",
             partyServings: 110,
             eventServings: 130
+        }
+    ],
+
+    heart: [
+        {
+            sizeId: "heart_15",
+            label: "15 cm heart cake",
+            partyServings: 8,
+            eventServings: 14
+        },
+        {
+            sizeId: "heart_20",
+            label: "20 cm heart cake",
+            partyServings: 18,
+            eventServings: 22
+        },
+        {
+            sizeId: "heart_23",
+            label: "23 cm heart cake",
+            partyServings: 20,
+            eventServings: 28
+        },
+        {
+            sizeId: "heart_25",
+            label: "25 cm heart cake",
+            partyServings: 24,
+            eventServings: 38
+        },
+        {
+            sizeId: "heart_30",
+            label: "30 cm heart cake",
+            partyServings: 40,
+            eventServings: 56
         }
     ]
 };
@@ -176,18 +215,77 @@ const tieredCakeSizes = {
 
     rectangle: [
         {
+            sizeId: "rectangle_18_28_23_33",
+            label: "18 × 28 cm + 23 × 33 cm tiered sheet cake",
+            tiers: 2,
+            partyServings: 60,
+            eventServings: 82
+        },
+        {
             sizeId: "rectangle_20_30_30_40",
-            label: "20 × 30 cm + 30 × 40 cm rectangular tiered cake",
+            label: "20 × 30 cm + 30 × 40 cm tiered sheet cake",
             tiers: 2,
             partyServings: 90,
             eventServings: 105
         },
         {
+            sizeId: "rectangle_23_33_28_38",
+            label: "23 × 33 cm + 28 × 38 cm tiered sheet cake",
+            tiers: 2,
+            partyServings: 90,
+            eventServings: 124
+        },
+        {
             sizeId: "rectangle_23_33_33_43",
-            label: "23 × 33 cm + 33 × 43 cm rectangular tiered cake",
+            label: "23 × 33 cm + 33 × 43 cm tiered sheet cake",
             tiers: 2,
             partyServings: 100,
             eventServings: 124
+        },
+        {
+            sizeId: "rectangle_18_28_23_33_28_38",
+            label: "18 × 28 cm + 23 × 33 cm + 28 × 38 cm tiered sheet cake",
+            tiers: 3,
+            partyServings: 114,
+            eventServings: 156
+        }
+    ],
+
+    heart: [
+        {
+            sizeId: "heart_15_20",
+            label: "15 + 20 cm heart tiered cake",
+            tiers: 2,
+            partyServings: 26,
+            eventServings: 36
+        },
+        {
+            sizeId: "heart_20_25",
+            label: "20 + 25 cm heart tiered cake",
+            tiers: 2,
+            partyServings: 42,
+            eventServings: 60
+        },
+        {
+            sizeId: "heart_23_30",
+            label: "23 + 30 cm heart tiered cake",
+            tiers: 2,
+            partyServings: 60,
+            eventServings: 84
+        },
+        {
+            sizeId: "heart_15_20_25",
+            label: "15 + 20 + 25 cm heart tiered cake",
+            tiers: 3,
+            partyServings: 50,
+            eventServings: 74
+        },
+        {
+            sizeId: "heart_20_25_30",
+            label: "20 + 25 + 30 cm heart tiered cake",
+            tiers: 3,
+            partyServings: 82,
+            eventServings: 116
         }
     ]
 };
@@ -195,12 +293,8 @@ const tieredCakeSizes = {
 const estimateMessage =
     "The calculated servings are estimates and depend on how the cake is cut.";
 
-const customPlanningMessage =
-    "This cake requires custom planning. The final size and servings must be confirmed with the confectionist.";
-
 module.exports = {
     singleTierCakeSizes,
     tieredCakeSizes,
     estimateMessage,
-    customPlanningMessage
 };
