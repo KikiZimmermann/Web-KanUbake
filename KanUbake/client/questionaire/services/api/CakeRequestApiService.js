@@ -1,12 +1,16 @@
 import { CakeRequestMapper } from "../../mapper/CakeRequestMapper.js";
+const token = localStorage.getItem("accessToken");
 
 export class CakeRequestApiService {
     static async saveCakeRequest(cakeRequest) {
         const payload = CakeRequestMapper.toApiPayload(cakeRequest);
 
-        const response = await fetch("http://localhost:3010/api/cake-requests/sichern", {
+        const response = await fetch("http://localhost:3010/insert/cake", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
             credentials: "include",
             body: JSON.stringify(payload)
         }
