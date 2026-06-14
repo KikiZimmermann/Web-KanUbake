@@ -70,7 +70,7 @@ export class QuestionnaireValidator {
             fields.push("shape");
         }
 
-        if (!request.tiers) {
+        if (request.shape !== "sculpted_3d" && !request.tiers) {
             messages.push("Please choose the number of tiers.");
             fields.push("tiers");
         }

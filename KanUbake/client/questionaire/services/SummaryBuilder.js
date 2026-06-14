@@ -25,8 +25,8 @@ export class SummaryBuilder {
                     this.createSummaryItem("Shape", cakeRequest.shape, questionnaireOptions.shapes),
                     this.createSummaryItem("Tiers", cakeRequest.tiers, questionnaireOptions.tiers),
                     this.createSummaryItem("Size Information", cakeRequest.sizeMode, questionnaireOptions.sizeModes),
-                    this.createPlainSummaryItem("Known Servings", cakeRequest.knownServings),
-                    this.createPlainSummaryItem("Known Size", cakeRequest.knownSize),
+                    this.createPlainSummaryItem("Serving Size", cakeRequest.knownServings),
+                    this.createPlainSummaryItem("Cake Size", this.getCakeSizeSummaryValue(cakeRequest)),
                     this.createMultiSummaryItem("Restrictions", cakeRequest.restrictions, questionnaireOptions.restrictions),
                     this.createPlainSummaryItem("Restriction Notes", cakeRequest.restrictionNotes)
                 ]
@@ -322,5 +322,24 @@ export class SummaryBuilder {
         return key
             .replace(/([A-Z])/g, " $1")
             .replace(/^./, (firstLetter) => firstLetter.toUpperCase());
+    }
+
+    getCakeSizeSummaryValue(cakeRequest) {
+        if (
+            cakeRequest.consultationRequired === true ||
+            cakeRequest.sizeAdviceLevel === "consultation"
+        ) {
+            return "Needs to be discussed with the bakery";
+        }
+
+        if (cakeRequest.recommendedSize) {
+            return cakeRequest.recommendedSize;
+        }
+
+        if (cakeRequest.knownSize) {
+            return cakeRequest.knownSize;
+        }
+
+        return "";
     }
 }

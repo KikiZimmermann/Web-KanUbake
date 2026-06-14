@@ -122,6 +122,15 @@ export class QuestionnaireRenderer {
   renderBasicChapter() {
     const request = this.state.getCakeRequest();
 
+    const sizeSelectionDisabled =
+      request.shape === "sculpted_3d" ||
+      request.shape === "other" ||
+      request.shape === "unsure_advise" ||
+      request.tiers === "unsure_advise";
+
+    const tiersDisabled =
+      request.shape === "sculpted_3d";
+
     this.chapterContainerElement.innerHTML = `
     <div class="chapter-content">
 
@@ -172,14 +181,20 @@ export class QuestionnaireRenderer {
       "tiers",
       "How many tiers should the cake have?",
       questionnaireOptions.tiers,
-      request.tiers
+      request.tiers,
+      {
+        disabled: tiersDisabled
+      }
     )}
 
       ${this.createSelectField(
       "sizeMode",
       "What do you already know about the size?",
       questionnaireOptions.sizeModes,
-      request.sizeMode
+      request.sizeMode,
+      {
+        disabledValues: sizeSelectionDisabled ? ["known_size"] : []
+      }
     )}
 
       ${this.createSizeDetailsField(request)}
@@ -1233,20 +1248,33 @@ ${this.createOtherTextField(
     `;
   }
 
-  createSelectField(fieldName, labelText, options, selectedValue) {
+  createSelectField(
+    fieldName,
+    labelText,
+    options,
+    selectedValue,
+    {
+      disabled = false,
+      disabledValues = []
+    } = {}) {
+
+
+
     return `
       <div class="form-field">
         <label for="${fieldName}">${labelText}</label>
 
-        <select id="${fieldName}" data-field="${fieldName}">
+        <select id="${fieldName}" data-field="${fieldName}" ${disabled ? "disabled" : ""}>
           <option value="">Please choose...</option>
 
           ${options
         .map((option) => {
           const selected = option.value === selectedValue ? "selected" : "";
 
+          const optionDisabled = disabledValues.includes(option.value) ? "disabled" : "";
+
           return `
-                <option value="${option.value}" ${selected}>
+                <option value="${option.value}" ${selected} ${optionDisabled}>
                   ${option.label}
                 </option>
               `;
@@ -1380,7 +1408,10 @@ ${this.createOtherTextField(
           recommendedSize: "",
           estimatedServings: "",
           sizeEstimateMessage: "",
-          plannedServingsWithBuffer: ""
+          plannedServingsWithBuffer: "",
+          sizeAdvice: "",
+          sizeAdviceLevel: "",
+          consultationRequired: false
         });
 
         this.render();
@@ -2035,10 +2066,47 @@ ${this.createOtherTextField(
     }
 
     selectElement.addEventListener("change", (event) => {
-      this.state.updateField(fieldName, event.target.value);
+      const request = this.state.getCakeRequest();
+      const newValue = event.target.value;
+
+      this.state.updateField(fieldName, newValue);
 
       if (shouldClearKnownSize) {
         this.state.updateField("knownSize", "");
+      }
+
+      /*
+        A 3D / sculpted cake does not use a normal tier selection.
+      */
+      if (fieldName === "shape" && newValue === "sculpted_3d") {
+        this.state.updateField("tiers", "");
+      }
+
+      const sizeSelectionDisabled =
+        request.shape === "sculpted_3d" ||
+        request.shape === "other" ||
+        request.shape === "unsure_advise" ||
+        request.tiers === "unsure_advise";
+
+      /*
+        If "I know the cake size" was selected before the user
+        changed to a consultation-only combination, remove it.
+      */
+      if (
+        sizeSelectionDisabled &&
+        request.sizeMode === "known_size"
+      ) {
+        this.state.updateMultipleFields({
+          sizeMode: "",
+          knownSize: "",
+          recommendedSize: "",
+          estimatedServings: "",
+          sizeEstimateMessage: "",
+          plannedServingsWithBuffer: "",
+          sizeAdvice: "",
+          sizeAdviceLevel: "",
+          consultationRequired: false
+        });
       }
 
       this.updateCakeSizeEstimate();
@@ -2061,7 +2129,14 @@ ${this.createOtherTextField(
     const servingSize = request.servingSize;
     const tiers = request.tiers;
 
-    if (!shape || !servingSize || !tiers || !request.sizeMode) {
+    const tiersRequired = shape !== "sculpted_3d";
+
+    if (
+      !shape ||
+      !servingSize ||
+      !request.sizeMode ||
+      (tiersRequired && !tiers)
+    ) {
       request.markUpdated();
       this.render();
       return;
@@ -2076,12 +2151,13 @@ ${this.createOtherTextField(
           this.render();
           return;
         }
+        const tiersForApi = shape === "sculpted_3d" ? "unsure_advise" : tiers;
 
         result = await this.cakeSizeApiService.estimateSizeByServings({
           servings: request.knownServings,
           shape: shape,
           servingSize: servingSize,
-          tiers: tiers
+          tiers: tiersForApi
         });
       }
 
