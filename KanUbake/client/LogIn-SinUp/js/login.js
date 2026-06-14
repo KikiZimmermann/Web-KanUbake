@@ -34,6 +34,11 @@ document.getElementById("log_in").addEventListener("click", (e) => {
       // show success message
       showPopup("Login successful! Redirecting...", "success");
 
+      // reload necessary to ensure nav updates including dashboard
+      setTimeout(() => {
+        window.location.href = "../../index/index.html";
+      }, 2000);
+
       // wait 2 seconds then redirect to home page
       setTimeout(() => {
         window.location.href = "../../index/index.html";

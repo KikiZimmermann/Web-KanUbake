@@ -69,7 +69,7 @@ window.onload = function () {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: refreshToken }),
-      }).catch(() => {}); // ignore network errors — still log out locally
+      }).catch(() => { }); // ignore network errors — still log out locally
     }
 
     // remove both tokens from localStorage — user is now logged out
@@ -122,13 +122,18 @@ function initAuthBtn() {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: refreshToken }),
-      }).catch(() => {});
+      }).catch(() => { });
     }
 
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     logoutDialog.close();
     showGoodbyePopup();
+    loadNav();
+    setTimeout(() => {
+      window.location.replace("/index/index.html");
+    }, 800);
+
     if (editAccountBtn) editAccountBtn.style.display = "none";
     authBtn.textContent = "Log In";
     authBtn.onclick = () => {
@@ -140,3 +145,4 @@ function initAuthBtn() {
     logoutDialog.close();
   });
 }
+
