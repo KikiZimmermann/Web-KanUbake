@@ -23,9 +23,9 @@
 }
 
 main {
-    background: linear-gradient(180deg, rgb(200, 246, 248) 0%, #70bdbe 100%);
-    border-left: rgb(100, 182, 201) solid;
-    border-right: rgb(100, 182, 201) solid;
+    background: linear-gradient(180deg, rgb(254, 234, 192) 0%, #f9cf83 100%);
+    border-left: rgb(222, 185, 91) solid;
+    border-right: rgb(222, 185, 91) solid;
 }
 
 div.introduction {
@@ -38,8 +38,8 @@ div.introduction {
 article.showcase {
     padding: 20px;
     margin: 0;
-    background: rgb(236, 255, 254);
-    border: rgb(100, 182, 201) dashed;
+    background: rgb(255, 247, 230);
+    border: #e07a5f dashed;
 }
 
 p a {

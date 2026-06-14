@@ -127,6 +127,10 @@ function initAuthBtn() {
     logoutDialog.close();
     showGoodbyePopup();
     loadNav();
+    setTimeout(() => {
+      window.location.replace("/index/index.html");
+    }, 800);
+
     if (editAccountBtn) editAccountBtn.style.display = "none";
     authBtn.textContent = "Log In";
     authBtn.onclick = () => {
