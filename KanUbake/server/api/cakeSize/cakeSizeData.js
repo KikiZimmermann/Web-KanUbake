@@ -84,19 +84,19 @@ const singleTierCakeSizes = {
         },
         {
             sizeId: "rectangle_23_33",
-            label: "23 × 33 cm rectangular cake",
+            label: "23 × 33 cm sheet cake",
             partyServings: 36,
             eventServings: 44
         },
         {
             sizeId: "rectangle_33_43",
-            label: "33 × 43 cm rectangular cake",
+            label: "33 × 43 cm sheet cake",
             partyServings: 65,
             eventServings: 80
         },
         {
             sizeId: "rectangle_41_61",
-            label: "41 × 61 cm rectangular cake",
+            label: "41 × 61 cm sheet cake",
             partyServings: 110,
             eventServings: 130
         }
