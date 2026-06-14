@@ -50,32 +50,33 @@ function getCake(app) {
 
 
 function deleteCake(app) {
-    app.delete("/delete/kuchen/:id", authenticateToken, async (req, res) => {
+    app.delete("/delete/kuchen", authenticateToken, async (req, res) => {
         try {
-            await kuchenRepository.deleteKuchen(req.params.id, req.user);
+            const { id } = req.body;
+            await kuchenRepository.deleteKuchen(id, req.user);
             res.json({ success: true });
         } catch (err) {
             console.error(err);
             res.status(500).json({
                 error: "Fehler beim Löschen des Kuchens",
             });
-        }    
+        }
     });
 }
 
 function updateCake(app) {
-    app.put("/update/kuchen/:id", authenticateToken, async (req, res) => {
+    app.put("/update/kuchen", authenticateToken, async (req, res) => {
         try {
-        const kuchen = req.body;
+        const { id, kuchen } = req.body;
 
-        if (!kuchen) {
+        if (!id || !kuchen) {
             return res.status(400).json({
-                error: "kuchen ist erforderlich",
+            error: "id und kuchen sind erforderlich",
             });
         }
 
         await kuchenRepository.updateKuchen(
-            req.params.id,
+            id,
             kuchen,
             req.user
         );
