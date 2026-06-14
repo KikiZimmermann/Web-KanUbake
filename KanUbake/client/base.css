@@ -217,7 +217,8 @@ footer {
   border: none;
 }
 
-#authBtn {
+#authBtn,
+#editAccountBtn {
   background-color: #f77575;
   padding: 8px 16px;
   border-radius: 10px;
@@ -227,9 +228,11 @@ footer {
   font-size: medium;
 }
 
-#authBtn:hover {
+#authBtn:hover,
+#editAccountBtn:hover {
   background: #e55b67;
   color: white;
+  cursor: pointer;
 }
 
 .nav-buttons {

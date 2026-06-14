@@ -8,7 +8,6 @@ const {
     singleTierCakeSizes,
     tieredCakeSizes,
     estimateMessage,
-    customPlanningMessage
 } = require("./cakeSizeData");
 
 function estimateSizeByServings({
@@ -18,7 +17,6 @@ function estimateSizeByServings({
     tiers
 }) {
     const requestedServings = Number(servings);
-    const tierCount = Number(tiers);
 
     if (!requestedServings || requestedServings <= 0) {
         return createErrorResult("Please provide a valid number of servings.");
@@ -32,8 +30,14 @@ function estimateSizeByServings({
         return createErrorResult("Please provide a serving size.");
     }
 
-    if (requiresCustomPlanning(shape)) {
-        return createCustomPlanningResult();
+    if (requiresSizeConsultation(shape, tiers)) {
+        return createSizeConsultationResult(requestedServings);
+    }
+
+    const tierCount = Number(tiers);
+
+    if (![1, 2, 3].includes(tierCount)) {
+        return createSizeConsultationResult(requestedServings);
     }
 
     const servingsWithBuffer = addPlanningBuffer(requestedServings);
@@ -44,20 +48,97 @@ function estimateSizeByServings({
         return createErrorResult("No size data available for this combination.");
     }
 
+    const largestAvailableSize = availableSizes.reduce((largest, current) => {
+        return current[servingKey] > largest[servingKey]
+            ? current
+            : largest;
+    });
+
+    const largestCapacity = largestAvailableSize[servingKey];
+
     const matchingSize = availableSizes.find((cakeSize) => {
         return cakeSize[servingKey] >= servingsWithBuffer;
     });
 
     if (!matchingSize) {
+        let sizeAdvice;
+
+        if (tierCount < 3) {
+            sizeAdvice =
+                `The largest available ${tierCount}-tier cake for this shape serves ` +
+                `approximately ${largestCapacity} people. This may not be enough for ` +
+                `the requested ${requestedServings} servings. A larger cake or a cake ` +
+                `with more tiers may be more suitable. Please discuss the final size ` +
+                `with the confectionist.`;
+        } else {
+            sizeAdvice =
+                `The largest available 3-tier cake for this shape serves approximately ` +
+                `${largestCapacity} people. This may not be enough for the requested ` +
+                `${requestedServings} servings. Please discuss the required cake size ` +
+                `with the confectionist.`;
+        }
+
         return {
             success: true,
-            recommendedSize: "Custom planning required",
-            estimatedServings: "Custom estimate required",
+            consultationRequired: true,
+            recommendedSize: "",
+            sizeId: "",
+            estimatedServings: largestCapacity,
             requestedServings: requestedServings,
             plannedServingsWithBuffer: servingsWithBuffer,
-            message:
-                "The requested serving count is higher than the available size table. Please confirm the final size with the confectionist."
+            message: estimateMessage,
+            sizeAdvice: sizeAdvice,
+            sizeAdviceLevel: "hard"
         };
+    }
+
+    const estimatedServings = matchingSize[servingKey];
+
+    const oversizedThreshold = Math.ceil(
+        requestedServings * getOversizedFactor(requestedServings)
+    );
+
+    let sizeAdvice = null;
+    let sizeAdviceLevel = null;
+
+    const nearCapacityThreshold = Math.floor(
+        largestCapacity * NEAR_CAPACITY_THRESHOLD
+    );
+
+    const isNearMaximumCapacity =
+        servingsWithBuffer >= nearCapacityThreshold;
+
+    if (isNearMaximumCapacity) {
+        if (tierCount < 3) {
+            sizeAdvice =
+                `The requested number of servings is close to the standard capacity ` +
+                `limit for a ${tierCount}-tier cake of this shape. A larger cake or ` +
+                `a cake with more tiers may be more suitable. Please discuss the final ` +
+                `size with the confectionist.`;
+        } else {
+            sizeAdvice =
+                `The requested number of servings is close to the standard capacity ` +
+                `limit for a 3-tier cake of this shape. Please discuss the final size ` +
+                `with the confectionist.`;
+        }
+
+        sizeAdviceLevel = "soft";
+    }
+
+    if (!sizeAdvice && estimatedServings >= oversizedThreshold) {
+        if (tierCount > 1) {
+            sizeAdvice =
+                `The smallest available ${tierCount}-tier cake serves approximately ` +
+                `${estimatedServings} people, which is (considerably) more than the ` +
+                `${requestedServings} requested servings. A cake with fewer tiers may ` +
+                `be more suitable. Please discuss the final size with the confectionist.`;
+        } else {
+            sizeAdvice =
+                `The recommended cake serves approximately ${estimatedServings} people, ` +
+                `which is (considerably) more than the ${requestedServings} requested servings. ` +
+                `A smaller cake may be more suitable. Please discuss the final size with ` +
+                `the confectionist.`;
+        }
     }
 
     return {
@@ -67,7 +148,9 @@ function estimateSizeByServings({
         estimatedServings: matchingSize[servingKey],
         requestedServings: requestedServings,
         plannedServingsWithBuffer: servingsWithBuffer,
-        message: estimateMessage
+        message: estimateMessage,
+        sizeAdvice: sizeAdvice,
+        sizeAdviceLevel: sizeAdviceLevel
     };
 }
 
@@ -77,12 +160,6 @@ function estimateServingsBySize({
     servingSize,
     tiers
 }) {
-    const tierCount = Number(tiers);
-
-    if (!sizeId) {
-        return createErrorResult("Please provide a cake size.");
-    }
-
     if (!shape) {
         return createErrorResult("Please provide a cake shape.");
     }
@@ -91,8 +168,20 @@ function estimateServingsBySize({
         return createErrorResult("Please provide a serving size.");
     }
 
-    if (requiresCustomPlanning(shape)) {
-        return createCustomPlanningResult();
+    if (requiresSizeConsultation(shape, tiers)) {
+        return createSizeConsultationResult();
+    }
+
+    if (!sizeId) {
+        return createErrorResult(
+            "Please provide a cake size."
+        );
+    }
+
+    const tierCount = Number(tiers);
+
+    if (![1, 2, 3].includes(tierCount)) {
+        return createSizeConsultationResult();
     }
 
     const servingKey = getServingKey(servingSize);
@@ -125,9 +214,17 @@ function estimateServingsBySize({
 }
 
 function getAvailableCakeSizes({ shape, tiers }) {
+    if (!shape) {
+        return [];
+    }
+
+    if (requiresSizeConsultation(shape, tiers)) {
+        return [];
+    }
+
     const tierCount = Number(tiers);
 
-    if (!shape || requiresCustomPlanning(shape)) {
+    if (![1, 2, 3].includes(tierCount)) {
         return [];
     }
 
@@ -173,16 +270,47 @@ function addPlanningBuffer(servings) {
     return Math.ceil(servings * 1.1);
 }
 
-function requiresCustomPlanning(shape) {
-    return shape === "sculpted_3d" || shape === "geometric";
+function getOversizedFactor(requestedServings) {
+    if (requestedServings < 30) {
+        return 1.5;
+    }
+
+    if (requestedServings < 60) {
+        return 1.15;
+    }
+
+    if (requestedServings < 120) {
+        return 1.1;
+    }
+
+    return 1.05;
 }
 
-function createCustomPlanningResult() {
+const NEAR_CAPACITY_THRESHOLD = 0.9;
+
+function requiresSizeConsultation(shape, tiers) {
+    return (
+        shape === "sculpted_3d" ||
+        shape === "other" ||
+        shape === "unsure_advise" ||
+        tiers === "unsure_advise"
+    );
+}
+
+function createSizeConsultationResult(requestedServings = null) {
     return {
         success: true,
-        recommendedSize: "Custom planning required",
-        estimatedServings: "Custom estimate required",
-        message: customPlanningMessage
+        consultationRequired: true,
+        recommendedSize: "",
+        sizeId: "",
+        estimatedServings: "",
+        requestedServings: requestedServings,
+        plannedServingsWithBuffer: null,
+        message:
+            "A standard cake size cannot be calculated for this selection. " +
+            "Please discuss the suitable cake size with the confectionist.",
+        sizeAdvice: null,
+        sizeAdviceLevel: "consultation"
     };
 }
 

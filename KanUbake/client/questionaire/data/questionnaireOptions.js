@@ -37,9 +37,10 @@ export const questionnaireOptions = {
     shapes: [
         { value: "round", label: "Round" },
         { value: "square", label: "Square" },
-        { value: "rectangle", label: "Rectangular" },
-        { value: "geometric", label: "Other Geometric Shape" },
+        { value: "rectangle", label: "Sheet" },
+        { value: "heart", label: "Heart" },
         { value: "sculpted_3d", label: "3D / Sculpted Cake" },
+        { value: "other", label: "Other" },
         { value: "unsure_advise", label: "I’m Not Sure Yet – Please Advise" }
     ],
 

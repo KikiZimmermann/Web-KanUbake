@@ -1,0 +1,78 @@
+const express = require("express");
+require("dotenv").config({ path: __dirname + "/.env" });
+
+const app = express();
+
+class KuchenRepository {
+  constructor(db) {
+    this.db = db;
+  }
+
+  async createKuchen(kuchen, user) {
+    const sql = `
+        INSERT INTO kuchen (data, user_id)
+        VALUES (?, ?)
+    `;
+
+    const [result] = await this.db.promise().query(
+      sql,
+      [
+        kuchen,
+        user.id
+      ]
+    );
+    return result;
+  }
+
+  async findallKuchen(user) {
+    const sql = `
+        SELECT *
+        FROM kuchen
+        WHERE user_id = ?
+    `;
+
+    const [rows] = await this.db.promise().query(
+        sql, [
+          user.id
+        ]
+    );
+    return rows;
+  }
+
+  async deleteKuchen(kuchenId, user) {
+    const sql = `
+        DELETE FROM kuchen
+        WHERE id = ?
+        AND user_id = ?
+    `;
+
+    const [result] = await this.db.promise().query(
+        sql, [
+        kuchenId,
+        user.id
+        ]
+    );
+
+    return result;
+  }
+
+  async updateKuchen(kuchenId, kuchen, user) {
+  const sql = `
+    UPDATE kuchen
+    SET data = ?
+    WHERE id = ?
+    AND user_id = ?
+  `;
+
+  const [result] = await this.db.promise().query(
+    sql, [
+        JSON.stringify(kuchen),
+        kuchenId,
+        user.id
+    ]);
+
+    return result;
+  }
+}
+
+module.exports = KuchenRepository;

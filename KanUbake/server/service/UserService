@@ -1,0 +1,79 @@
+const bcrypt = require("bcrypt");
+const UserRepository = require("../repositories/UserRepository");
+const authenticateToken = require("../middleware/authenticateToken");
+const db = require("../DB/db");
+
+const userRepository = new UserRepository(db);
+
+function getUser(app) {
+  app.get("/user", authenticateToken, async (req, res) => {
+    try {
+      const user = await userRepository.findUserbyEmail(req.user.email);
+      if (!user) return res.sendStatus(404);
+
+      res.json({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        dateOfBirth: user.dateOfBirth,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to fetch user" });
+    }
+  });
+}
+
+function updateUser(app) {
+  app.put("/user", authenticateToken, async (req, res) => {
+    try {
+      const { firstName, lastName, dateOfBirth, currentPassword, newPassword } = req.body;
+
+      const existing = await userRepository.findUserbyEmail(req.user.email);
+      if (!existing) return res.sendStatus(404);
+
+      let hashedPassword = existing.password;
+
+      if (currentPassword) {
+        const match = await bcrypt.compare(currentPassword, existing.password);
+        if (!match) return res.sendStatus(403);
+        hashedPassword = await bcrypt.hash(newPassword, 10);
+      }
+
+      await userRepository.updateUser(req.user.email, {
+        firstName,
+        lastName,
+        dateOfBirth,
+        password: hashedPassword,
+      });
+
+      res.sendStatus(200);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to update user" });
+    }
+  });
+}
+
+function deleteUser(app) {
+  app.delete("/user", authenticateToken, async (req, res) => {
+    try {
+      const { password } = req.body;
+
+      const existing = await userRepository.findUserbyEmail(req.user.email);
+      if (!existing) return res.sendStatus(404);
+
+      const match = await bcrypt.compare(password, existing.password);
+      if (!match) return res.sendStatus(403);
+
+      await userRepository.deleteUser(req.user.email);
+
+      res.sendStatus(204);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to delete user" });
+    }
+  });
+}
+
+module.exports = { getUser, updateUser, deleteUser };

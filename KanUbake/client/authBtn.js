@@ -28,6 +28,7 @@ function showGoodbyePopup() {
 window.onload = function () {
   // get the auth button and logout dialog elements
   const authBtn = document.getElementById("authBtn");
+  const editAccountBtn = document.getElementById("editAccountBtn");
   const logoutDialog = document.getElementById("logoutDialog");
 
   // check if an accessToken exists in the browser's localStorage
@@ -35,12 +36,17 @@ window.onload = function () {
   const token = localStorage.getItem("accessToken");
 
   if (token) {
-    // user is logged in → show "Log Out" button
+    // user is logged in → show "Log Out" button and "Edit Account" button
     authBtn.textContent = "Log Out";
-    // when clicked → show the logout confirmation dialog
     authBtn.onclick = () => {
       logoutDialog.showModal();
     };
+    if (editAccountBtn) {
+      editAccountBtn.style.display = "inline-block";
+      editAccountBtn.onclick = () => {
+        window.location.href = "/LogIn-SinUp/html/EditAccount.html";
+      };
+    }
   } else {
     // user is not logged in → show "Log In" button
     authBtn.textContent = "Log In";
@@ -66,13 +72,10 @@ window.onload = function () {
     // remove both tokens from localStorage — user is now logged out
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
-    // close the dialog
     logoutDialog.close();
-    // show goodbye popup
     showGoodbyePopup();
-    // change button back to "Log In"
+    if (editAccountBtn) editAccountBtn.style.display = "none";
     authBtn.textContent = "Log In";
-    // when clicked → redirect to login page
     authBtn.onclick = () => {
       window.location.href = "/LogIn-SinUp/html/LogIn.html";
     };
@@ -87,6 +90,7 @@ window.onload = function () {
 // called by header.js after header HTML is injected into the DOM
 function initAuthBtn() {
   const authBtn = document.getElementById("authBtn");
+  const editAccountBtn = document.getElementById("editAccountBtn");
   const logoutDialog = document.getElementById("logoutDialog");
 
   const token = localStorage.getItem("accessToken");
@@ -94,6 +98,12 @@ function initAuthBtn() {
   if (token) {
     authBtn.textContent = "Log Out";
     authBtn.onclick = () => logoutDialog.showModal();
+    if (editAccountBtn) {
+      editAccountBtn.style.display = "inline-block";
+      editAccountBtn.onclick = () => {
+        window.location.href = "/LogIn-SinUp/html/EditAccount.html";
+      };
+    }
   } else {
     authBtn.textContent = "Log In";
     authBtn.onclick = () => {
@@ -117,6 +127,7 @@ function initAuthBtn() {
     logoutDialog.close();
     showGoodbyePopup();
     loadNav();
+    if (editAccountBtn) editAccountBtn.style.display = "none";
     authBtn.textContent = "Log In";
     authBtn.onclick = () => {
       window.location.href = "/LogIn-SinUp/html/LogIn.html";

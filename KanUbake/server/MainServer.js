@@ -10,9 +10,11 @@ const cors = require("cors");
 const { registerCakeSizeApi } = require("./api/cakeSize/cakeSizeApi");
 const { registerEmailApi } = require("./api/emailApi");
 const { registerCakeAnalysisApi } = require("./api/cakeAnalysisApi");
+const cakeService = require("./service/KuchenService");
+const userService = require("./service/UserService");
+const authenticateToken = require("./middleware/authenticateToken");
 
 app.use(express.json());
-
 app.use(express.static(path.join(__dirname, "../client")));
 
 app.get("/", (req, res) => {
@@ -35,22 +37,15 @@ registerCakeSizeApi(app);
 registerEmailApi(app);
 registerCakeAnalysisApi(app);
 
-//Schaut ob der Token richitig ist
-function authenticateToken(req, res, next) {
-  //token holen
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
 
-  //token testen ob richtig
-  if (token == null) return res.sendStatus(401);
+//app.use(authenticateToken); das wäre Ab hier braucht alles einen gültigen Token, um auf die Endpunkte zuzugreifen
+//aber ich habe es pro route selber in meinem file gemacht
+cakeService.insertCake(app);
+cakeService.getCake(app);
 
-  jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
-    if (err) return res.sendStatus(401);
-
-    req.user = user; //aus dem token sagen wir welcher user grad sachen macht
-    next();
-  });
-}
+userService.getUser(app);
+userService.updateUser(app);
+userService.deleteUser(app);
 
 //just rearranged
 app.listen(3010, () => {

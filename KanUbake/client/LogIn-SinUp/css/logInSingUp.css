@@ -41,13 +41,121 @@ html {
   height: 6rem;
 }
 
-/* ── Submit button ───────────────────────────────────── */
-.form_basic>.btn:last-child {
+/* ── Submit / action buttons ─────────────────────────── */
+.form_basic>.btn:last-child,
+#save_changes,
+#delete_account {
   font-weight: bold;
   padding: 1.8rem;
   margin: 0 0.5rem 0.2rem;
   background-color: #ebd3d3;
   border: 0.05rem solid var(--dark-brown);
+}
+
+#delete_account {
+  background-color: #f5c2c2;
+  margin-top: 0;
+}
+
+/* ── Action button row ───────────────────────────────── */
+.action-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  align-items: center;
+}
+
+@media (min-width: 764px) {
+  .action-btns {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .action-btns .btn {
+    width: 40%;
+    margin: 0;
+  }
+}
+
+/* ── Delete confirmation dialog ──────────────────────── */
+#deleteDialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  border: 0.05rem solid var(--dark-brown);
+}
+
+#deleteDialog::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.delete-dialog-text {
+  margin-bottom: 1rem;
+  background: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+.delete-pass-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.2rem;
+  font-size: 0.9rem;
+  color: var(--dark-brown);
+  font-weight: bold;
+}
+
+.delete-pass-error {
+  color: #c0392b;
+  font-size: 0.75rem;
+  min-height: 1rem;
+  font-weight: normal;
+}
+
+.delete-dialog-btns {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.delete-confirm-btn {
+  background-color: #f5c2c2;
+  padding: 0.8rem 1.5rem;
+  font-weight: bold;
+}
+
+.delete-cancel-btn {
+  padding: 0.8rem 1.5rem;
+  font-weight: bold;
+}
+
+/* ── Section divider ─────────────────────────────────── */
+.section-divider {
+  width: 80%;
+  border: none;
+  border-top: 1.5px solid var(--dark-brown);
+  opacity: 0.2;
+  margin: 0.5rem 0 0;
+}
+
+/* ── Password section hint ───────────────────────────── */
+.pass-hint {
+  font-size: 0.75rem;
+  font-weight: normal;
+  color: var(--dark-brown);
+  opacity: 0.7;
+  text-align: center;
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  margin: -2rem 0 0;
 }
 
 /* ── Home icon (mobile: hidden) ──────────────────────── */

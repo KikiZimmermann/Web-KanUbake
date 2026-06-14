@@ -108,6 +108,7 @@ function generateAccessToken(user) {
   return jwt.sign(user, process.env.ACCESS_TOKEN, { expiresIn: "1000s" });
 }
 
+
 // endpoint to sign up — creates a new user account
 app.post("/signup", async function (req, res) {
   // get all the fields the browser sent
@@ -141,3 +142,4 @@ app.post("/signup", async function (req, res) {
   // 201 = Created — account was successfully created
   res.sendStatus(201);
 });
+
