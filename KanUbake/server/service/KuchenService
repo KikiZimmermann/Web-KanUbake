@@ -1,0 +1,93 @@
+const KuchenRepository = require("../repositories/KuchenRepository");
+const authenticateToken = require("../middleware/authenticateToken");
+const db = require("../db/db");
+const express = require("express"); // web server framework
+
+const kuchenRepository = new KuchenRepository(db);
+
+function insertCake(app) {
+    app.post("/insert/cake", authenticateToken, async (req, res) => {
+    try {
+        const kuchen = req.body;
+
+        if (!kuchen) {
+        return res.status(400).json({
+            error: "kuchen ist erforderlich",
+        });
+        }
+
+        const result = await kuchenRepository.createKuchen(
+            JSON.stringify(kuchen),
+            req.user
+        );
+
+        res.status(201).json({
+            success: true,
+            message: "Kuchen erfolgreich erstellt",
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            error: "Fehler beim Erstellen des Kuchens",
+        });
+    }
+    });
+}
+
+function getCake(app) {
+    app.get("/get/cake", authenticateToken, async (req, res) => {
+        try {
+            const data = await kuchenRepository.findAllKuchen(req.user);
+            res.json(data);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({
+                error: "Fehler beim Abrufen des Kuchens",
+            });
+        }
+    });
+}
+
+
+function deleteCake(app) {
+    app.delete("/delete/kuchen/:id", authenticateToken, async (req, res) => {
+        try {
+            await kuchenRepository.deleteKuchen(req.params.id, req.user);
+            res.json({ success: true });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({
+                error: "Fehler beim Löschen des Kuchens",
+            });
+        }    
+    });
+}
+
+function updateCake(app) {
+    app.put("/update/kuchen/:id", authenticateToken, async (req, res) => {
+        try {
+        const kuchen = req.body;
+
+        if (!kuchen) {
+            return res.status(400).json({
+                error: "kuchen ist erforderlich",
+            });
+        }
+
+        await kuchenRepository.updateKuchen(
+            req.params.id,
+            kuchen,
+            req.user
+        );
+        res.json({ success: true });
+
+        } catch (err) {
+            console.error(err);
+        res.status(500).json({
+            error: "Fehler beim Updaten des Kuchens",
+        });
+    }
+    });
+}
+
+module.exports = { insertCake, getCake, deleteCake, updateCake };
