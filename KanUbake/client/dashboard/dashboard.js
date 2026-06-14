@@ -35,11 +35,10 @@ function renderCakes(cakes) {
     cakes.forEach(cake => {
         const article = document.createElement("article");
         article.className = "showcase";
-
         article.innerHTML = `
             <div class="introduction">
-                <h3>${cake.title}</h3>
-                <p>Last Updated: ${cake.updated_at || "unknown"}</p>
+                <h3>${cake.data.displayName}</h3>
+                <p>Last Updated: ${cake.updated_at || "noch nicht angegeben"}</p>
                 <button>View / Edit</button>
                 <button>Delete</button>
             </div>
