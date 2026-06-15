@@ -1,104 +1,111 @@
 <!doctype html>
 
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Questionnaire</title>
+    <link rel="stylesheet" href="questionnaire.css" />
+    <link rel="stylesheet" href="../authBtn.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="../fetchWithAuth.js"></script>
+    <script src="../authBtn.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+    <script type="module" src="questionnaire.js" defer></script>
+    <link rel="icon" type="image/png" href="/img/logos/icon.png" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <title>Questionnaire</title>
-  <link rel="stylesheet" href="questionnaire.css" />
-  <link rel="stylesheet" href="../authBtn.css" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="../fetchWithAuth.js"></script>
-  <script src="../authBtn.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
-  <script type="module" src="questionnaire.js" defer></script>
-  <link rel="icon" type="image/png" href="/img/logos/icon.png">
-</head>
+  <body>
+    <div id="header"></div>
+    <script src="../fixedLayout/header.js"></script>
+    <script>
+      window.pageTitle = "Questionaire";
+    </script>
 
-<body>
+    <nav id="nav"></nav>
+    <script src="../fixedLayout/nav.js"></script>
 
-  <div id="header"></div>
-  <script src="../fixedLayout/header.js"></script>
-  <script>
-    window.pageTitle = "Questionaire";
-  </script>
+    <main class="questionnaire-page">
+      <section id="startScreen" class="intro-card">
+        <h2>Welcome to the Cake Designer</h2>
 
-  <nav id="nav"></nav>
-  <script src="../fixedLayout/nav.js"></script>
+        <div class="intro-section">
+          <h3>How the Cake Designer works</h3>
+          <p>
+            The Cake Designer guides you through your cake request step by step.
+            You will answer questions about the occasion, number of guests, cake
+            shape, flavour, decoration and other important details.
+          </p>
+          <p>
+            The questionnaire adapts to your selections and only shows options
+            that are relevant to your cake. It also helps identify combinations
+            that may not work well together and takes allergies, dietary
+            restrictions and other special requirements into account.
+          </p>
+          <p>
+            You do not need to know every detail yet. If you are unsure, you can
+            choose “I’m not sure yet – please advise” and continue.
+          </p>
+          <p>
+            At the end, you will receive a summary of your choices, a suitable
+            cake size recommendation and an estimated price range. The final
+            result may vary depending on design complexity, ingredients,
+            availability and special requests.
+          </p>
+        </div>
 
-  <main class="questionnaire-page">
-    <section id="startScreen" class="intro-card">
-      <h2>Welcome to the Cake Designer</h2>
-      <p>
-        This form helps you describe your cake idea step by step. You do not
-        need to know every detail. If you are unsure, you can choose “I’m not
-        sure yet – please advise”.
-      </p>
-      <p>
-        The cake size estimation is based on common cake serving charts and
-        public cake size calculators. These sources show that the number of
-        servings depends on cake shape, diameter, slice size and number of
-        tiers. The pricing calculation is based on common custom cake pricing
-        logic: ingredient costs, labor, overhead, complexity, delivery and
-        profit margin. For the prototype, these factors are simplified into
-        configurable pricing rules.
-      </p>
-
-      <button id="startQuestionnaireButton" type="button">
-        Start questionnaire
-      </button>
-    </section>
-
-    <section id="wizardScreen" class="questionnaire-card hidden">
-      <div class="progress-container" aria-label="Questionnaire progress">
-        <button class="progress-step active" type="button" data-chapter="0">
-          1. Basic
+        <button id="startQuestionnaireButton" type="button">
+          Start questionnaire
         </button>
-        <button class="progress-step" type="button" data-chapter="1">
-          2. Flavor
-        </button>
-        <button class="progress-step" type="button" data-chapter="2">
-          3. Design
-        </button>
-        <button class="progress-step" type="button" data-chapter="3">
-          4. References
-        </button>
-        <button class="progress-step" type="button" data-chapter="4">
-          5. Summary
-        </button>
-      </div>
-
-      <section id="chapterIntro" class="chapter-intro">
-        <!-- JavaScript will render the chapter-specific intro here -->
       </section>
 
-      <form id="questionnaireForm">
-        <section id="chapterContainer" class="chapter-container">
-          <!-- JavaScript will render the current chapter here -->
+      <section id="wizardScreen" class="questionnaire-card hidden">
+        <div class="progress-container" aria-label="Questionnaire progress">
+          <button class="progress-step active" type="button" data-chapter="0">
+            1. Basic
+          </button>
+          <button class="progress-step" type="button" data-chapter="1">
+            2. Flavor
+          </button>
+          <button class="progress-step" type="button" data-chapter="2">
+            3. Design
+          </button>
+          <button class="progress-step" type="button" data-chapter="3">
+            4. References
+          </button>
+          <button class="progress-step" type="button" data-chapter="4">
+            5. Summary
+          </button>
+        </div>
+
+        <section id="chapterIntro" class="chapter-intro">
+          <!-- JavaScript will render the chapter-specific intro here -->
         </section>
 
-        <div class="form-navigation">
-          <button id="cancelButton" type="button">Cancel</button>
+        <form id="questionnaireForm">
+          <section id="chapterContainer" class="chapter-container">
+            <!-- JavaScript will render the current chapter here -->
+          </section>
 
-          <div class="form-navigation-right">
-            <button id="backButton" type="button">Back</button>
-            <button id="saveButton" type="button">Save draft</button>
-            <button id="nextButton" type="button">Next</button>
+          <div class="form-navigation">
+            <button id="cancelButton" type="button">Cancel</button>
+
+            <div class="form-navigation-right">
+              <button id="backButton" type="button">Back</button>
+              <button id="saveButton" type="button">Save draft</button>
+              <button id="nextButton" type="button">Next</button>
+            </div>
           </div>
-        </div>
-      </form>
-    </section>
-  </main>
+        </form>
+      </section>
+    </main>
 
+    <div id="footer"></div>
+    <script src="../fixedLayout/footer.js"></script>
 
-  <div id="footer"></div>
-  <script src="../fixedLayout/footer.js"></script>
-
-  <dialog id="logoutDialog">
-    <p>Are you sure you want to log out?</p>
-    <button id="confirmLogout">Yes, Log Out</button>
-    <button id="cancelLogout">Cancel</button>
-  </dialog>
-</body>
-
+    <dialog id="logoutDialog">
+      <p>Are you sure you want to log out?</p>
+      <button id="confirmLogout">Yes, Log Out</button>
+      <button id="cancelLogout">Cancel</button>
+    </dialog>
+  </body>
 </html>
