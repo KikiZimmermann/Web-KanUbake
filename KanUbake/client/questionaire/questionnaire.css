@@ -83,6 +83,22 @@ main {
   color: #5f3526;
 }
 
+.progress-step:disabled {
+  opacity: 0.45;
+
+  background-color: #eeeeee;
+  color: #8f7a7a;
+
+  border-color: #b8aaaa;
+
+  cursor: not-allowed;
+}
+
+.progress-step:disabled:hover {
+  background-color: #eeeeee;
+  color: #8f7a7a;
+}
+
 /* ── General Form fields ── */
 
 .form-field {

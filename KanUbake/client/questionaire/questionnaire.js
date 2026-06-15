@@ -44,6 +44,34 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const summaryBuilder = new SummaryBuilder();
     let validationErrorsActive = false;
+    let maxUnlockedChapter = 0;
+
+    function updateQuestionnaireNavigation() {
+        const currentChapterIndex = state.getCurrentChapterIndex();
+        const referencesChapterIndex = state.getChapterCount() - 2;
+
+        progressButtons.forEach((button) => {
+            const chapterIndex = Number(button.dataset.chapter);
+            const isLocked = chapterIndex > maxUnlockedChapter;
+
+            button.disabled = isLocked;
+            button.classList.toggle(
+                "active",
+                chapterIndex === currentChapterIndex
+            );
+        });
+
+        if (currentChapterIndex === referencesChapterIndex) {
+            nextButton.textContent = "Finish";
+        } else {
+            nextButton.textContent = "Next";
+        }
+    }
+
+    function renderQuestionnaire() {
+        renderer.render();
+        updateQuestionnaireNavigation();
+    }
 
     async function loadSavedCakeRequestIfPresent() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -64,7 +92,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             startScreen.classList.add("hidden");
             wizardScreen.classList.remove("hidden");
 
-            renderer.render();
+            renderQuestionnaire();
 
             return true;
         } catch (error) {
@@ -196,7 +224,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         startScreen.classList.add("hidden");
         wizardScreen.classList.remove("hidden");
 
-        renderer.render();
+        renderQuestionnaire();
     });
 
     backButton.addEventListener("click", () => {
@@ -204,7 +232,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         clearValidationErrors();
 
         state.goToPreviousChapter();
-        renderer.render();
+        renderQuestionnaire();
     });
 
     nextButton.addEventListener("click", () => {
@@ -220,8 +248,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         validationErrorsActive = false;
 
+        if (state.isLastChapter()) {
+            return;
+        }
+
         const nextChapterIndex = state.getCurrentChapterIndex() + 1;
-        const isMovingToSummary = nextChapterIndex === state.getChapterCount() - 1;
+        const isMovingToSummary =
+            nextChapterIndex === state.getChapterCount() - 1;
+
+        /*
+          Das nächste Kapitel wird erst freigeschaltet,
+          nachdem das aktuelle Kapitel erfolgreich validiert wurde.
+        */
+        maxUnlockedChapter = Math.max(
+            maxUnlockedChapter,
+            nextChapterIndex
+        );
 
         if (isMovingToSummary) {
             const cakeRequest = state.getCakeRequest();
@@ -230,12 +272,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             draftStorageService.saveDraft(cakeRequest);
         }
 
-        if (state.isLastChapter()) {
-            return;
-        }
-
         state.goToNextChapter();
-        renderer.render();
+        renderQuestionnaire();
     });
 
     saveButton.addEventListener("click", () => {
@@ -251,7 +289,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         console.log("Draft saved:", savedDraft);
 
-        if(!token) {
+        if (!token) {
             alert("Log in to save it to your account.");
         }
         else if (savedDraft.status === "draft_complete") {
@@ -314,6 +352,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             clearValidationErrors();
 
             state.resetRequest();
+            maxUnlockedChapter = 0;
+
+            updateQuestionnaireNavigation();
+
             wizardScreen.classList.add("hidden");
             startScreen.classList.remove("hidden");
         }
@@ -321,15 +363,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     progressButtons.forEach((button) => {
         button.addEventListener("click", () => {
+            const chapterIndex = Number(button.dataset.chapter);
+
+            if (chapterIndex > maxUnlockedChapter) {
+                return;
+            }
+
             validationErrorsActive = false;
             clearValidationErrors();
 
-            const chapterIndex = Number(button.dataset.chapter);
-
             state.goToChapter(chapterIndex);
-            renderer.render();
+            renderQuestionnaire();
         });
     });
 
+    updateQuestionnaireNavigation();
     await loadSavedCakeRequestIfPresent();
 });
