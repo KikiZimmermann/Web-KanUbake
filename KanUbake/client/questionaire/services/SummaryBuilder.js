@@ -11,10 +11,11 @@
 */
 
 import { questionnaireOptions } from "../data/questionnaireOptions.js";
+import { QuestionnaireCompatibilityService } from "./QuestionnaireCompatibilityService.js";
 
 export class SummaryBuilder {
-    buildSummary(cakeRequest) {
-        return [
+    buildSummary(cakeRequest, allergenAnalysis = null) {
+        const sections = [
             {
                 title: "Basic Information & Size",
                 items: [
@@ -105,6 +106,59 @@ export class SummaryBuilder {
                 ].filter(Boolean)
             }
         ];
+
+        const compatibilitySection =
+            this.createCompatibilitySummarySection(
+                cakeRequest,
+                allergenAnalysis
+            );
+
+        if (compatibilitySection) {
+            sections.push(compatibilitySection);
+        }
+
+        return sections;
+    }
+
+    createCompatibilitySummarySection(cakeRequest, allergenAnalysis) {
+        const messages = [];
+
+        const localWarnings =
+            QuestionnaireCompatibilityService.getRequestWarnings(
+                cakeRequest
+            );
+
+        localWarnings.forEach((warning) => {
+            if (warning?.message) {
+                messages.push(warning.message);
+            }
+        });
+
+        const apiWarnings =
+            Array.isArray(allergenAnalysis?.warnings)
+                ? allergenAnalysis.warnings
+                : [];
+
+        apiWarnings.forEach((warning) => {
+            if (warning?.message) {
+                messages.push(warning.message);
+            }
+        });
+
+        const uniqueMessages = [...new Set(messages)];
+
+        if (uniqueMessages.length === 0) {
+            return null;
+        }
+
+        return {
+            title: "Compatibility & Allergy Notes",
+            items: uniqueMessages.map((message) => ({
+                label: "Important Note",
+                value: message,
+                type: "warning"
+            }))
+        };
     }
 
     createColorSummaryItem(cakeRequest) {

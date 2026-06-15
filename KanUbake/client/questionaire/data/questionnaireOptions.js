@@ -24,7 +24,6 @@ export const questionnaireOptions = {
         { value: "themed_cake", label: "Themed Cake" },
         { value: "naked_cake", label: "Naked Cake" },
         { value: "semi_naked_cake", label: "Semi-Naked Cake" },
-        { value: "cupcakes_mini", label: "Cupcakes / Mini Cakes" },
         { value: "unsure", label: "Not Sure Yet" }
     ],
 
@@ -167,7 +166,6 @@ export const questionnaireOptions = {
         { value: "cream_cheese", label: "Cream Cheese Frosting" },
         { value: "naked_semi_naked", label: "Naked / Semi-Naked" },
         { value: "fruit_glaze", label: "Fruit Glaze" },
-        { value: "fresh_fruit", label: "Fresh Fruit Topping" },
         { value: "unsure_advise", label: "I’m Not Sure Yet – Please Advise" },
         { value: "other", label: "Other Option" }
     ],
@@ -251,7 +249,7 @@ export const questionnaireOptions = {
         { value: "sugar_flowers", label: "Sugar Flowers" },
         { value: "figurines", label: "Figurines / Modelling" },
         { value: "drip", label: "Drip" },
-        { value: "fruits", label: "Fruits" },
+        { value: "fruits", label: "Fresh Fruit Decoration / Topping" },
         { value: "macarons", label: "Macarons" },
         { value: "sprinkles", label: "Sprinkles" },
         { value: "pearls", label: "Pearls" },

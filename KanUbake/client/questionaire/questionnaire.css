@@ -476,6 +476,35 @@ select option:disabled {
   border-radius: 8px;
 }
 
+/* ── Summary Warnings ── */
+
+.summary-row--warning {
+  background-color: #fff3cd;
+  border: 1px solid #d6aa20;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.summary-row--warning dt {
+  color: #765700;
+  font-weight: 700;
+}
+
+.summary-warning-value {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+
+  color: #765700;
+  white-space: normal;
+}
+
+.summary-warning-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
 /* ── Summary Color Cards ── */
 
 .summary-color-palette,
@@ -1045,6 +1074,19 @@ select option:disabled {
 
   .reference-details textarea {
     width: 100%;
+  }
+
+  .compatibility-warning-list {
+    margin-left: 0;
+  }
+
+  .compatibility-warning,
+  .compatibility-conflict {
+    grid-column: 1;
+  }
+
+  .compatibility-tooltip {
+    max-width: 220px;
   }
 }
 

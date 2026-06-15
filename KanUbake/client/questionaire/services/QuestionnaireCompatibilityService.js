@@ -236,12 +236,34 @@ export class QuestionnaireCompatibilityService {
         return this.createAllowedState();
     }
 
+    static hasNakedStyle(cakeRequest) {
+        return (
+            ["naked_cake", "semi_naked_cake"].includes(
+                cakeRequest.cakeType
+            ) ||
+            cakeRequest.covering === "naked_semi_naked"
+        );
+    }
+
     static getDecorationState(cakeRequest, optionValue) {
         const cakeType = cakeRequest.cakeType;
         const covering = cakeRequest.covering;
 
+        const hasNakedStyle =
+            this.hasNakedStyle(cakeRequest);
+
+        const moistCoverings = [
+            "whipped_cream",
+            "mascarpone_cream",
+            "cream_cheese",
+            "fruit_glaze"
+        ];
+
+        /*
+          Ruffles need a fully covered surface.
+        */
         if (
-            ["naked_cake", "semi_naked_cake"].includes(cakeType) &&
+            hasNakedStyle &&
             optionValue === "ruffles"
         ) {
             return this.createDisabledState(
@@ -249,8 +271,14 @@ export class QuestionnaireCompatibilityService {
             );
         }
 
+        /*
+          Edible prints need a smooth and relatively dry surface.
+        */
         if (
-            ["naked_cake", "fruit_cake"].includes(cakeType) &&
+            (
+                hasNakedStyle ||
+                cakeType === "fruit_cake"
+            ) &&
             optionValue === "edible_print"
         ) {
             return this.createDisabledState(
@@ -258,14 +286,9 @@ export class QuestionnaireCompatibilityService {
             );
         }
 
-        const moistCoverings = [
-            "whipped_cream",
-            "mascarpone_cream",
-            "cream_cheese",
-            "fruit_glaze",
-            "fresh_fruit"
-        ];
-
+        /*
+          Wafer paper is sensitive to moisture.
+        */
         if (
             moistCoverings.includes(covering) &&
             optionValue === "wafer_paper"
@@ -275,6 +298,9 @@ export class QuestionnaireCompatibilityService {
             );
         }
 
+        /*
+          Edible prints are also unsuitable on moist coverings.
+        */
         if (
             moistCoverings.includes(covering) &&
             optionValue === "edible_print"
@@ -284,6 +310,9 @@ export class QuestionnaireCompatibilityService {
             );
         }
 
+        /*
+          Some decorations on fresh fruit cakes need suitable placement.
+        */
         if (
             cakeType === "fruit_cake" &&
             [
@@ -299,6 +328,9 @@ export class QuestionnaireCompatibilityService {
             );
         }
 
+        /*
+          Fresh fruit may damage fondant through moisture.
+        */
         if (
             covering === "fondant" &&
             optionValue === "fruits"
@@ -308,12 +340,15 @@ export class QuestionnaireCompatibilityService {
             );
         }
 
+        /*
+          A bow may work as a topper, but not necessarily on the sides.
+        */
         if (
-            cakeType === "naked_cake" &&
+            hasNakedStyle &&
             optionValue === "bow"
         ) {
             return this.createWarningState(
-                "A bow used as a topper may be possible, but a bow attached to the sides usually requires a covered surface. Please discuss the placement with the bakery."
+                "A bow used as a topper may be possible, but a bow attached to the sides usually requires a fully covered surface. Please discuss the placement with the bakery."
             );
         }
 
@@ -336,6 +371,7 @@ export class QuestionnaireCompatibilityService {
 
         if (
             cakeRequest.covering === "fondant" &&
+            Array.isArray(cakeRequest.decorations) &&
             cakeRequest.decorations.includes("fruits")
         ) {
             warnings.push({
@@ -399,7 +435,8 @@ export class QuestionnaireCompatibilityService {
         return [
             "whipped_cream",
             "mascarpone_cream",
-            "cream_cheese"
+            "cream_cheese",
+            "naked_semi_naked"
         ].includes(cakeRequest.covering);
     }
 
@@ -433,11 +470,103 @@ export class QuestionnaireCompatibilityService {
         return cakeRequest.tierFlavors;
     }
 
+    static getApiRestrictionWarnings(cakeRequest, allergens) {
+        const warnings = [];
+
+        if (
+            this.hasRestriction(cakeRequest, "nut_free") &&
+            allergens.includes("nuts")
+        ) {
+            warnings.push({
+                restriction: "nut_free",
+                allergen: "nuts",
+                message:
+                    "The current cake selection may contain nuts and conflicts with the selected nut-free requirement."
+            });
+        }
+
+        if (
+            this.hasRestriction(cakeRequest, "egg_free") &&
+            allergens.includes("egg")
+        ) {
+            warnings.push({
+                restriction: "egg_free",
+                allergen: "egg",
+                message:
+                    "The current cake selection may contain egg and conflicts with the selected egg-free requirement."
+            });
+        }
+
+        if (
+            this.hasRestriction(cakeRequest, "gluten_free") &&
+            allergens.includes("gluten")
+        ) {
+            warnings.push({
+                restriction: "gluten_free",
+                allergen: "gluten",
+                message:
+                    "The current cake selection may contain gluten. A gluten-free recipe must be confirmed with the bakery."
+            });
+        }
+
+        if (
+            this.hasRestriction(cakeRequest, "lactose_free") &&
+            allergens.includes("milk")
+        ) {
+            warnings.push({
+                restriction: "lactose_free",
+                allergen: "milk",
+                message:
+                    "The current cake selection may contain milk. Whether it can be prepared lactose-free must be confirmed with the bakery."
+            });
+        }
+
+        if (
+            this.hasRestriction(cakeRequest, "vegan") &&
+            allergens.includes("egg")
+        ) {
+            warnings.push({
+                restriction: "vegan",
+                allergen: "egg",
+                message:
+                    "The current cake selection may contain egg and may not be suitable for a vegan request."
+            });
+        }
+
+        if (
+            this.hasRestriction(cakeRequest, "vegan") &&
+            allergens.includes("milk")
+        ) {
+            warnings.push({
+                restriction: "vegan",
+                allergen: "milk",
+                message:
+                    "The current cake selection may contain dairy and may not be suitable for a vegan request."
+            });
+        }
+
+        return warnings;
+    }
+
     static async analyzeAllergens(cakeRequest) {
         try {
-            return await CakeRequestApiService.nutrientsCakeRequest(
-                cakeRequest
-            );
+            const result =
+                await CakeRequestApiService.nutrientsCakeRequest(
+                    cakeRequest
+                );
+
+            const allergens = Array.isArray(result.allergens)
+                ? result.allergens
+                : [];
+
+            return {
+                allergens,
+                warnings: this.getApiRestrictionWarnings(
+                    cakeRequest,
+                    allergens
+                ),
+                error: false
+            };
         } catch (error) {
             console.error(
                 "The cake request allergens could not be analyzed:",
@@ -446,6 +575,7 @@ export class QuestionnaireCompatibilityService {
 
             return {
                 allergens: [],
+                warnings: [],
                 error: true
             };
         }

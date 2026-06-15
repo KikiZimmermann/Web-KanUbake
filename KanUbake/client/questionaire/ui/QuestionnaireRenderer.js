@@ -264,44 +264,110 @@ export class QuestionnaireRenderer {
     this.attachFlavorChapterEvents();
   }
 
+  prepareSculptedCakeDesign(request) {
+    if (request.shape !== "sculpted_3d") {
+      return;
+    }
+
+    request.covering = "fondant";
+
+    request.designStyle = "";
+    request.themeDescription = "";
+
+    request.colorMode = "";
+    request.colorTheme = "";
+    request.colors = [];
+    request.paletteBaseColor = null;
+    request.paletteColors = [];
+
+    request.decorations = [];
+    request.textDetails = null;
+    request.numberAgeDetails = null;
+    request.candleDetails = null;
+    request.cakeTopperDetails = null;
+    request.figurineDetails = null;
+    request.ediblePrintDescription = "";
+    request.otherDecorationDescription = "";
+
+    if (request.fondantLayer === "marmalade") {
+      request.fondantLayer = "";
+      request.fondantMarmaladeFlavor = "";
+      request.fondantOtherMarmaladeFlavor = "";
+    }
+  }
+
   renderDesignChapter() {
     const request = this.state.getCakeRequest();
 
+    this.prepareSculptedCakeDesign(request);
     this.prepareFondantLayerDetails();
 
-    this.chapterContainerElement.innerHTML = `
+    if (request.shape === "sculpted_3d") {
+      this.chapterContainerElement.innerHTML = `
       <div class="chapter-content">
 
-        ${this.createSelectField(
+        <div class="conditional-section">
+          <h3>Individual 3D / Sculpted Cake Design</h3>
+
+          <p class="field-hint">
+            Sculpted and 3D cakes require an individual consultation.
+            The final shape, internal structure, covering and decorations
+            depend on the requested design.
+          </p>
+
+          <p class="field-hint">
+            Fondant is used as the outer covering for this cake type.
+            Please choose a stable layer underneath the fondant.
+          </p>
+
+          ${this.createFondantLayerField(request)}
+
+          <p class="field-hint">
+            Please add reference images and describe the requested design
+            in the References chapter.
+          </p>
+        </div>
+
+      </div>
+    `;
+
+      this.attachDesignChapterEvents();
+      return;
+    }
+
+    this.chapterContainerElement.innerHTML = `
+    <div class="chapter-content">
+
+      ${this.createSelectField(
       "covering",
       "What covering or outer frosting would you like?",
       questionnaireOptions.coverings,
       request.covering,
     )}
 
-        ${this.createCoveringDetailsField(request)}
+      ${this.createCoveringDetailsField(request)}
 
-        ${this.createFondantLayerField(request)}
+      ${this.createFondantLayerField(request)}
 
-        ${this.createSelectField(
+      ${this.createSelectField(
       "designStyle",
       "What design style do you like?",
       questionnaireOptions.designStyles,
       request.designStyle,
     )}
 
-        ${this.createThemeDescriptionField(request)}
+      ${this.createThemeDescriptionField(request)}
 
-        ${this.createSelectField(
+      ${this.createSelectField(
       "colorMode",
       "What colors would you like for the cake?",
       questionnaireOptions.colorModes,
       request.colorMode,
     )}
 
-        ${this.createColorDetailsField(request)}
+      ${this.createColorDetailsField(request)}
 
-        ${this.createCheckboxGroup(
+      ${this.createCheckboxGroup(
       "decorations",
       "Which extras or decorations would you like?",
       questionnaireOptions.decorations,
@@ -309,24 +375,18 @@ export class QuestionnaireRenderer {
       "If you do not select anything, no extras will be added. Multiple selections are possible.",
     )}
 
-        ${this.createCompatibilityWarnings(request)}
+      ${this.createCompatibilityWarnings(request)}
 
-        ${this.createTextDetailsField(request)}
+      ${this.createTextDetailsField(request)}
+      ${this.createNumberAgeDetailsField(request)}
+      ${this.createCandleDetailsField(request)}
+      ${this.createCakeTopperDetailsField(request)}
+      ${this.createFigurineDetailsField(request)}
+      ${this.createEdiblePrintDetailsField(request)}
+      ${this.createOtherDecorationDetailsField(request)}
 
-        ${this.createNumberAgeDetailsField(request)}
-
-        ${this.createCandleDetailsField(request)}
-
-        ${this.createCakeTopperDetailsField(request)}
-
-        ${this.createFigurineDetailsField(request)}
-
-        ${this.createEdiblePrintDetailsField(request)}
-
-        ${this.createOtherDecorationDetailsField(request)}
-
-      </div>
-    `;
+    </div>
+  `;
 
     this.attachDesignChapterEvents();
 
@@ -334,7 +394,10 @@ export class QuestionnaireRenderer {
       "colorSelectorContainer",
     );
 
-    this.colorSelector.mount(colorSelectorContainer, request.colorMode);
+    this.colorSelector.mount(
+      colorSelectorContainer,
+      request.colorMode,
+    );
   }
 
   renderReferencesChapter() {
@@ -1698,13 +1761,6 @@ ${this.createOtherTextField(
             ? "disabled"
             : "";
 
-        const titleAttribute =
-          compatibilityState.message
-            ? `title="${this.escapeHtmlAttribute(
-              compatibilityState.message
-            )}"`
-            : "";
-
         let optionLabel = option.label;
 
         if (compatibilityState.disabled) {
@@ -1718,7 +1774,6 @@ ${this.createOtherTextField(
           value="${option.value}"
           ${selected}
           ${disabledAttribute}
-          ${titleAttribute}
           data-compatibility-disabled="${compatibilityState.disabled}"
           data-compatibility-warning="${compatibilityState.warning}"
           data-compatibility-message="${this.escapeHtmlAttribute(
@@ -1829,10 +1884,6 @@ ${this.createOtherTextField(
                 message: ""
               };
 
-          /*
-            A previously selected incompatible checkbox stays
-            enabled so the user can remove the selection.
-          */
           const shouldDisable =
             compatibilityState.disabled &&
             !checked;
@@ -1845,13 +1896,6 @@ ${this.createOtherTextField(
           const disabledAttribute =
             shouldDisable
               ? "disabled"
-              : "";
-
-          const titleAttribute =
-            compatibilityState.message
-              ? `title="${this.escapeHtmlAttribute(
-                compatibilityState.message
-              )}"`
               : "";
 
           const compatibilityClass =
@@ -1882,7 +1926,6 @@ ${this.createOtherTextField(
                   ${compatibilityClass}
                   ${selectedConflictClass}
                 "
-                ${titleAttribute}
               >
                 <input
                   type="checkbox"
@@ -1900,13 +1943,13 @@ ${this.createOtherTextField(
 
                 ${compatibilityState.warning
               ? `
-                    <span
-                      class="compatibility-warning-icon"
-                      aria-hidden="true"
-                    >
-                      ⚠
-                    </span>
-                  `
+                      <span
+                        class="compatibility-warning-icon"
+                        aria-hidden="true"
+                      >
+                        ⚠
+                      </span>
+                    `
               : ""
             }
 
@@ -1919,10 +1962,10 @@ ${this.createOtherTextField(
 
       ${hintText
         ? `
-          <p class="field-hint">
-            ${hintText}
-          </p>
-        `
+            <p class="field-hint">
+              ${hintText}
+            </p>
+          `
         : ""
       }
     </div>
@@ -2946,47 +2989,82 @@ ${this.createOtherTextField(
   async renderSummary() {
     const cakeRequest = this.state.getCakeRequest();
 
-    const summarySections = this.summaryBuilder.buildSummary(cakeRequest);
-    this.summaryRenderer.render(summarySections);
+    const initialSummarySections =
+      this.summaryBuilder.buildSummary(cakeRequest);
 
-    const priceEstimateRequested = cakeRequest.budgetMode === "show_estimate";
-
-    const automaticPricingUnavailable =
-      cakeRequest.shape === "sculpted_3d" || cakeRequest.shape === "other";
-
-    if (priceEstimateRequested) {
-      if (automaticPricingUnavailable) {
-        this.summaryRenderer.renderPricingUnavailable();
-      } else {
-        this.summaryRenderer.renderPricingLoading();
-
-        PricingApiService.estimatePrice(cakeRequest)
-          .then((pricingResult) => {
-            this.summaryRenderer.renderPricingResult(pricingResult);
-          })
-          .catch((error) => {
-            console.error("Pricing estimate failed:", error);
-            this.summaryRenderer.renderPricingError();
-          });
-      }
-    }
-
+    this.summaryRenderer.render(initialSummarySections);
     this.summaryRenderer.renderAnalysisLoading();
 
-    Promise.all([
-      CakeRequestApiService.nutrientsCakeRequest(cakeRequest),
-      CakeRequestApiService.analyzeCakeRequest(cakeRequest),
-    ])
-      .then(([allergensResult, nutrientsResult]) => {
-        this.summaryRenderer.renderAnalysisResults(
-          allergensResult.allergens,
-          nutrientsResult.analysis,
+    try {
+      const [allergenAnalysis, nutrientsResult] =
+        await Promise.all([
+          QuestionnaireCompatibilityService.analyzeAllergens(
+            cakeRequest
+          ),
+          CakeRequestApiService.analyzeCakeRequest(
+            cakeRequest
+          ),
+        ]);
+
+      const updatedSummarySections =
+        this.summaryBuilder.buildSummary(
+          cakeRequest,
+          allergenAnalysis
         );
-      })
-      .catch((error) => {
-        console.error("Cake analysis failed:", error);
-        this.summaryRenderer.renderAnalysisError();
-      });
+
+      /*
+        render() replaces the complete summary.
+        Therefore, the analysis section is recreated afterwards.
+      */
+      this.summaryRenderer.render(updatedSummarySections);
+      this.summaryRenderer.renderAnalysisLoading();
+
+      this.summaryRenderer.renderAnalysisResults(
+        allergenAnalysis.allergens,
+        nutrientsResult.analysis
+      );
+    } catch (error) {
+      console.error(
+        "Cake analysis failed:",
+        error
+      );
+
+      this.summaryRenderer.renderAnalysisError();
+    }
+
+    const priceEstimateRequested =
+      cakeRequest.budgetMode === "show_estimate";
+
+    if (!priceEstimateRequested) {
+      return;
+    }
+
+    const automaticPricingUnavailable =
+      cakeRequest.shape === "sculpted_3d" ||
+      cakeRequest.shape === "other";
+
+    if (automaticPricingUnavailable) {
+      this.summaryRenderer.renderPricingUnavailable();
+      return;
+    }
+
+    this.summaryRenderer.renderPricingLoading();
+
+    try {
+      const pricingResult =
+        await PricingApiService.estimatePrice(cakeRequest);
+
+      this.summaryRenderer.renderPricingResult(
+        pricingResult
+      );
+    } catch (error) {
+      console.error(
+        "Pricing estimate failed:",
+        error
+      );
+
+      this.summaryRenderer.renderPricingError();
+    }
   }
 
   renderNavigationButtons() {

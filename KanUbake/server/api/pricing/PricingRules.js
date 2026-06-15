@@ -23,13 +23,6 @@ const pricingRules = {
         themed_cake: 8.5,
         naked_cake: 7.5,
         semi_naked_cake: 7.8,
-
-        /*
-          Cupcakes and mini cakes are not calculated per cake portion.
-          They need a separate quantity-based logic later.
-        */
-        cupcakes_mini: null,
-
         unsure: 8.0
     },
 

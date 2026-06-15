@@ -51,13 +51,6 @@ class PricingValidator {
             errors.push("Decorations must be an array.");
         }
 
-        if (requestData.cakeType === "cupcakes_mini") {
-            consultationRequired = true;
-            messages.push(
-                "Cupcakes and mini cakes require a separate quantity-based estimate."
-            );
-        }
-
         if (requestData.shape === "sculpted_3d") {
             consultationRequired = true;
             messages.push(

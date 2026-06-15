@@ -87,15 +87,34 @@ export class SummaryRenderer {
         const row = document.createElement("div");
         row.classList.add("summary-row");
 
+        if (item.type === "warning") {
+            row.classList.add("summary-row--warning");
+        }
+
         const label = document.createElement("dt");
         label.textContent = item.label;
 
         const value = document.createElement("dd");
 
         if (item.type === "color-list") {
-            value.append(this.createColorList(item.colors));
+            value.append(
+                this.createColorList(item.colors)
+            );
         } else if (item.type === "color-palette") {
-            value.append(this.createColorPalette(item));
+            value.append(
+                this.createColorPalette(item)
+            );
+        } else if (item.type === "warning") {
+            const warningIcon = document.createElement("span");
+            warningIcon.classList.add("summary-warning-icon");
+            warningIcon.setAttribute("aria-hidden", "true");
+            warningIcon.textContent = "⚠";
+
+            const warningText = document.createElement("span");
+            warningText.textContent = item.value ?? "";
+
+            value.classList.add("summary-warning-value");
+            value.append(warningIcon, warningText);
         } else {
             value.textContent = item.value ?? "";
             value.style.whiteSpace = "pre-line";
